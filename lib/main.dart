@@ -1,6 +1,7 @@
 import 'package:bindu_decor/Clients.dart';
 import 'package:bindu_decor/Home_Page.dart';
 import 'package:bindu_decor/Wal_Flo_Car.dart';
+import 'package:bindu_decor/bl_gl_ar.dart';
 import 'package:flutter/material.dart';
 
 import 'About.dart';
@@ -28,7 +29,10 @@ class MyApp extends StatelessWidget {
         AppRoutes.clients: (context) => const Clients(),
         AppRoutes.wallpapers : (context) => const Wallpapers(),
         AppRoutes.floorings : (context) => const Floorings(),
-        AppRoutes.carpets : (context) => const Carpets()
+        AppRoutes.carpets : (context) => const Carpets(),
+        AppRoutes.blinds: (context) => const Blinds(),
+        AppRoutes.glassfilms: (context) => const GlassFilms(),
+        AppRoutes.artificialturfs: (context) => const ArtificialTurfs()
       },
     );
   }

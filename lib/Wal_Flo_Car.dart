@@ -871,7 +871,8 @@ class _CarpetAnimatedSectionState extends State<CarpetAnimatedSection>
   late Animation<Offset> _leftSlideAnimation;
   late Animation<Offset> _rightSlideAnimation;
 
-  final List<CarpetItem> _carpets = const [
+  final List<CarpetItem> _carpets = const
+  [
     CarpetItem(
       title: "Royal Hand-Tufted Plush",
       imgurl: "assets/wal_flo_car/car1.png",

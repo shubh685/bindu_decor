@@ -18,8 +18,8 @@ class AppRoutes {
   static const String wallpapers = '/shop/wallpapers';
   static const String floorings = '/shop/floorings';
   static const String carpets = '/shop/carpets';
-  static const String blinds = '/shop/blinds';
-  static const String glassfilms = '/shop/glassfilms';
+  static const String blinds = '/shop/Blinds';
+  static const String glassfilms = '/shop/Glassfilms';
   static const String artificialturfs = '/shop/artificialturfs';
   static const String gymfloorings = '/shop/gymfloorings';
   static const String awnings = '/shop/awnings';
