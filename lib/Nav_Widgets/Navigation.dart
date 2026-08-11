@@ -2,6 +2,7 @@ import 'package:bindu_decor/Home_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 // ==========================================
 // NAVIGATION DATA MODELS
@@ -415,18 +416,22 @@ class _BinduFooterState extends State<BinduFooter>
   late Animation<Offset> _emailAnim;
   late Animation<Offset> _workingHoursAnim;
 
+  // Track if the animation has already been triggered
+  bool _hasAnimated = false;
+
   @override
   void initState() {
     super.initState();
 
+    // Duration normalized to 1 second for a smooth staggered reveal
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 15),
+      duration: const Duration(milliseconds: 1000),
     );
 
     // 1. Logo & Title (Top -> Bottom)
     _logoAnim = Tween<Offset>(
-      begin: const Offset(0.0, -1.0),
+      begin: const Offset(0.0, -0.5),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
@@ -435,7 +440,7 @@ class _BinduFooterState extends State<BinduFooter>
 
     // 2. Address (Left -> Right)
     _addressAnim = Tween<Offset>(
-      begin: const Offset(-1.0, 0.0),
+      begin: const Offset(-0.5, 0.0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
@@ -444,7 +449,7 @@ class _BinduFooterState extends State<BinduFooter>
 
     // 3. Phone (Left -> Right)
     _phoneAnim = Tween<Offset>(
-      begin: const Offset(-1.0, 0.0),
+      begin: const Offset(-0.5, 0.0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
@@ -453,7 +458,7 @@ class _BinduFooterState extends State<BinduFooter>
 
     // 4. Email (Left -> Right)
     _emailAnim = Tween<Offset>(
-      begin: const Offset(-1.0, 0.0),
+      begin: const Offset(-0.5, 0.0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
@@ -462,14 +467,14 @@ class _BinduFooterState extends State<BinduFooter>
 
     // 5. Working Hours (Right -> Left)
     _workingHoursAnim = Tween<Offset>(
-      begin: const Offset(1.0, 0.0),
+      begin: const Offset(0.5, 0.0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: const Interval(0.65, 1.0, curve: Curves.easeOut),
     ));
 
-    _controller.forward();
+    // Note: _controller.forward() removed from here so it waits for scroll visibility
   }
 
   @override
@@ -511,36 +516,46 @@ class _BinduFooterState extends State<BinduFooter>
     const String emailText = "info@bindudecor.com";
     const String phoneText = "+91 9930098219 / 2228905344 / 28930959";
 
-    return Container(
-      width: double.infinity,
-      color: const Color(0xFF276B5A),
-      padding: EdgeInsets.symmetric(
-        vertical: 40.0,
-        horizontal: isDesktop ? 60.0 : 24.0,
-      ),
-      child: isDesktop
-          ? Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(flex: 2, child: _buildLogoSection()),
-          const SizedBox(width: 20),
-          Expanded(
-            flex: 4,
-            child: _buildContactSection(addressText, emailText, phoneText),
-          ),
-          const SizedBox(width: 20),
-          Expanded(flex: 3, child: _buildRightSection()),
-        ],
-      )
-          : Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildLogoSection(),
-          const SizedBox(height: 30),
-          _buildContactSection(addressText, emailText, phoneText),
-          const SizedBox(height: 30),
-          _buildRightSection(),
-        ],
+    return VisibilityDetector(
+      key: const Key('bindu_footer_visibility'),
+      onVisibilityChanged: (info) {
+        // Trigger animation when at least 10% of the footer is scrolled into view
+        if (info.visibleFraction > 0.1 && !_hasAnimated) {
+          _hasAnimated = true;
+          _controller.forward();
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        color: const Color(0xFF276B5A),
+        padding: EdgeInsets.symmetric(
+          vertical: 40.0,
+          horizontal: isDesktop ? 60.0 : 24.0,
+        ),
+        child: isDesktop
+            ? Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(flex: 2, child: _buildLogoSection()),
+            const SizedBox(width: 20),
+            Expanded(
+              flex: 4,
+              child: _buildContactSection(addressText, emailText, phoneText),
+            ),
+            const SizedBox(width: 20),
+            Expanded(flex: 3, child: _buildRightSection()),
+          ],
+        )
+            : Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildLogoSection(),
+            const SizedBox(height: 30),
+            _buildContactSection(addressText, emailText, phoneText),
+            const SizedBox(height: 30),
+            _buildRightSection(),
+          ],
+        ),
       ),
     );
   }
@@ -596,7 +611,15 @@ class _BinduFooterState extends State<BinduFooter>
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text("CONTACT DETAILS", style: GoogleFonts.cabin(color: const Color(0xFFD4B16A), fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        Text(
+          "CONTACT DETAILS",
+          style: GoogleFonts.cabin(
+            color: const Color(0xFFD4B16A),
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
+          ),
+        ),
         const SizedBox(height: 16),
         SlideTransition(
           position: _addressAnim,
@@ -643,7 +666,15 @@ class _BinduFooterState extends State<BinduFooter>
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(phone, style: GoogleFonts.cabin(color: Colors.white, fontSize: 15, decoration: TextDecoration.underline, decorationColor: Colors.white54)),
+                  child: Text(
+                    phone,
+                    style: GoogleFonts.cabin(
+                      color: Colors.white,
+                      fontSize: 15,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.white54,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -663,7 +694,15 @@ class _BinduFooterState extends State<BinduFooter>
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(email, style: GoogleFonts.cabin(color: Colors.white, fontSize: 15, decoration: TextDecoration.underline, decorationColor: Colors.white54)),
+                  child: Text(
+                    email,
+                    style: GoogleFonts.cabin(
+                      color: Colors.white,
+                      fontSize: 15,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.white54,
+                    ),
+                  ),
                 ),
               ],
             ),

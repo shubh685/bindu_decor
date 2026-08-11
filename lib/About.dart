@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 import 'package:bindu_decor/Nav_Widgets/Navigation.dart';
 import 'Home_Page.dart';
 
@@ -75,8 +76,6 @@ class _AboutState extends State<About> {
 
   void _handleNavigation(String route) {
     if (route.startsWith('http')) {
-      // Handle external URLs like Google Reviews
-      // Example: launchUrl(Uri.parse(route));
       return;
     }
 
@@ -377,7 +376,7 @@ class _TimelineViewState extends State<TimelineView> {
 }
 
 // ==========================================
-// MISSION & VISION (ANIMATED: 18 SECONDS)
+// MISSION & VISION (SCROLL ANIMATED)
 // ==========================================
 
 class MissionVisionAnimatedSection extends StatefulWidget {
@@ -393,12 +392,13 @@ class _MissionVisionAnimatedSectionState extends State<MissionVisionAnimatedSect
   late AnimationController _controller;
   late Animation<Offset> _leftSlideAnimation;
   late Animation<Offset> _rightSlideAnimation;
+  bool _hasAnimated = false;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 18),
+      duration: const Duration(milliseconds: 900),
       vsync: this,
     );
 
@@ -417,8 +417,6 @@ class _MissionVisionAnimatedSectionState extends State<MissionVisionAnimatedSect
     ).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
     );
-
-    _controller.forward();
   }
 
   @override
@@ -450,8 +448,16 @@ class _MissionVisionAnimatedSectionState extends State<MissionVisionAnimatedSect
       ),
     );
 
-    if (isDesktop) {
-      return Padding(
+    return VisibilityDetector(
+      key: const Key('mission_vision_visibility_key'),
+      onVisibilityChanged: (info) {
+        if (info.visibleFraction > 0.15 && !_hasAnimated) {
+          _hasAnimated = true;
+          _controller.forward();
+        }
+      },
+      child: isDesktop
+          ? Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child: IntrinsicHeight(
           child: Row(
@@ -462,9 +468,8 @@ class _MissionVisionAnimatedSectionState extends State<MissionVisionAnimatedSect
             ],
           ),
         ),
-      );
-    } else {
-      return SizedBox(
+      )
+          : SizedBox(
         height: 280,
         child: ListView(
           scrollDirection: Axis.horizontal,
@@ -475,8 +480,8 @@ class _MissionVisionAnimatedSectionState extends State<MissionVisionAnimatedSect
             SizedBox(width: screenWidth * 0.82, child: visionCard),
           ],
         ),
-      );
-    }
+      ),
+    );
   }
 
   Widget _buildMiViCard({required String title, required String description}) {
@@ -524,7 +529,7 @@ class _MissionVisionAnimatedSectionState extends State<MissionVisionAnimatedSect
 }
 
 // ==========================================
-// MEET TEAM (ANIMATED: 18 SECONDS)
+// MEET TEAM (SCROLL ANIMATED)
 // ==========================================
 
 class TeamMember {
@@ -554,6 +559,7 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
   late AnimationController _controller;
   late Animation<Offset> _leftSlideAnimation;
   late Animation<Offset> _rightSlideAnimation;
+  bool _hasAnimated = false;
 
   final List<TeamMember> teamMembers = const [
     TeamMember(
@@ -583,11 +589,11 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 18),
+      duration: const Duration(milliseconds: 900),
       vsync: this,
     );
 
-    // 1st Card: Slide from Left (-1.0 to 0.0)
+    // Left direction animation for Rajesh Chitalia & Dinesh Chitalia
     _leftSlideAnimation = Tween<Offset>(
       begin: const Offset(-1.0, 0.0),
       end: Offset.zero,
@@ -595,15 +601,13 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
       CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
     );
 
-    // 2nd & 3rd Card: Slide from Right (1.0 to 0.0)
+    // Right direction animation for Venisha Chitalia
     _rightSlideAnimation = Tween<Offset>(
       begin: const Offset(1.0, 0.0),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
     );
-
-    _controller.forward();
   }
 
   @override
@@ -618,7 +622,7 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
     final bool isDesktop = screenWidth >= 900;
 
     final List<Widget> cards = [
-      // 1st Card - Slide from Left
+      // Rajesh Chitalia Card - Left Direction
       SlideTransition(
         position: _leftSlideAnimation,
         child: _teamCard(
@@ -628,9 +632,9 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
           imageUrl: teamMembers[0].imageUrl,
         ),
       ),
-      // 2nd Card - Slide from Right
+      // Dinesh Chitalia Card - Left Direction
       SlideTransition(
-        position: _rightSlideAnimation,
+        position: _leftSlideAnimation,
         child: _teamCard(
           tit: teamMembers[1].name,
           role: teamMembers[1].role,
@@ -638,7 +642,7 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
           imageUrl: teamMembers[1].imageUrl,
         ),
       ),
-      // 3rd Card - Slide from Right
+      // Venisha Chitalia Card - Right Direction
       SlideTransition(
         position: _rightSlideAnimation,
         child: _teamCard(
@@ -650,47 +654,56 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
       ),
     ];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text("Meet Our Team", style: GoogleFonts.cabin(fontSize: isDesktop ? 32 : 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
-        const SizedBox(height: 6),
-        Container(
-          height: 3,
-          width: 50,
-          decoration: BoxDecoration(
-            color: const Color(0xFFC89D52),
-            borderRadius: BorderRadius.circular(2),
+    return VisibilityDetector(
+      key: const Key('meet_team_visibility_key'),
+      onVisibilityChanged: (info) {
+        if (info.visibleFraction > 0.15 && !_hasAnimated) {
+          _hasAnimated = true;
+          _controller.forward();
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text("Meet Our Team", style: GoogleFonts.cabin(fontSize: isDesktop ? 32 : 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
+          const SizedBox(height: 6),
+          Container(
+            height: 3,
+            width: 50,
+            decoration: BoxDecoration(
+              color: const Color(0xFFC89D52),
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-        ),
-        const SizedBox(height: 24),
-        if (isDesktop)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: cards.map((card) => Expanded(child: card)).toList(),
+          const SizedBox(height: 24),
+          if (isDesktop)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: cards.map((card) => Expanded(child: card)).toList(),
+                ),
+              ),
+            )
+          else
+            SizedBox(
+              height: 380,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: cards.length,
+                separatorBuilder: (context, index) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  return SizedBox(
+                    width: screenWidth * 0.70,
+                    child: cards[index],
+                  );
+                },
               ),
             ),
-          )
-        else
-          SizedBox(
-            height: 380,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: cards.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                return SizedBox(
-                  width: screenWidth * 0.70,
-                  child: cards[index],
-                );
-              },
-            ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 

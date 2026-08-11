@@ -3,6 +3,7 @@ import 'package:bindu_decor/Nav_Widgets/Navigation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 // ==========================================
 // NAVIGATION ROUTES
@@ -40,13 +41,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // Navigation Configuration
   final List<NavItem> _navItems = const [
     NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
     NavItem(label: "About", route: AppRoutes.about, icon: CupertinoIcons.info_circle),
     NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.person_alt_circle),
     NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart),
-    NavItem(label: "Reviews", icon: Icons.reviews_outlined, route:"https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D"),
+    NavItem(
+      label: "Reviews",
+      icon: Icons.reviews_outlined,
+      route: "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
+    ),
   ];
 
   final List<NestedMenuItem> _shopItems = const [
@@ -71,7 +75,6 @@ class _HomePageState extends State<HomePage> {
 
   void _handleNavigation(String route) {
     if (route.startsWith('http')) {
-      // Handle external URLs like Google Reviews
       return;
     }
 
@@ -80,7 +83,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -88,11 +90,10 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
-        // ✅ CORRECT
         child: BinduNavigationBar(
           navItems: _navItems,
           shopItems: _shopItems,
-          onMenuItemTap: () => _handleNavigation, // Passing function tear-off reference
+          onMenuItemTap: () => _handleNavigation,
         ),
       ),
       drawer: isDesktop
@@ -293,57 +294,18 @@ class _ExploreByCategorySectionState extends State<ExploreByCategorySection> {
   int _currentPage = 0;
 
   final List<CategoryItem> _categories = const [
-    CategoryItem(
-      title: "Wallpapers",
-      imageUrl: "assets/images/wallpapers.png",
-      route: AppRoutes.wallpapers,
-    ),
-    CategoryItem(
-      title: "Floorings",
-      imageUrl: "assets/images/floorings.png",
-      route: AppRoutes.floorings,
-    ),
-    CategoryItem(
-      title: "Carpets",
-      imageUrl: "assets/images/carpets.png",
-      route: AppRoutes.carpets,
-    ),
-    CategoryItem(
-      title: "Blinds",
-      imageUrl: "assets/images/blinds.png",
-    ),
-    CategoryItem(
-      title: "Glass Films",
-      imageUrl: "assets/images/glass-films.png",
-    ),
-    CategoryItem(
-      title: "Artificial Turfs",
-      imageUrl: "assets/images/arti-turfs.png",
-    ),
-    CategoryItem(
-      title: "Gym Floorings",
-      imageUrl: "assets/images/gym_floor.png",
-    ),
-    CategoryItem(
-      title: "Awnings",
-      imageUrl: "assets/images/awnings.png",
-    ),
-    CategoryItem(
-      title: "Mosquito Nets",
-      imageUrl: "assets/images/mos_net.png",
-    ),
-    CategoryItem(
-      title: "Upholstery",
-      imageUrl: "assets/images/upholstery.png",
-    ),
-    CategoryItem(
-      title: "Curtains",
-      imageUrl: "assets/images/curtains.png",
-    ),
-    CategoryItem(
-      title: "Stretch Ceiling",
-      imageUrl: "assets/images/str_ceil.png",
-    ),
+    CategoryItem(title: "Wallpapers", imageUrl: "assets/images/wallpapers.png", route: AppRoutes.wallpapers),
+    CategoryItem(title: "Floorings", imageUrl: "assets/images/floorings.png", route: AppRoutes.floorings),
+    CategoryItem(title: "Carpets", imageUrl: "assets/images/carpets.png", route: AppRoutes.carpets),
+    CategoryItem(title: "Blinds", imageUrl: "assets/images/blinds.png"),
+    CategoryItem(title: "Glass Films", imageUrl: "assets/images/glass-films.png"),
+    CategoryItem(title: "Artificial Turfs", imageUrl: "assets/images/arti-turfs.png"),
+    CategoryItem(title: "Gym Floorings", imageUrl: "assets/images/gym_floor.png"),
+    CategoryItem(title: "Awnings", imageUrl: "assets/images/awnings.png"),
+    CategoryItem(title: "Mosquito Nets", imageUrl: "assets/images/mos_net.png"),
+    CategoryItem(title: "Upholstery", imageUrl: "assets/images/upholstery.png"),
+    CategoryItem(title: "Curtains", imageUrl: "assets/images/curtains.png"),
+    CategoryItem(title: "Stretch Ceiling", imageUrl: "assets/images/str_ceil.png"),
   ];
 
   @override
@@ -435,8 +397,7 @@ class _ExploreByCategorySectionState extends State<ExploreByCategorySection> {
                 final int endIndex = (startIndex + itemsPerPage < _categories.length)
                     ? startIndex + itemsPerPage
                     : _categories.length;
-                final List<CategoryItem> pageItems =
-                _categories.sublist(startIndex, endIndex);
+                final List<CategoryItem> pageItems = _categories.sublist(startIndex, endIndex);
 
                 return Row(
                   children: pageItems.map((category) {
@@ -475,9 +436,7 @@ class _ExploreByCategorySectionState extends State<ExploreByCategorySection> {
                   height: 10,
                   width: isActive ? 24 : 10,
                   decoration: BoxDecoration(
-                    color: isActive
-                        ? const Color(0xFF3B9A82)
-                        : const Color(0xFF3B9A82).withOpacity(0.25),
+                    color: isActive ? const Color(0xFF3B9A82) : const Color(0xFF3B9A82).withOpacity(0.25),
                     borderRadius: BorderRadius.circular(5),
                   ),
                 ),
@@ -570,7 +529,7 @@ class _CategoryCard extends StatelessWidget {
 }
 
 // ==========================================
-// OUR DETAILS SECTION (With Animated Counters)
+// OUR DETAILS SECTION (With Scroll Animation Trigger)
 // ==========================================
 
 class FeatureItem {
@@ -587,8 +546,13 @@ class FeatureItem {
 
 class AnimatedHighlightTile extends StatefulWidget {
   final FeatureItem item;
+  final bool startAnimation;
 
-  const AnimatedHighlightTile({super.key, required this.item});
+  const AnimatedHighlightTile({
+    super.key,
+    required this.item,
+    required this.startAnimation,
+  });
 
   @override
   State<AnimatedHighlightTile> createState() => _AnimatedHighlightTileState();
@@ -603,7 +567,7 @@ class _AnimatedHighlightTileState extends State<AnimatedHighlightTile>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 2), // Normalized to standard 2 seconds
       vsync: this,
     );
 
@@ -612,7 +576,17 @@ class _AnimatedHighlightTileState extends State<AnimatedHighlightTile>
       end: widget.item.targetValue,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
-    _controller.forward();
+    if (widget.startAnimation) {
+      _controller.forward();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant AnimatedHighlightTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.startAnimation && !_controller.isAnimating && !_controller.isCompleted) {
+      _controller.forward();
+    }
   }
 
   @override
@@ -622,7 +596,6 @@ class _AnimatedHighlightTileState extends State<AnimatedHighlightTile>
   }
 
   String _formatNumber(int value) {
-    // Adds comma formatting for values like 20,000 or 27,000
     return value.toString().replaceAllMapped(
         RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
   }
@@ -669,10 +642,6 @@ class _AnimatedHighlightTileState extends State<AnimatedHighlightTile>
   }
 }
 
-// ==========================================
-// OUR DETAILS SECTION WITH NUMBER ANIMATION
-// ==========================================
-
 class OurDetails extends StatefulWidget {
   const OurDetails({super.key});
 
@@ -684,6 +653,7 @@ class _OurDetailsState extends State<OurDetails> {
   late final PageController _page;
   Timer? timer;
   int _curPage = 0;
+  bool _isVisible = false;
 
   final List<FeatureItem> highlights = const [
     FeatureItem(targetValue: 40, suffix: "+", subtitle: "Years in the industry"),
@@ -741,94 +711,104 @@ class _OurDetailsState extends State<OurDetails> {
     final int itemsPerPage = _getItemsPerPage(screenWidth);
     final int totalPages = (highlights.length / itemsPerPage).ceil();
 
-    return Container(
-      width: double.infinity,
-      color: const Color(0xFF276B5A),
-      padding: const EdgeInsets.symmetric(vertical: 36.0, horizontal: 16.0),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 65,
-            child: PageView.builder(
-              controller: _page,
-              itemCount: totalPages,
-              onPageChanged: (int index) {
-                setState(() {
-                  _curPage = index;
-                });
-              },
-              itemBuilder: (context, pageIndex) {
-                final int startIndex = pageIndex * itemsPerPage;
-                final int endIndex = (startIndex + itemsPerPage < highlights.length)
-                    ? startIndex + itemsPerPage
-                    : highlights.length;
-                final List<FeatureItem> pageItems =
-                highlights.sublist(startIndex, endIndex);
+    return VisibilityDetector(
+      key: const Key('our_details_visibility'),
+      onVisibilityChanged: (info) {
+        if (info.visibleFraction > 0.2 && !_isVisible) {
+          setState(() {
+            _isVisible = true;
+          });
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        color: const Color(0xFF276B5A),
+        padding: const EdgeInsets.symmetric(vertical: 36.0, horizontal: 16.0),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 65,
+              child: PageView.builder(
+                controller: _page,
+                itemCount: totalPages,
+                onPageChanged: (int index) {
+                  setState(() {
+                    _curPage = index;
+                  });
+                },
+                itemBuilder: (context, pageIndex) {
+                  final int startIndex = pageIndex * itemsPerPage;
+                  final int endIndex = (startIndex + itemsPerPage < highlights.length)
+                      ? startIndex + itemsPerPage
+                      : highlights.length;
+                  final List<FeatureItem> pageItems = highlights.sublist(startIndex, endIndex);
 
-                return Row(
-                  children: List.generate(pageItems.length, (index) {
-                    final item = pageItems[index];
-                    final bool isLastInRow = index == pageItems.length - 1;
+                  return Row(
+                    children: List.generate(pageItems.length, (index) {
+                      final item = pageItems[index];
+                      final bool isLastInRow = index == pageItems.length - 1;
 
-                    return Expanded(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: AnimatedHighlightTile(
-                              key: ValueKey(item.subtitle),
-                              item: item,
+                      return Expanded(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: AnimatedHighlightTile(
+                                key: ValueKey(item.subtitle),
+                                item: item,
+                                startAnimation: _isVisible,
+                              ),
                             ),
-                          ),
-                          if (!isLastInRow && itemsPerPage > 1)
-                            Container(
-                              height: 60,
-                              width: 1,
-                              color: Colors.white30,
-                            ),
-                        ],
+                            if (!isLastInRow && itemsPerPage > 1)
+                              Container(
+                                height: 60,
+                                width: 1,
+                                color: Colors.white30,
+                              ),
+                          ],
+                        ),
+                      );
+                    }),
+                  );
+                },
+              ),
+            ),
+            if (totalPages > 1) ...[
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(totalPages, (index) {
+                  final bool isActive = _curPage == index;
+                  return GestureDetector(
+                    onTap: () {
+                      _page.animateToPage(
+                        index,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                      height: 8,
+                      width: isActive ? 24 : 8,
+                      decoration: BoxDecoration(
+                        color: isActive ? const Color(0xFFE91E63) : Colors.white38,
+                        borderRadius: BorderRadius.circular(4),
                       ),
-                    );
-                  }),
-                );
-              },
-            ),
-          ),
-          if (totalPages > 1) ...[
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(totalPages, (index) {
-                final bool isActive = _curPage == index;
-                return GestureDetector(
-                  onTap: () {
-                    _page.animateToPage(
-                      index,
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                    height: 8,
-                    width: isActive ? 24 : 8,
-                    decoration: BoxDecoration(
-                      color: isActive ? const Color(0xFFE91E63) : Colors.white38,
-                      borderRadius: BorderRadius.circular(4),
                     ),
-                  ),
-                );
-              }),
-            ),
+                  );
+                }),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
 }
 
 // ==========================================
-// MORE INFO SECTION (Matches Exact Layout & Slide In)
+// MORE INFO SECTION (Scroll Animation Triggered)
 // ==========================================
 
 class MoreInfo extends StatefulWidget {
@@ -842,6 +822,7 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
   late AnimationController _animController;
   late Animation<Offset> _leftCardSlide;
   late Animation<Offset> _rightImageSlide;
+  bool _hasAnimated = false;
 
   @override
   void initState() {
@@ -849,29 +830,24 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
 
     _animController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 20), // Smooth 2-second slide duration
+      duration: const Duration(milliseconds: 800), // Standard smooth duration
     );
 
-    // Card enters from off-screen left (-1.2 X offset) to its exact stacked position (0.0 Offset)
     _leftCardSlide = Tween<Offset>(
-      begin: const Offset(-5.5, 0.0),
+      begin: const Offset(-0.8, 0.0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _animController,
       curve: Curves.easeOutCubic,
     ));
 
-    // Image enters from off-screen right (+1.2 X offset) to its exact stacked position (0.0 Offset)
     _rightImageSlide = Tween<Offset>(
-      begin: const Offset(1.2, 0.0),
+      begin: const Offset(0.8, 0.0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _animController,
       curve: Curves.easeOutCubic,
     ));
-
-    // Start the entry animation when widget loads
-    _animController.forward();
   }
 
   @override
@@ -885,16 +861,25 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isDesktop = screenWidth >= 900;
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        vertical: 48.0,
-        horizontal: isDesktop ? 48.0 : 16.0,
-      ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1200),
-          child: isDesktop ? _buildDesktopLayout(context) : _buildMobileLayout(context),
+    return VisibilityDetector(
+      key: const Key('more_info_visibility'),
+      onVisibilityChanged: (info) {
+        if (info.visibleFraction > 0.25 && !_hasAnimated) {
+          _hasAnimated = true;
+          _animController.forward();
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(
+          vertical: 48.0,
+          horizontal: isDesktop ? 48.0 : 16.0,
+        ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1200),
+            child: isDesktop ? _buildDesktopLayout(context) : _buildMobileLayout(context),
+          ),
         ),
       ),
     );
@@ -907,7 +892,6 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
         clipBehavior: Clip.none,
         alignment: Alignment.centerLeft,
         children: [
-          // 1. Image Layered on the Right Side
           Positioned(
             right: 0,
             top: 0,
@@ -930,8 +914,6 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
               ),
             ),
           ),
-
-          // 2. About Us Text Card Overlapping on the Left Side (As in Photo)
           Positioned(
             left: 0,
             top: 30,

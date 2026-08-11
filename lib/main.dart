@@ -27,7 +27,8 @@ class MyApp extends StatelessWidget {
         AppRoutes.about: (context) => const About(),
         AppRoutes.clients: (context) => const Clients(),
         AppRoutes.wallpapers : (context) => const Wallpapers(),
-        AppRoutes.floorings : (context) => const Floorings()
+        AppRoutes.floorings : (context) => const Floorings(),
+        AppRoutes.carpets : (context) => const Carpets()
       },
     );
   }

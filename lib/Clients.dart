@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 import 'Home_Page.dart';
 import 'Nav_Widgets/Navigation.dart';
@@ -43,8 +44,6 @@ class _ClientsState extends State<Clients> {
 
   void _handleNavigation(String route) {
     if (route.startsWith('http')) {
-      // Handle external URLs like Google Reviews
-      // Example: launchUrl(Uri.parse(route));
       return;
     }
 
@@ -111,44 +110,33 @@ class _ClientLogoList extends StatefulWidget {
 
 class _ClientLogoListState extends State<_ClientLogoList>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+  late AnimationController _headerController;
   late Animation<Offset> _topToBottomTextAnim;
-  late Animation<Offset> _leftToRightImageAnim;
+  bool _headerAnimated = false;
 
   @override
   void initState() {
     super.initState();
 
-    // Minimum 80 seconds animation running duration
-    _controller = AnimationController(
+    // Standard smooth duration for headers
+    _headerController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 14),
+      duration: const Duration(milliseconds: 700),
     );
 
-    // First 3 texts slide from Top to Down
+    // Headers slide Top to Down when scrolled into view
     _topToBottomTextAnim = Tween<Offset>(
-      begin: const Offset(0.0, -1.5),
+      begin: const Offset(0.0, -1.0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
-      parent: _controller,
+      parent: _headerController,
       curve: Curves.easeOut,
     ));
-
-    // Images slide from Left to Right
-    _leftToRightImageAnim = Tween<Offset>(
-      begin: const Offset(-1.5, 0.0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
-
-    _controller.forward();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _headerController.dispose();
     super.dispose();
   }
 
@@ -196,94 +184,109 @@ class _ClientLogoListState extends State<_ClientLogoList>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // 1. First Text (Top to Bottom Slide)
-          SlideTransition(
-            position: _topToBottomTextAnim,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFF276B5A).withOpacity(0.08),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text("TRUSTED BY INDUSTRY LEADER", style: GoogleFonts.cabin(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0, color: const Color(0xFF276B5A))),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // 2. Second Text (Top to Bottom Slide)
-          SlideTransition(
-            position: _topToBottomTextAnim,
-            child: Text("Our Esteemed Clients", textAlign: TextAlign.center, style: GoogleFonts.cabin(fontSize: screenWidth >= 900 ? 36 : 28, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A), letterSpacing: 0.5)),
-          ),
-          const SizedBox(height: 10),
-
-          // Decorative Gold Line
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                height: 2,
-                width: 24,
-                color: const Color(0xFFC89D52).withOpacity(0.4),
-              ),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 6),
-                height: 4,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFC89D52),
-                  borderRadius: BorderRadius.circular(2),
+          // Header scroll detector
+          VisibilityDetector(
+            key: const Key('header_visibility_key'),
+            onVisibilityChanged: (info) {
+              if (info.visibleFraction > 0.1 && !_headerAnimated) {
+                _headerAnimated = true;
+                _headerController.forward();
+              }
+            },
+            child: Column(
+              children: [
+                // 1. First Text
+                SlideTransition(
+                  position: _topToBottomTextAnim,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF276B5A).withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text("TRUSTED BY INDUSTRY LEADER", style: GoogleFonts.cabin(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0, color: const Color(0xFF276B5A))),
+                  ),
                 ),
-              ),
-              Container(
-                height: 2,
-                width: 24,
-                color: const Color(0xFFC89D52).withOpacity(0.4),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-          // 3. Third Text (Top to Bottom Slide)
-          SlideTransition(
-            position: _topToBottomTextAnim,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Text(
-                "Proudly serving corporate offices, luxury residences, and commercial venues across India.",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.cabin(
-                  fontSize: 15,
-                  color: Colors.black54,
+                // 2. Second Text
+                SlideTransition(
+                  position: _topToBottomTextAnim,
+                  child: Text("Our Esteemed Clients", textAlign: TextAlign.center, style: GoogleFonts.cabin(fontSize: screenWidth >= 900 ? 36 : 28, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A), letterSpacing: 0.5)),
                 ),
-              ),
+                const SizedBox(height: 10),
+
+                // Decorative Gold Line
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 2,
+                      width: 24,
+                      color: const Color(0xFFC89D52).withOpacity(0.4),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 6),
+                      height: 4,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFC89D52),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    Container(
+                      height: 2,
+                      width: 24,
+                      color: const Color(0xFFC89D52).withOpacity(0.4),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // 3. Third Text
+                SlideTransition(
+                  position: _topToBottomTextAnim,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Text(
+                      "Proudly serving corporate offices, luxury residences, and commercial venues across India.",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.cabin(
+                        fontSize: 15,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 40),
 
-          // Client Cards Grid (All images slide from Left side)
-          SlideTransition(
-            position: _leftToRightImageAnim,
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth >= 1200
-                    ? 80.0
-                    : (screenWidth >= 768 ? 36.0 : 16.0),
+          // Client Cards Grid (Each image animates one by one on scroll)
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth >= 1200
+                  ? 80.0
+                  : (screenWidth >= 768 ? 36.0 : 16.0),
+            ),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: teamMembers.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: screenWidth >= 768 ? 24 : 12,
+                mainAxisSpacing: screenWidth >= 768 ? 24 : 12,
+                childAspectRatio: 2.1,
               ),
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: teamMembers.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: screenWidth >= 768 ? 24 : 12,
-                  mainAxisSpacing: screenWidth >= 768 ? 24 : 12,
-                  childAspectRatio: 2.1,
-                ),
-                itemBuilder: (context, index) {
-                  return _AnimatedClientCard(imgUrl: teamMembers[index].imgUrl);
-                },
-              ),
+              itemBuilder: (context, index) {
+                return _AnimatedClientCard(
+                  key: ValueKey("client_card_$index"),
+                  imgUrl: teamMembers[index].imgUrl,
+                  index: index,
+                );
+              },
             ),
           ),
         ],
@@ -294,43 +297,84 @@ class _ClientLogoListState extends State<_ClientLogoList>
 
 class _AnimatedClientCard extends StatefulWidget {
   final String imgUrl;
-  const _AnimatedClientCard({required this.imgUrl});
+  final int index;
+  const _AnimatedClientCard({super.key, required this.imgUrl, required this.index});
 
   @override
   State<_AnimatedClientCard> createState() => _AnimatedClientCardState();
 }
 
-class _AnimatedClientCardState extends State<_AnimatedClientCard> {
+class _AnimatedClientCardState extends State<_AnimatedClientCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _cardController;
+  late Animation<Offset> _leftToRightImageAnim;
   bool isHovered = false;
+  bool _hasAnimated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _cardController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    // Card slides in from left to right as scrolled into view
+    _leftToRightImageAnim = Tween<Offset>(
+      begin: const Offset(-0.8, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _cardController,
+      curve: Curves.easeOutCubic,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _cardController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => isHovered = true),
-      onExit: (_) => setState(() => isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(seconds: 18),
-        curve: Curves.easeOut,
-        transform: isHovered
-            ? (Matrix4.identity()..translate(0, -6, 0))
-            : Matrix4.identity(),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF276B5A), width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: isHovered
-                  ? const Color(0xFF276B5A).withOpacity(0.12)
-                  : Colors.black.withOpacity(0.04),
-              blurRadius: isHovered ? 16 : 8,
-              offset: isHovered ? const Offset(0, 8) : const Offset(0, 2),
+    return VisibilityDetector(
+      key: Key('client_card_visibility_${widget.index}'),
+      onVisibilityChanged: (info) {
+        if (info.visibleFraction > 0.1 && !_hasAnimated) {
+          _hasAnimated = true;
+          _cardController.forward();
+        }
+      },
+      child: SlideTransition(
+        position: _leftToRightImageAnim,
+        child: MouseRegion(
+          onEnter: (_) => setState(() => isHovered = true),
+          onExit: (_) => setState(() => isHovered = false),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOut,
+            transform: isHovered
+                ? (Matrix4.identity()..translate(0, -6, 0))
+                : Matrix4.identity(),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFF276B5A), width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: isHovered
+                      ? const Color(0xFF276B5A).withOpacity(0.12)
+                      : Colors.black.withOpacity(0.04),
+                  blurRadius: isHovered ? 16 : 8,
+                  offset: isHovered ? const Offset(0, 8) : const Offset(0, 2),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Center(
-          child: _buildDynamicImage(widget.imgUrl),
+            child: Center(
+              child: _buildDynamicImage(widget.imgUrl),
+            ),
+          ),
         ),
       ),
     );

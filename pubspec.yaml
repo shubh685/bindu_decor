@@ -36,7 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   google_fonts: ^6.3.2
   url_launcher: ^6.3.2
-
+  visibility_detector: ^0.4.0+2
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -64,6 +64,7 @@ flutter:
     - assets/images/
     - assets/client_logos/
     - assets/wal_flo_car/
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
