@@ -65,6 +65,7 @@ flutter:
     - assets/client_logos/
     - assets/wal_flo_car/
     - assets/bl_gl_ar/
+    - assets/gy_aw_mo/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

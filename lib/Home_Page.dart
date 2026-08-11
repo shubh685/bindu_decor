@@ -18,8 +18,8 @@ class AppRoutes {
   static const String wallpapers = '/shop/wallpapers';
   static const String floorings = '/shop/floorings';
   static const String carpets = '/shop/carpets';
-  static const String blinds = '/shop/Blinds';
-  static const String glassfilms = '/shop/Glassfilms';
+  static const String blinds = '/shop/blinds';
+  static const String glassfilms = '/shop/glassfilms';
   static const String artificialturfs = '/shop/artificialturfs';
   static const String gymfloorings = '/shop/gymfloorings';
   static const String awnings = '/shop/awnings';
@@ -297,15 +297,15 @@ class _ExploreByCategorySectionState extends State<ExploreByCategorySection> {
     CategoryItem(title: "Wallpapers", imageUrl: "assets/images/wallpapers.png", route: AppRoutes.wallpapers),
     CategoryItem(title: "Floorings", imageUrl: "assets/images/floorings.png", route: AppRoutes.floorings),
     CategoryItem(title: "Carpets", imageUrl: "assets/images/carpets.png", route: AppRoutes.carpets),
-    CategoryItem(title: "Blinds", imageUrl: "assets/images/blinds.png"),
-    CategoryItem(title: "Glass Films", imageUrl: "assets/images/glass-films.png"),
-    CategoryItem(title: "Artificial Turfs", imageUrl: "assets/images/arti-turfs.png"),
-    CategoryItem(title: "Gym Floorings", imageUrl: "assets/images/gym_floor.png"),
-    CategoryItem(title: "Awnings", imageUrl: "assets/images/awnings.png"),
-    CategoryItem(title: "Mosquito Nets", imageUrl: "assets/images/mos_net.png"),
-    CategoryItem(title: "Upholstery", imageUrl: "assets/images/upholstery.png"),
-    CategoryItem(title: "Curtains", imageUrl: "assets/images/curtains.png"),
-    CategoryItem(title: "Stretch Ceiling", imageUrl: "assets/images/str_ceil.png"),
+    CategoryItem(title: "Blinds", imageUrl: "assets/images/blinds.png", route: AppRoutes.blinds),
+    CategoryItem(title: "Glass Films", imageUrl: "assets/images/glass-films.png", route: AppRoutes.glassfilms),
+    CategoryItem(title: "Artificial Turfs", imageUrl: "assets/images/arti-turfs.png", route: AppRoutes.artificialturfs),
+    CategoryItem(title: "Gym Floorings", imageUrl: "assets/images/gym_floor.png", route: AppRoutes.gymfloorings),
+    CategoryItem(title: "Awnings", imageUrl: "assets/images/awnings.png", route: AppRoutes.awnings),
+    CategoryItem(title: "Mosquito Nets", imageUrl: "assets/images/mos_net.png", route: AppRoutes.mosquitoNets),
+    CategoryItem(title: "Upholstery", imageUrl: "assets/images/upholstery.png", route: AppRoutes.upholstery),
+    CategoryItem(title: "Curtains", imageUrl: "assets/images/curtains.png", route: AppRoutes.curtains),
+    CategoryItem(title: "Stretch Ceiling", imageUrl: "assets/images/str_ceil.png", route: AppRoutes.stretchCeiling),
   ];
 
   @override

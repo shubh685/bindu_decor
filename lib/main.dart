@@ -1,4 +1,5 @@
 import 'package:bindu_decor/Clients.dart';
+import 'package:bindu_decor/Gy_aw_mo.dart';
 import 'package:bindu_decor/Home_Page.dart';
 import 'package:bindu_decor/Wal_Flo_Car.dart';
 import 'package:bindu_decor/bl_gl_ar.dart';
@@ -32,7 +33,10 @@ class MyApp extends StatelessWidget {
         AppRoutes.carpets : (context) => const Carpets(),
         AppRoutes.blinds: (context) => const Blinds(),
         AppRoutes.glassfilms: (context) => const GlassFilms(),
-        AppRoutes.artificialturfs: (context) => const ArtificialTurfs()
+        AppRoutes.artificialturfs: (context) => const ArtificialTurfs(),
+        AppRoutes.gymfloorings: (context) => const GymFloorings(),
+        AppRoutes.awnings: (context) => const Awnings(),
+        AppRoutes.mosquitoNets: (context) =>  const MosquitoNets()
       },
     );
   }
