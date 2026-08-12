@@ -1,5 +1,6 @@
 import 'package:bindu_decor/Home_Page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -580,27 +581,13 @@ class _BinduFooterState extends State<BinduFooter>
                   border: Border.all(color: Colors.white70, width: 2),
                 ),
                 child: const Center(
-                  child: Text(
-                    "BINDU",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: Text("BINDU", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            "BINDU DECOR",
-            style: GoogleFonts.cabin(
-              color: Colors.white,
-              fontSize: 16,
-              letterSpacing: 2,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          Text("BINDU DECOR", style: GoogleFonts.cabin(color: Colors.white, fontSize: 16, letterSpacing: 2, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -737,4 +724,372 @@ class _BinduFooterState extends State<BinduFooter>
       ),
     );
   }
+}
+
+void showContactFormDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) => _contactForm(context),
+  );
+}
+
+Widget _contactForm(BuildContext context) {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController mobileController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
+
+  // Design type selected from dropdown
+  String selectedDesignType = 'Wallpapers';
+  final List<String> designTypes = [
+    'Wallpapers',
+    'Floorings',
+    'Carpets',
+    'Blinds',
+    'Glass Films',
+    'Artificial Turfs',
+    'Gym Floorings',
+    'Awnings',
+    'Mosquito Nets',
+    'Upholstery',
+    'Curtains',
+    'Stretch Ceiling',
+    'Other / Custom Design',
+  ];
+
+  // Color Palette
+  const Color primaryColor = Color(0xFF276B5A);
+  const Color goldAccent = Color(0xFFC89D52);
+
+  // Helper method to send email via system default email app
+  Future<void> sendInquiryEmail(StateSetter setDialogState) async {
+    if (!formKey.currentState!.validate()) return;
+
+    final String name = nameController.text.trim();
+    final String mobile = mobileController.text.trim();
+    final String userEmail = emailController.text.trim();
+    final String location = locationController.text.trim();
+
+    final String subject = Uri.encodeComponent('New Inquiry: $selectedDesignType from $name');
+    final String body = Uri.encodeComponent(
+      'Hello Bindu Decor Team,\n\n'
+          'I would like to make an inquiry regarding design recommendations for my location.\n\n'
+          'Inquiry Details:\n'
+          '• Name: $name\n'
+          '• Mobile: $mobile\n'
+          '• Email: $userEmail\n'
+          '• Location / City: $location\n'
+          '• Preferred Design Category: $selectedDesignType\n\n'
+          'Please suggest the best design options suitable for my location and preferences.\n\n'
+          'Looking forward to your response.',
+    );
+
+    final Uri emailUri = Uri.parse(
+      'mailto:info@bindudecor.com?subject=$subject&body=$body',
+    );
+
+    try {
+      if (await canLaunchUrl(emailUri)) {
+        await launchUrl(emailUri);
+        if (context.mounted) {
+          Navigator.of(context).pop(); // Close dialog on success
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Opening email client...'),
+              backgroundColor: primaryColor,
+            ),
+          );
+        }
+      } else {
+        throw 'Could not launch email app';
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not open mail client. Please try again.'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    }
+  }
+
+  return Dialog(
+    backgroundColor: Colors.transparent,
+    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+    child: Container(
+      constraints: const BoxConstraints(maxWidth: 480),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setDialogState) {
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header Section
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+                    decoration: const BoxDecoration(
+                      color: primaryColor,
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const SizedBox(width: 24),
+                            const Icon(
+                              Icons.mark_email_read_outlined,
+                              size: 38,
+                              color: Colors.white,
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              icon: const Icon(Icons.close, color: Colors.white70),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Inquiry Form',
+                          style: GoogleFonts.cabin(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Tell us your location & preferred style. Our AI & design experts will recommend tailored solutions for you.',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.cabin(
+                            fontSize: 13,
+                            color: Colors.white.withOpacity(0.85),
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Form Section
+                  Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        children: [
+                          // Full Name Field
+                          TextFormField(
+                            controller: nameController,
+                            textCapitalization: TextCapitalization.words,
+                            style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
+                            decoration: _buildInputDecoration(
+                              label: 'Full Name',
+                              hint: 'Enter your full name',
+                              icon: Icons.person_outline,
+                              primaryColor: primaryColor,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Please enter your name';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Mobile Number Field
+                          TextFormField(
+                            controller: mobileController,
+                            keyboardType: TextInputType.phone,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(10),
+                            ],
+                            style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
+                            decoration: _buildInputDecoration(
+                              label: 'Mobile Number',
+                              hint: 'Enter 10-digit phone number',
+                              icon: Icons.phone_outlined,
+                              primaryColor: primaryColor,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Please enter your mobile number';
+                              }
+                              if (value.trim().length < 10) {
+                                return 'Enter a valid 10-digit phone number';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Email ID Field
+                          TextFormField(
+                            controller: emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
+                            decoration: _buildInputDecoration(
+                              label: 'Email ID',
+                              hint: 'Enter your email address',
+                              icon: Icons.email_outlined,
+                              primaryColor: primaryColor,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Please enter your email';
+                              }
+                              final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                              if (!emailRegex.hasMatch(value.trim())) {
+                                return 'Enter a valid email address';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Location Field
+                          TextFormField(
+                            controller: locationController,
+                            textCapitalization: TextCapitalization.words,
+                            style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
+                            decoration: _buildInputDecoration(
+                              label: 'Your Location / City',
+                              hint: 'e.g., Borivali, Mumbai',
+                              icon: Icons.location_on_outlined,
+                              primaryColor: primaryColor,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Please enter your location';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Design Type Dropdown
+                          DropdownButtonFormField<String>(
+                            value: selectedDesignType,
+                            style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
+                            decoration: _buildInputDecoration(
+                              label: 'Design Type Recommended for Your Location',
+                              hint: 'Select design category',
+                              icon: Icons.design_services_outlined,
+                              primaryColor: primaryColor,
+                            ),
+                            items: designTypes.map((String type) {
+                              return DropdownMenuItem<String>(
+                                value: type,
+                                child: Text(type),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              if (newValue != null) {
+                                setDialogState(() {
+                                  selectedDesignType = newValue;
+                                });
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Submit Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: () => sendInquiryEmail(setDialogState),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: goldAccent,
+                                foregroundColor: Colors.white,
+                                elevation: 2,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Send Inquiry',
+                                    style: GoogleFonts.cabin(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.send_rounded, size: 18),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    ),
+  );
+}
+
+// Reusable Input Decoration Helper
+InputDecoration _buildInputDecoration({
+  required String label,
+  required String hint,
+  required IconData icon,
+  required Color primaryColor,
+}) {
+  return InputDecoration(
+    labelText: label,
+    hintText: hint,
+    labelStyle: GoogleFonts.cabin(color: Colors.black54, fontSize: 13),
+    hintStyle: GoogleFonts.cabin(color: Colors.black38, fontSize: 12),
+    prefixIcon: Icon(icon, color: primaryColor, size: 20),
+    filled: true,
+    fillColor: const Color(0xFFF9FBFB),
+    contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide(color: primaryColor.withOpacity(0.2)),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide(color: primaryColor.withOpacity(0.2)),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide(color: primaryColor, width: 1.5),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: Colors.redAccent),
+    ),
+  );
 }

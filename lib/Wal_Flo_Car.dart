@@ -344,7 +344,7 @@ class _WallpaperCardState extends State<_WallpaperCard> {
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          // Handle Get in Touch action (e.g. Open dialog or redirect to Contact Us)
+                          showContactFormDialog(context);
                         },
                         icon: const Icon(Icons.touch_app_outlined, size: 16, color: Colors.white),
                         label: Text("Get in Touch", style: GoogleFonts.cabin(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
@@ -719,13 +719,9 @@ class _FlooringCardState extends State<_FlooringCard> {
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          // Action for Get in Touch button
+                          showContactFormDialog(context);
                         },
-                        icon: const Icon(
-                          Icons.touch_app_outlined,
-                          size: 16,
-                          color: Colors.white,
-                        ),
+                        icon: const Icon(Icons.touch_app_outlined, size: 16, color: Colors.white),
                         label: Text("Get in Touch", style: GoogleFonts.cabin(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF276B5A),
@@ -1099,13 +1095,10 @@ class _CarpetCardState extends State<_CarpetCard> {
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          // Action for Get in Touch button
+                          showContactFormDialog(context);
                         },
                         icon: const Icon(
-                          Icons.touch_app_outlined,
-                          size: 16,
-                          color: Colors.white,
-                        ),
+                          Icons.touch_app_outlined, size: 16, color: Colors.white),
                         label: Text("Get in Touch", style: GoogleFonts.cabin(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF276B5A),

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:bindu_decor/Nav_Widgets/Navigation.dart';
+import 'package:bindu_decor/Wal_Flo_Car.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -187,19 +188,15 @@ Widget _mainImage(BuildContext context) {
           left: 0,
           right: 0,
           child: Center(
-            child: Container(
-              padding: EdgeInsets.all(buttonPadding),
-              decoration: BoxDecoration(
-                color: const Color(0xFF276B5A),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                "Explore Collection",
-                style: GoogleFonts.cabin(
-                  fontWeight: FontWeight.w500,
-                  fontSize: buttonFontSize,
-                  color: Colors.white,
+            child: InkWell(
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Wallpapers())),
+              child: Container(
+                padding: EdgeInsets.all(buttonPadding),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF276B5A),
+                  borderRadius: BorderRadius.circular(4),
                 ),
+                child: Text("Explore Collection", style: GoogleFonts.cabin(fontWeight: FontWeight.w500, fontSize: buttonFontSize, color: Colors.white)),
               ),
             ),
           ),

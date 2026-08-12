@@ -340,46 +340,18 @@ class _GymFlooringCardState extends State<_GymFlooringCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.item.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.cabin(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF276B5A),
-                      ),
-                    ),
+                    Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 15, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
                     const SizedBox(height: 4),
-                    Text(
-                      widget.item.desc,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.cabin(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xFF555555),
-                        height: 1.3,
-                      ),
-                    ),
+                    Text(widget.item.desc, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 12, fontWeight: FontWeight.w400, color: const Color(0xFF555555), height: 1.3)),
                     const Spacer(),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.touch_app_outlined,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          "Get in Touch",
-                          style: GoogleFonts.cabin(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
+                        onPressed: () {
+                          showContactFormDialog(context);
+                        },
+                        icon: const Icon(Icons.touch_app_outlined, size: 16, color: Colors.white),
+                        label: Text("Get in Touch", style: GoogleFonts.cabin(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF276B5A),
                           foregroundColor: Colors.white,
@@ -737,46 +709,19 @@ class _AwningCardState extends State<_AwningCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.item.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.cabin(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF276B5A),
-                      ),
-                    ),
+                    Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 15, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
                     const SizedBox(height: 4),
-                    Text(
-                      widget.item.desc,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.cabin(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xFF555555),
-                        height: 1.3,
-                      ),
-                    ),
+                    Text(widget.item.desc, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 12, fontWeight: FontWeight.w400, color: const Color(0xFF555555), height: 1.3)),
                     const Spacer(),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          showContactFormDialog(context);
+                        },
                         icon: const Icon(
-                          Icons.touch_app_outlined,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          "Get in Touch",
-                          style: GoogleFonts.cabin(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
+                          Icons.touch_app_outlined, size: 16, color: Colors.white),
+                        label: Text("Get in Touch", style: GoogleFonts.cabin(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF276B5A),
                           foregroundColor: Colors.white,
@@ -1136,46 +1081,18 @@ class _MosquitoNetCardState extends State<_MosquitoNetCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.item.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.cabin(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF276B5A),
-                      ),
-                    ),
+                    Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 15, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
                     const SizedBox(height: 4),
-                    Text(
-                      widget.item.desc,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.cabin(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xFF555555),
-                        height: 1.3,
-                      ),
-                    ),
+                    Text(widget.item.desc, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 12, fontWeight: FontWeight.w400, color: const Color(0xFF555555), height: 1.3)),
                     const Spacer(),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.touch_app_outlined,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          "Get in Touch",
-                          style: GoogleFonts.cabin(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
+                        onPressed: () {
+                          showContactFormDialog(context);
+                        },
+                        icon: const Icon(Icons.touch_app_outlined, size: 16, color: Colors.white),
+                        label: Text("Get in Touch", style: GoogleFonts.cabin(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF276B5A),
                           foregroundColor: Colors.white,
