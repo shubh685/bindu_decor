@@ -1,7 +1,13 @@
+import 'dart:convert';
+
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:bindu_decor/Home_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -238,14 +244,7 @@ class _NavItem extends StatelessWidget {
               Icon(icon, size: 20, color: const Color(0xFF276B5A)),
               const SizedBox(width: 6),
             ],
-            Text(
-              label,
-              style: GoogleFonts.cabin(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF276B5A),
-              ),
-            ),
+            Text(label, style: GoogleFonts.manrope(fontSize: 18, fontWeight: FontWeight.w500, color: const Color(0xFF276B5A))),
           ],
         ),
       ),
@@ -740,7 +739,8 @@ Widget _contactForm(BuildContext context) {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
 
-  // Design type selected from dropdown
+  bool isLoading = false;
+
   String selectedDesignType = 'Wallpapers';
   final List<String> designTypes = [
     'Wallpapers',
@@ -758,57 +758,232 @@ Widget _contactForm(BuildContext context) {
     'Other / Custom Design',
   ];
 
-  // Color Palette
   const Color primaryColor = Color(0xFF276B5A);
   const Color goldAccent = Color(0xFFC89D52);
 
-  // Helper method to send email via system default email app
-  Future<void> sendInquiryEmail(StateSetter setDialogState) async {
+  InputDecoration buildInputDecoration({
+    required String label,
+    required String hint,
+    required IconData icon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      prefixIcon: Icon(icon, color: primaryColor),
+      labelStyle: GoogleFonts.cabin(color: Colors.black87, fontSize: 13),
+      hintStyle: GoogleFonts.cabin(color: Colors.black38, fontSize: 13),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Colors.black26),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Colors.black26),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: primaryColor, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Colors.redAccent),
+      ),
+    );
+  }
+
+  // Submit form via HTTP API Call
+  Future<void> sendInquiryApi(StateSetter setDialogState) async {
     if (!formKey.currentState!.validate()) return;
 
-    final String name = nameController.text.trim();
-    final String mobile = mobileController.text.trim();
-    final String userEmail = emailController.text.trim();
-    final String location = locationController.text.trim();
+    setDialogState(() {
+      isLoading = true;
+    });
 
-    final String subject = Uri.encodeComponent('New Inquiry: $selectedDesignType from $name');
-    final String body = Uri.encodeComponent(
-      'Hello Bindu Decor Team,\n\n'
-          'I would like to make an inquiry regarding design recommendations for my location.\n\n'
-          'Inquiry Details:\n'
-          '• Name: $name\n'
-          '• Mobile: $mobile\n'
-          '• Email: $userEmail\n'
-          '• Location / City: $location\n'
-          '• Preferred Design Category: $selectedDesignType\n\n'
-          'Please suggest the best design options suitable for my location and preferences.\n\n'
-          'Looking forward to your response.',
-    );
+    final String generatedReqId =
+        'BD-${DateTime.now().millisecondsSinceEpoch}';
 
-    final Uri emailUri = Uri.parse(
-      'mailto:info@bindudecor.com?subject=$subject&body=$body',
+    final Uri apiUrl = Uri.parse(
+      'http://192.168.1.10/bindu_decor/send_inquiry.php',
     );
 
     try {
-      if (await canLaunchUrl(emailUri)) {
-        await launchUrl(emailUri);
-        if (context.mounted) {
-          Navigator.of(context).pop(); // Close dialog on success
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Opening email client...'),
-              backgroundColor: primaryColor,
+      final response = await http
+          .post(
+        apiUrl,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          'request_id': generatedReqId,
+          'name': nameController.text.trim(),
+          'mobile': mobileController.text.trim(),
+          'email': emailController.text.trim(),
+          'location': locationController.text.trim(),
+          'design_type': selectedDesignType,
+        }),
+      )
+          .timeout(const Duration(seconds: 30));
+
+      debugPrint('================ INQUIRY API ================');
+      debugPrint('URL: $apiUrl');
+      debugPrint('STATUS: ${response.statusCode}');
+      debugPrint('BODY: ${response.body}');
+      debugPrint('================================================');
+
+      if (!context.mounted) return;
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        setDialogState(() {
+          isLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Server Error ${response.statusCode}: ${response.body}',
             ),
-          );
-        }
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+
+        return;
+      }
+
+      Map<String, dynamic> responseData;
+
+      try {
+        responseData = jsonDecode(response.body);
+      } catch (jsonError) {
+        debugPrint('JSON ERROR: $jsonError');
+        debugPrint('RAW RESPONSE: ${response.body}');
+
+        setDialogState(() {
+          isLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Server returned an invalid response. Check PHP error.',
+            ),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+
+        return;
+      }
+
+      if (responseData['success'] == true) {
+        if (!context.mounted) return;
+
+        Navigator.of(context).pop();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              responseData['message'] ??
+                  'Inquiry submitted successfully!',
+            ),
+            backgroundColor: primaryColor,
+          ),
+        );
       } else {
-        throw 'Could not launch email app';
+        setDialogState(() {
+          isLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              responseData['message'] ??
+                  'Unable to submit inquiry.',
+            ),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } on TimeoutException catch (e) {
+      debugPrint('TIMEOUT ERROR: $e');
+
+      if (!context.mounted) return;
+
+      setDialogState(() {
+        isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Request timed out. Check whether the PHP server is running.',
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } on SocketException catch (e) {
+      debugPrint('SOCKET ERROR: $e');
+
+      if (!context.mounted) return;
+
+      setDialogState(() {
+        isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Cannot connect to PHP server. Check IP address and Apache.',
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } catch (e, stackTrace) {
+      debugPrint('GENERAL ERROR: $e');
+      debugPrint('STACK TRACE: $stackTrace');
+
+      if (!context.mounted) return;
+
+      setDialogState(() {
+        isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Connection Error: $e',
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
+  }
+
+  // Open WhatsApp directly with Price Request Message
+  Future<void> openWhatsApp() async {
+    const String phoneNumber = '919586518360';
+    final String name = nameController.text.trim();
+    final String location = locationController.text.trim();
+
+    String message = 'Hello Bindu Decor Team,\nI would like to ask for the price details regarding *$selectedDesignType*.';
+    if (name.isNotEmpty) message += '\nName: $name';
+    if (location.isNotEmpty) message += '\nLocation: $location';
+
+    final Uri whatsappUri = Uri.parse(
+      'https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}',
+    );
+
+    try {
+      if (await canLaunchUrl(whatsappUri)) {
+        await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch WhatsApp';
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Could not open mail client. Please try again.'),
+            content: Text('Unable to open WhatsApp.'),
             backgroundColor: Colors.redAccent,
           ),
         );
@@ -840,13 +1015,11 @@ Widget _contactForm(BuildContext context) {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Header Section
+                  // Header
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-                    decoration: const BoxDecoration(
-                      color: primaryColor,
-                    ),
+                    decoration: const BoxDecoration(color: primaryColor),
                     child: Column(
                       children: [
                         Row(
@@ -859,7 +1032,7 @@ Widget _contactForm(BuildContext context) {
                               color: Colors.white,
                             ),
                             IconButton(
-                              onPressed: () => Navigator.of(context).pop(),
+                              onPressed: isLoading ? null : () => Navigator.of(context).pop(),
                               icon: const Icon(Icons.close, color: Colors.white70),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
@@ -878,7 +1051,7 @@ Widget _contactForm(BuildContext context) {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Tell us your location & preferred style. Our AI & design experts will recommend tailored solutions for you.',
+                          'Tell us your location & preferred style. Our design experts will recommend tailored solutions for you.',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.cabin(
                             fontSize: 13,
@@ -890,23 +1063,22 @@ Widget _contactForm(BuildContext context) {
                     ),
                   ),
 
-                  // Form Section
+                  // Form
                   Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Form(
                       key: formKey,
                       child: Column(
                         children: [
-                          // Full Name Field
                           TextFormField(
                             controller: nameController,
+                            enabled: !isLoading,
                             textCapitalization: TextCapitalization.words,
                             style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
-                            decoration: _buildInputDecoration(
+                            decoration: buildInputDecoration(
                               label: 'Full Name',
                               hint: 'Enter your full name',
                               icon: Icons.person_outline,
-                              primaryColor: primaryColor,
                             ),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
@@ -916,21 +1088,19 @@ Widget _contactForm(BuildContext context) {
                             },
                           ),
                           const SizedBox(height: 16),
-
-                          // Mobile Number Field
                           TextFormField(
                             controller: mobileController,
+                            enabled: !isLoading,
                             keyboardType: TextInputType.phone,
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                               LengthLimitingTextInputFormatter(10),
                             ],
                             style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
-                            decoration: _buildInputDecoration(
+                            decoration: buildInputDecoration(
                               label: 'Mobile Number',
                               hint: 'Enter 10-digit phone number',
                               icon: Icons.phone_outlined,
-                              primaryColor: primaryColor,
                             ),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
@@ -943,17 +1113,15 @@ Widget _contactForm(BuildContext context) {
                             },
                           ),
                           const SizedBox(height: 16),
-
-                          // Email ID Field
                           TextFormField(
                             controller: emailController,
+                            enabled: !isLoading,
                             keyboardType: TextInputType.emailAddress,
                             style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
-                            decoration: _buildInputDecoration(
+                            decoration: buildInputDecoration(
                               label: 'Email ID',
                               hint: 'Enter your email address',
                               icon: Icons.email_outlined,
-                              primaryColor: primaryColor,
                             ),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
@@ -967,17 +1135,15 @@ Widget _contactForm(BuildContext context) {
                             },
                           ),
                           const SizedBox(height: 16),
-
-                          // Location Field
                           TextFormField(
                             controller: locationController,
+                            enabled: !isLoading,
                             textCapitalization: TextCapitalization.words,
                             style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
-                            decoration: _buildInputDecoration(
+                            decoration: buildInputDecoration(
                               label: 'Your Location / City',
                               hint: 'e.g., Borivali, Mumbai',
                               icon: Icons.location_on_outlined,
-                              primaryColor: primaryColor,
                             ),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
@@ -987,16 +1153,13 @@ Widget _contactForm(BuildContext context) {
                             },
                           ),
                           const SizedBox(height: 16),
-
-                          // Design Type Dropdown
                           DropdownButtonFormField<String>(
                             value: selectedDesignType,
                             style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
-                            decoration: _buildInputDecoration(
-                              label: 'Design Type Recommended for Your Location',
+                            decoration: buildInputDecoration(
+                              label: 'Design Category',
                               hint: 'Select design category',
                               icon: Icons.design_services_outlined,
-                              primaryColor: primaryColor,
                             ),
                             items: designTypes.map((String type) {
                               return DropdownMenuItem<String>(
@@ -1004,7 +1167,9 @@ Widget _contactForm(BuildContext context) {
                                 child: Text(type),
                               );
                             }).toList(),
-                            onChanged: (String? newValue) {
+                            onChanged: isLoading
+                                ? null
+                                : (String? newValue) {
                               if (newValue != null) {
                                 setDialogState(() {
                                   selectedDesignType = newValue;
@@ -1014,36 +1179,87 @@ Widget _contactForm(BuildContext context) {
                           ),
                           const SizedBox(height: 24),
 
-                          // Submit Button
-                          SizedBox(
-                            width: double.infinity,
-                            height: 48,
-                            child: ElevatedButton(
-                              onPressed: () => sendInquiryEmail(setDialogState),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: goldAccent,
-                                foregroundColor: Colors.white,
-                                elevation: 2,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Send Inquiry',
-                                    style: GoogleFonts.cabin(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                          // Actions Row (Send Inquiry & WhatsApp Buttons)
+                          Row(
+                            children: [
+                              // Send Inquiry Button
+                              Expanded(
+                                flex: 3,
+                                child: SizedBox(
+                                  height: 48,
+                                  child: ElevatedButton(
+                                    onPressed: isLoading ? null : () => sendInquiryApi(setDialogState),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: goldAccent,
+                                      foregroundColor: Colors.white,
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: isLoading
+                                        ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                        : Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Send Inquiry',
+                                          style: GoogleFonts.cabin(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        const Icon(Icons.send_rounded, size: 16),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  const Icon(Icons.send_rounded, size: 18),
-                                ],
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: 10),
+
+                              // WhatsApp Button
+                              Expanded(
+                                flex: 2,
+                                child: SizedBox(
+                                  height: 48,
+                                  child: ElevatedButton(
+                                    onPressed: openWhatsApp,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF25D366), // WhatsApp Green
+                                      foregroundColor: Colors.white,
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(Icons.chat_bubble_outline, size: 18),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          'Ask Price',
+                                          style: GoogleFonts.cabin(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -1055,41 +1271,6 @@ Widget _contactForm(BuildContext context) {
           },
         ),
       ),
-    ),
-  );
-}
-
-// Reusable Input Decoration Helper
-InputDecoration _buildInputDecoration({
-  required String label,
-  required String hint,
-  required IconData icon,
-  required Color primaryColor,
-}) {
-  return InputDecoration(
-    labelText: label,
-    hintText: hint,
-    labelStyle: GoogleFonts.cabin(color: Colors.black54, fontSize: 13),
-    hintStyle: GoogleFonts.cabin(color: Colors.black38, fontSize: 12),
-    prefixIcon: Icon(icon, color: primaryColor, size: 20),
-    filled: true,
-    fillColor: const Color(0xFFF9FBFB),
-    contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: primaryColor.withOpacity(0.2)),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: primaryColor.withOpacity(0.2)),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: primaryColor, width: 1.5),
-    ),
-    errorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: const BorderSide(color: Colors.redAccent),
     ),
   );
 }

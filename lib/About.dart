@@ -242,15 +242,7 @@ class _TimelineViewState extends State<TimelineView> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          "Timeline",
-          style: GoogleFonts.cabin(
-            fontSize: isMobile ? 28 : 36,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF276B5A),
-            letterSpacing: 0.5,
-          ),
-        ),
+        Text("Timeline", style: GoogleFonts.cabin(fontSize: isMobile ? 28 : 36, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A), letterSpacing: 0.5)),
         const SizedBox(height: 6),
         Container(
           height: 3,
@@ -262,111 +254,92 @@ class _TimelineViewState extends State<TimelineView> {
         ),
         const SizedBox(height: 30),
         SizedBox(
-          height: isMobile ? 380 : 420,
+          height: isMobile ? 320 : 310,
           child: Listener(
             onPointerDown: (_) => setState(() => _isUserInteracting = true),
             onPointerUp: (_) => setState(() => _isUserInteracting = false),
-            child: Scrollbar(
+            child: ListView.builder(
               controller: _scrollController,
-              thumbVisibility: true,
-              trackVisibility: true,
-              child: ListView.builder(
-                controller: _scrollController,
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                itemCount: events.length,
-                itemBuilder: (context, index) {
-                  final event = events[index];
-                  final isFirst = index == 0;
-                  final isLast = index == events.length - 1;
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              itemCount: events.length,
+              itemBuilder: (context, index) {
+                final event = events[index];
+                final isFirst = index == 0;
+                final isLast = index == events.length - 1;
 
-                  return SizedBox(
-                    width: itemWidth,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Positioned(
-                          top: isMobile ? 80 : 90,
-                          left: isFirst ? itemWidth / 2 : 0,
-                          right: isLast ? itemWidth / 2 : 0,
-                          child: Container(
-                            height: 3,
-                            color: const Color(0xFF276B5A).withOpacity(0.3),
+                return SizedBox(
+                  width: itemWidth,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Positioned(
+                        top: isMobile ? 80 : 90,
+                        left: isFirst ? itemWidth / 2 : 0,
+                        right: isLast ? itemWidth / 2 : 0,
+                        child: Container(
+                          height: 3,
+                          color: const Color(0xFF276B5A).withOpacity(0.3),
+                        ),
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 30),
+                          Container(
+                            width: isMobile ? 90 : 110,
+                            height: isMobile ? 60 : 80,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              gradient: LinearGradient(
+                                colors: event.gradient,
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: event.gradient.first.withOpacity(0.35),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Icon(event.icon, color: Colors.white, size: isMobile ? 28 : 35),
                           ),
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 30),
-                            Container(
-                              width: isMobile ? 90 : 110,
-                              height: isMobile ? 60 : 80,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(24),
-                                gradient: LinearGradient(
-                                  colors: event.gradient,
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: event.gradient.first.withOpacity(0.35),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(event.icon, color: Colors.white, size: isMobile ? 28 : 35),
+                          const SizedBox(height: 20),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 2,
                             ),
-                            const SizedBox(height: 20),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFC89D52).withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                event.year,
-                                style: GoogleFonts.cabin(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFC89D52).withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            const SizedBox(height: 6),
-                            Text(
-                              event.title,
+                            child: Text(event.year, style: GoogleFonts.cabin(fontSize: 14, fontWeight: FontWeight.bold))),
+                          const SizedBox(height: 6),
+                          Text(event.title, style: GoogleFonts.cabin(fontSize: isMobile ? 18 : 22, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              event.description,
+                              textAlign: TextAlign.center,
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.cabin(
-                                fontSize: isMobile ? 18 : 22,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF276B5A),
+                                fontSize: isMobile ? 12 : 14,
+                                color: Colors.black87,
+                                height: 1.4,
                               ),
                             ),
-                            const SizedBox(height: 10),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Text(
-                                event.description,
-                                textAlign: TextAlign.center,
-                                maxLines: 4,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.cabin(
-                                  fontSize: isMobile ? 12 : 14,
-                                  color: Colors.black87,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -470,7 +443,7 @@ class _MissionVisionAnimatedSectionState extends State<MissionVisionAnimatedSect
         ),
       )
           : SizedBox(
-        height: 280,
+        height: 310,
         child: ListView(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 16),

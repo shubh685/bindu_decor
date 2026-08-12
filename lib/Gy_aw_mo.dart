@@ -720,7 +720,7 @@ class _AwningCardState extends State<_AwningCard> {
                           showContactFormDialog(context);
                         },
                         icon: const Icon(
-                          Icons.touch_app_outlined, size: 16, color: Colors.white),
+                            Icons.touch_app_outlined, size: 16, color: Colors.white),
                         label: Text("Get in Touch", style: GoogleFonts.cabin(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF276B5A),
