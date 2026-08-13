@@ -48,13 +48,11 @@ final List<NestedMenuItem> _globalShopItems = const [
 
 class DecorProductItem {
   final String title;
-  final String price;
   final List<String> imageUrls;
   final String description;
 
   const DecorProductItem({
     required this.title,
-    required this.price,
     required this.imageUrls,
     required this.description,
   });
@@ -78,12 +76,29 @@ class _ProductGridCardState extends State<ProductGridCard> {
   bool _isFavorite = false;
 
   Widget _buildProductImage(String path) {
+    if (path.isEmpty) {
+      return _buildPlaceholder();
+    }
+
     return Image.network(
       path,
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
+      // Fallback to placeholder if network request fails or offline
       errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          color: const Color(0xFFF2F2F2),
+          child: const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF276B5A)),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -160,17 +175,6 @@ class _ProductGridCardState extends State<ProductGridCard> {
           ),
         ),
         const SizedBox(height: 2),
-
-        // Price per sq. ft.
-        Text(
-          widget.item.price,
-          style: GoogleFonts.cabin(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFF666666),
-          ),
-        ),
-        const SizedBox(height: 6),
 
         // Thumbnails & Get in Touch Bar
         Row(
@@ -313,31 +317,28 @@ class WallpaperAnimatedSection extends StatelessWidget {
   final List<DecorProductItem> _wallpapers = const [
     DecorProductItem(
       title: "The Song of the Woods",
-      price: "₹250 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/87/42/48/874248a3138f2208a3f8fa55bfefec23.jpg",
-        "https://i.pinimg.com/236x/51/cd/a7/51cda7860eb8c693fd61ed10e7e66b0c.jpg",
-        "https://i.pinimg.com/736x/12/3a/0b/123a0b4d45e2270928a6fdf6d132ab23.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZsUShEzxBw8UMG1bXP4OA76w62MddirmLsxpQSEJ-7A&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZ2x1v1wN0yDrpf-diMv0zswg_wRcWWxK2zqwQP-60Ew&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9NlR5jBTk4tJv49uFzm9isBBATYtsciHzVCW67hStCQ&s=10",
       ],
       description: "Monochrome forest trees mural depicting peaceful wilderness.",
     ),
     DecorProductItem(
       title: "Little Curiosity",
-      price: "₹250 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/66/3d/dc/663ddcdaf1c20974a4e68510f6eab6fb.jpgg",
-        "https://i.pinimg.com/736x/07/2d/27/072d272f467bcc1b0b995bc34cc8f21a.jpg",
-        "https://i.pinimg.com/736x/7d/8d/40/7d8d400a4e4ebe24c92581b52c848597.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwK7pJ34s4p-K9BxnpIzh4NGKk5MBNzJOVanon8FkS9w&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGri-MxB0WuO36eV9VizgUJV2HOFHUCew1HaktAsB9HQ&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQevlSTzfIrkf6XMPRqB-8yK50GV4MkxbDPQhAjLPZZKw&s=10",
       ],
       description: "Sage green botanical pattern featuring subtle animal silhouettes.",
     ),
     DecorProductItem(
       title: "Secrets Of The Stars",
-      price: "₹250 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/21/0f/cf/210fcf17b9d628f8f2b3ec2a0c868128.jpg",
-        "https://i.pinimg.com/736x/80/2c/40/802c40fe51cedf55895b8df4952ac624.jpg",
-        "https://i.pinimg.com/736x/39/d1/20/39d120dcae780449bc9e1a8a29eef2e1.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQgY8za7EGgk_vFJo9j0N9DeB-GPbU3FJBFaXh0MB44Q&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRylL2JMFEAJ8_mTdLUcXWcG9api2dJIprGaF0F4B10Dg&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAFMQ-EhhhtEZNEercVE3y7gEOROge81aLSjhf5yQitQ&s=10",
       ],
       description: "Night sky over traditional royal architectural landscape.",
     ),
@@ -356,14 +357,7 @@ class WallpaperAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "Wallpapers Collection",
-            style: GoogleFonts.cabin(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
+          Text("Wallpapers Collection", style: GoogleFonts.cabin(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
@@ -454,31 +448,28 @@ class FloorAnimatedSection extends StatelessWidget {
   final List<DecorProductItem> _floors = const [
     DecorProductItem(
       title: "Royal Gold Oak Plank",
-      price: "₹320 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/8d/a4/09/8da40941df5e8c1ff94e0f5451e5cfb1.jpg",
-        "https://i.pinimg.com/736x/5c/12/3b/5c123b092837fec178224b11f0084aef.jpg",
-        "https://i.pinimg.com/736x/77/82/30/7782309e20a2334ef518d6bf918231e8.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7EN-yCRT7ltma9w_m17wK3nXBqZAkOtv7iINgSi40rQ&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTihL0RCXs3WhhNEGjIqJIE0ZIdWKf2e6Sey7zJX4GYBw&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyIy6VYGVGXLF_gukV-dIAZ3She3Ty-mqPGH1jw8chTQ&s=10",
       ],
       description: "Premium oak finish hardwood flooring planks.",
     ),
     DecorProductItem(
       title: "Dark Vintage Hardwood",
-      price: "₹290 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/32/cb/fa/32cbfa91a27e77b4d3d2db7aa6d42125.jpg",
-        "https://i.pinimg.com/736x/88/1b/23/881b238f902cd381baee2100a747cd11.jpg",
-        "https://i.pinimg.com/736x/91/ee/40/91ee40a5f099120bc7645167e42d729a.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBdbAUfRC2j0DfJsq0oN0NQimXZwHJW4QCCJpz4NBf7g&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaM9GO9jZJSLdWoDHbkG1Bd6nofQZZfJHy9RbuOs87EQ&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeNPHYvLU9WYWRoDEKO1ACulwuk63UKZGAbid78yByRw&s=10",
       ],
       description: "Rich dark walnut wood planks for cozy, elegant interior flooring.",
     ),
     DecorProductItem(
       title: "Italian Carrara Marble Tile",
-      price: "₹450 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/c5/40/07/c54007b8b29dd6242c388efd4cb73860.jpg",
-        "https://i.pinimg.com/736x/41/39/0f/41390f7a098bc100e428d09fbc622345.jpg",
-        "https://i.pinimg.com/736x/11/49/aa/1149aacb234ff5002981329aef100a82.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPRnh8pDemscGO5PY7m2v50tR4Qat9_U_phc1IaLgHhg&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKqJebUVEo3MY1BcGeaEjEWf2HFFQq_P3C265T2NQsZw&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNEro14_--ktIWuwyp80puiGGbzAGYfqMKCsNyx7_Www&s=10",
       ],
       description: "Polished Italian white marble finish tile for luxury spaces.",
     ),
@@ -497,14 +488,7 @@ class FloorAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "Premium Floorings",
-            style: GoogleFonts.cabin(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
+          Text("Premium Floorings", style: GoogleFonts.cabin(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
@@ -595,31 +579,28 @@ class CarpetAnimatedSection extends StatelessWidget {
   final List<DecorProductItem> _carpets = const [
     DecorProductItem(
       title: "Royal Hand-Tufted Plush",
-      price: "₹180 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/55/78/3d/55783d6a229cb5fa9e7b235ee6fa25d3.jpg",
-        "https://i.pinimg.com/736x/2a/e5/11/2ae51130e9d8cb4318d18471b3e94b81.jpg",
-        "https://i.pinimg.com/736x/7b/91/f0/7b91f034eb89e672bbcd199b542e88a0.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPa2GEOtq7-vDQGS-jV9Z8OODV8QRiTTEWQBFgTqS_qA&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_viVUCAkCR3qYrA8EOcXC8Uy9IKH-SqQ7t7BZ_OtnSQ&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzYjZFew7XRn6ceO1GJjtcSXmcMQp_WFPp7kN9QvakgQ&s=10",
       ],
       description: "Soft hand-tufted plush wool carpet for living areas.",
     ),
     DecorProductItem(
       title: "Modern Vintage Persian Rug",
-      price: "₹210 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/1a/bc/40/1abc401b52a4e9bd1114bd4f31c4f1c9.jpg",
-        "https://i.pinimg.com/736x/48/21/5c/48215cc3984180dd43fe8d3a24ab1e01.jpg",
-        "https://i.pinimg.com/736x/31/b0/29/31b029288ee8798bf2c28ef5aef21d00.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTuRERD2mMB77rJbolW6_1rEiEOy66BrinmP1x_qCXGA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmpiH2bQ5C2R6uBGTejBHcToqbvKbHxuiIeN_VijXY0w&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrJ5a9CQckdA1DTUcY0qgxlzzXXvz_fhFaTEeE9dHTqg&s=10",
       ],
       description: "Traditional motif with modern distressed finish.",
     ),
     DecorProductItem(
       title: "Abstract Gold & Teal Rug",
-      price: "₹240 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/8d/23/ef/8d23eff0bc261687fbd52a0a28f8f9cd.jpg",
-        "https://i.pinimg.com/736x/17/80/9e/17809e51c8e1903ebc109d94943f5a11.jpg",
-        "https://i.pinimg.com/736x/60/a4/12/60a4128f1e4bc0b2c1f92a34298ab820.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgSZ8zcz5vT0vXzDsIZD7uWhL1bF_wDUP6YZ5fVEXdCA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQo0nYlMpW9BvxFFNbWWW-PImQuEGeyYwYiPJgyCp5dYQ&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIBNifFvWKH-ogGlLibh7VdWaM6ifHr1qhtNnGtdcQzg&s",
       ],
       description: "Artistic contemporary statement rug for living spaces.",
     ),
@@ -638,14 +619,7 @@ class CarpetAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "Luxury Carpets & Rugs",
-            style: GoogleFonts.cabin(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
+          Text("Luxury Carpets & Rugs", style: GoogleFonts.cabin(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,

@@ -48,13 +48,11 @@ final List<NestedMenuItem> _globalShopItems = const [
 
 class DecorProductItem {
   final String title;
-  final String price;
   final List<String> imageUrls;
   final String description;
 
   const DecorProductItem({
     required this.title,
-    required this.price,
     required this.imageUrls,
     required this.description,
   });
@@ -78,12 +76,28 @@ class _ProductGridCardState extends State<ProductGridCard> {
   bool _isFavorite = false;
 
   Widget _buildProductImage(String path) {
+    if (path.isEmpty) {
+      return _buildPlaceholder();
+    }
+
     return Image.network(
       path,
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
       errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          color: const Color(0xFFF2F2F2),
+          child: const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF276B5A)),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -149,28 +163,8 @@ class _ProductGridCardState extends State<ProductGridCard> {
         const SizedBox(height: 8),
 
         // Title
-        Text(
-          widget.item.title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.cabin(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF222222),
-          ),
-        ),
+        Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF222222))),
         const SizedBox(height: 2),
-
-        // Price
-        Text(
-          widget.item.price,
-          style: GoogleFonts.cabin(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFF666666),
-          ),
-        ),
-        const SizedBox(height: 6),
 
         // Thumbnails & Inquire Action Button
         Row(
@@ -311,43 +305,30 @@ class BlindsAnimatedSection extends StatelessWidget {
   final List<DecorProductItem> _blinds = const [
     DecorProductItem(
       title: "Modern Wooden Roller Blinds",
-      price: "₹120 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/2b/9d/28/2b9d28d0859c03bfd92ca8a635677b10.jpg",
-        "https://i.pinimg.com/736x/9f/8e/33/9f8e330a84d2847c21f92e8111e1f40d.jpg",
-        "https://i.pinimg.com/736x/44/21/00/442100808a991823bcd14b1b88e14620.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL-v-AASWB8__k6UF3FSvo6yDbfMZYTVFkWPr3iyZ5_g&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4Pc6ToN_DEvhUyQBKYXaYzq24yQFWWEb_cfJv85dvXg&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShmMFK9REEOt5OHBeesimNvShdgzNxDELdPa3UlNx9Jg&s=10",
       ],
       description: "Wooden textured roller blinds offering precise light control and natural elegance.",
     ),
     DecorProductItem(
       title: "Motorized Zebra Shades",
-      price: "₹160 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/88/44/2c/88442c554e20790f95b5420306198f12.jpg",
-        "https://i.pinimg.com/736x/11/aa/22/11aa223344b55c66d7788e8822998d33.jpg",
-        "https://i.pinimg.com/736x/33/cc/11/33cc1199a88b2200ef77443311884021.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4KAdQo4yQNWahr6N_0GzhhXazPw0ad8K47iJDfKWr2Q&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPaIX0R3v8brk-xVKMeRikwlNxv7bj3DfDddg-UreMfg&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTwI2TGooJGANSB_eQiReW3NSs-N7iAOs2hiVVUjX0fg&s=10",
       ],
       description: "Dual-layer motorized zebra blinds for effortless switching between privacy and light.",
     ),
     DecorProductItem(
       title: "Roman Fabric Window Blinds",
-      price: "₹140 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/11/bf/2d/11bf2d4c06208be14022c4d62cd2f6bc.jpg",
-        "https://i.pinimg.com/736x/55/01/22/550122e8477bb91122a1002938e12332.jpg",
-        "https://i.pinimg.com/736x/77/88/99/77889922002341d3311f44a889932145.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZh1_VnC8N3cCzt8Gd7XQoOR0QD5LlkWqgDAJkZHLmmA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnNeeqXE_rlKkFGSUXpvmXKDhlamiEmqepfQzv7uEAXQ&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSqswW3cgOCNLbzrYdOIQCaVVYIWVne40XouM_DMUcZg&s=10",
       ],
       description: "Soft fabric Roman blinds folding neatly for modern interiors.",
-    ),
-    DecorProductItem(
-      title: "Vertical Venetian Blinds",
-      price: "₹110 / sq.ft.",
-      imageUrls: [
-        "https://i.pinimg.com/736x/3f/8a/19/3f8a19d36e2f16ef0aa9a785cfca512c.jpg",
-        "https://i.pinimg.com/736x/8a/3b/19/8a3b1922c091bc883e42911b33201a44.jpg",
-        "https://i.pinimg.com/736x/66/12/f4/6612f4882103e91d844c8227b998101a.jpg",
-      ],
-      description: "Durable vertical Venetian blinds designed for wide glass panels and office windows.",
     ),
   ];
 
@@ -462,43 +443,30 @@ class GlassFilmsAnimatedSection extends StatelessWidget {
   final List<DecorProductItem> _glassFilms = const [
     DecorProductItem(
       title: "Frosted Privacy Glass Film",
-      price: "₹65 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/5b/44/e9/5b44e9dae9c3e2bb97f74c7dbb94b0d0.jpg",
-        "https://i.pinimg.com/736x/31/20/fa/3120fa290881b22eefd092288111ee22.jpg",
-        "https://i.pinimg.com/736x/88/21/bc/8821bc33400e99811802df910011ef93.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS5zFLRhjS9bxpN_W8yjHldqg9joye5Se1QW6cfdiSTg&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmzDETgaFUSPzqCx5tSFMiLQLMAgtOhjaR1UNASB1FOg&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPAVnhQIuchRPWi4e8Vsvw2QnVwBE8mg-67BoARJ6Hog&s",
       ],
       description: "High-quality frosted film ensuring complete privacy while allowing soft daylight.",
     ),
     DecorProductItem(
       title: "Geometric Patterned Film",
-      price: "₹85 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/7d/1a/06/7d1a067a9643d937a0914856fcdb7746.jpg",
-        "https://i.pinimg.com/736x/11/44/88/114488992223bb33109a82209112a9ef.jpg",
-        "https://i.pinimg.com/736x/99/aa/10/99aa102988172ee0102931bc7721e843.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXRZC7xpWuTK1qrmwMhfh8Z26x_uGljRpjJRCPC84v9Q&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBcdEkYb5azFMFjjOJK91lklZdGKgfyhIMdfuqRhtiIA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIq7t9egM5zlMezxBvibP6it1Ykje5j88Y904AA8Qd_g&s=10",
       ],
       description: "Decorative geometric glass film bringing stylish aesthetics to office dividers.",
     ),
     DecorProductItem(
       title: "Solar Heat Control Sun Film",
-      price: "₹95 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/32/38/2b/32382b6bdff36f78a9bb2c1b9759c5d1.jpg",
-        "https://i.pinimg.com/736x/22/01/55/220155a88019fe8227e2219934bb012a.jpg",
-        "https://i.pinimg.com/736x/67/00/31/670031a908819d44320b9218d99801ec.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPCYJF8zNWJY7NBiXcwci4MZCz16e23kEtKNOxWwmSbQ&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHcm81hOYwFfB758rp2YpjzPUycII2xDDO5p9LOGfCoA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZ4Zbdp91p8wTeC-r6JACk0TbbnIjmIjG0ZKBShKuwEg&s",
       ],
       description: "UV blocking reflective solar control film that reduces indoor heat and glare.",
-    ),
-    DecorProductItem(
-      title: "Stained Glass Decorative Film",
-      price: "₹120 / sq.ft.",
-      imageUrls: [
-        "https://i.pinimg.com/736x/c2/f3/e6/c2f3e69f826359eb36be98b7eec97fbf.jpg",
-        "https://i.pinimg.com/736x/44/55/66/445566778899112233445566778899aa.jpg",
-        "https://i.pinimg.com/736x/88/99/00/889900112233445566778899001122bb.jpg",
-      ],
-      description: "Vibrant stained glass effect film designed for artistic feature partition displays.",
     ),
   ];
 
@@ -613,43 +581,30 @@ class ArtificialTurfsAnimatedSection extends StatelessWidget {
   final List<DecorProductItem> _turfs = const [
     DecorProductItem(
       title: "Lush Green Balcony Grass",
-      price: "₹55 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/88/29/73/882973809623eeb4a9ed517b6d19a27f.jpg",
-        "https://i.pinimg.com/736x/12/89/34/128934567890abcd1234567890abcdef.jpg",
-        "https://i.pinimg.com/736x/23/90/45/239045678901bcde2345678901bcdefa.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_K67g_nBZEKDDJP0xJKRrcFtvjSnTI1t9UHSuTECN4A&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFqAXWYwJdjpxXF1H6s2r-zGd9kZ82akiroKW9Yc3RQA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRUk-ng3-DGQKQL9eHke4ze6CGk5wVGscO7a9sBCtjdQ&s=10",
       ],
       description: "Ultra-soft 35mm natural look artificial grass ideal for balcony gardens.",
     ),
     DecorProductItem(
       title: "High-Density Landscape Turf",
-      price: "₹75 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/da/be/1a/dabe1a5332f913d6a69ef4c1c9117cf4.jpg",
-        "https://i.pinimg.com/736x/34/01/56/340156789012cdef3456789012cdefab.jpg",
-        "https://i.pinimg.com/736x/45/12/67/451267890123defa4567890123defabc.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3T8qsfIxm7yDq5Poiz0CPXlZTbutHFmbV8zrfb_1L3A&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxnShjA6E52AnAS2wbE0cGt349Zf7jYAi0_GEDnVeJKw&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwj8Y1dQWDFC1mTeywt0EJX_uDFOhf6UfrKLb4QVeNKw&s=10",
       ],
       description: "Durable UV-resistant grass providing vibrant green lawn coverage without watering.",
     ),
     DecorProductItem(
       title: "Sports & Play Area Turf",
-      price: "₹90 / sq.ft.",
       imageUrls: [
-        "https://i.pinimg.com/736x/34/7c/43/347c43df3531b4baefaa326eebffec1a.jpg",
-        "https://i.pinimg.com/736x/56/23/78/562378901234efab5678901234efabcd.jpg",
-        "https://i.pinimg.com/736x/67/34/89/673489012345fabc6789012345fabcde.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRNewt7mQGQo7Dz11IwUUuruBQubrowazxEPIsrJOQhA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmM0s5e1nH_jjcrGRRhc3_9NU_a7JtwM4Mnj3Yk_audA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe2hOE1UwqU_xHWlQD6BAk-mvWjQnKDJ-AG7Emdtk5qg&s",
       ],
       description: "Heavy-duty artificial turf engineered for high-traffic playgrounds and sports courts.",
-    ),
-    DecorProductItem(
-      title: "Vertical Green Wall Plant Panel",
-      price: "₹130 / sq.ft.",
-      imageUrls: [
-        "https://i.pinimg.com/736x/32/da/df/32dadfa0f8c057edcbb2f45814e55e8c.jpg",
-        "https://i.pinimg.com/736x/78/45/90/784590123456abcd7890123456abcdef.jpg",
-        "https://i.pinimg.com/736x/89/56/01/895601234567bcde8901234567bcdefa.jpg",
-      ],
-      description: "Synthetic green foliage panel perfect for accent feature walls and patio backdrops.",
     ),
   ];
 

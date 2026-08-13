@@ -2,10 +2,242 @@ import 'package:bindu_decor/Nav_Widgets/Navigation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'Home_Page.dart';
 
+// ============================================================================
+// GLOBAL NAVIGATION CONFIGURATIONS
+// ============================================================================
+
+final List<NavItem> _globalNavItems = const [
+  NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
+  NavItem(label: "About", route: AppRoutes.about, icon: CupertinoIcons.info_circle),
+  NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.person_alt_circle),
+  NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart),
+  NavItem(
+    label: "Reviews",
+    icon: Icons.reviews_outlined,
+    route:
+    "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
+  ),
+];
+
+final List<NestedMenuItem> _globalShopItems = const [
+  NestedMenuItem(
+    title: 'Products & Services',
+    subItems: [
+      NavItem(label: 'Wallpapers', route: AppRoutes.wallpapers, icon: CupertinoIcons.photo),
+      NavItem(label: 'Floorings', route: AppRoutes.floorings, icon: CupertinoIcons.square_grid_2x2),
+      NavItem(label: 'Carpets', route: AppRoutes.carpets, icon: CupertinoIcons.layers),
+      NavItem(label: 'Blinds', route: AppRoutes.blinds, icon: CupertinoIcons.bars),
+      NavItem(label: 'Glass Films', route: AppRoutes.glassfilms, icon: CupertinoIcons.film),
+      NavItem(label: 'Artificial Turfs', route: AppRoutes.artificialturfs, icon: CupertinoIcons.tree),
+      NavItem(label: 'Gym Floorings', route: AppRoutes.gymfloorings, icon: CupertinoIcons.sportscourt),
+      NavItem(label: 'Awnings', route: AppRoutes.awnings, icon: CupertinoIcons.house),
+      NavItem(label: 'Mosquito Nets', route: AppRoutes.mosquitoNets, icon: CupertinoIcons.shield),
+      NavItem(label: 'Upholstery', route: AppRoutes.upholstery, icon: CupertinoIcons.bed_double),
+      NavItem(label: 'Curtains', route: AppRoutes.curtains, icon: CupertinoIcons.rectangle_grid_1x2),
+      NavItem(label: 'Stretch Ceiling', route: AppRoutes.stretchCeiling, icon: CupertinoIcons.arrow_up_square),
+    ],
+  ),
+];
+
+// ============================================================================
+// DATA MODEL
+// ============================================================================
+
+class DecorProductItem {
+  final String title;
+  final List<String> imageUrls;
+  final String description;
+
+  const DecorProductItem({
+    required this.title,
+    required this.imageUrls,
+    required this.description,
+  });
+}
+
+// ============================================================================
+// COMMON PRODUCT GRID CARD WIDGET
+// ============================================================================
+
+class ProductGridCard extends StatefulWidget {
+  final DecorProductItem item;
+
+  const ProductGridCard({super.key, required this.item});
+
+  @override
+  State<ProductGridCard> createState() => _ProductGridCardState();
+}
+
+class _ProductGridCardState extends State<ProductGridCard> {
+  int _selectedImageIndex = 0;
+  bool _isFavorite = false;
+
+  Widget _buildProductImage(String path) {
+    if (path.isEmpty) {
+      return _buildPlaceholder();
+    }
+
+    return Image.network(
+      path,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          color: const Color(0xFFF2F2F2),
+          child: const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF276B5A)),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      color: const Color(0xFFF2F2F2),
+      child: const Center(
+        child: Icon(CupertinoIcons.photo, color: Colors.grey, size: 32),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentImage = widget.item.imageUrls.isNotEmpty
+        ? widget.item.imageUrls[_selectedImageIndex]
+        : '';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Main Image Display Area
+        Expanded(
+          child: Stack(
+            children: [
+              GestureDetector(
+                onTap: () => showContactFormDialog(context),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4.0),
+                  child: Container(
+                    width: double.infinity,
+                    color: const Color(0xFFF5F5F5),
+                    child: _buildProductImage(currentImage),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 10,
+                right: 10,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isFavorite = !_isFavorite;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.7),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _isFavorite ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+                      size: 18,
+                      color: _isFavorite ? Colors.red : Colors.black87,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // Title
+        Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF222222))),
+        const SizedBox(height: 2),
+
+        // Thumbnails & Inquire Action Button
+        Row(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: List.generate(widget.item.imageUrls.length, (idx) {
+                    final isSelected = idx == _selectedImageIndex;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedImageIndex = idx;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 6),
+                        width: 26,
+                        height: 26,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: isSelected ? Colors.black87 : Colors.transparent,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(1),
+                          child: _buildProductImage(widget.item.imageUrls[idx]),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
+
+            InkWell(
+              onTap: () => showContactFormDialog(context),
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF276B5A),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.touch_app_outlined, size: 12, color: Colors.white),
+                    const SizedBox(width: 4),
+                    Text(
+                      "Inquire",
+                      style: GoogleFonts.cabin(
+                        fontSize: 11,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 // =============================================================================
-// 1. GYM FLOORING SECTION
+// 1. GYM FLOORINGS SECTION
 // =============================================================================
 
 class GymFloorings extends StatefulWidget {
@@ -16,44 +248,8 @@ class GymFloorings extends StatefulWidget {
 }
 
 class _GymFlooringsState extends State<GymFloorings> {
-  // Navigation Configuration
-  final List<NavItem> _navItems = const [
-    NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
-    NavItem(label: "About", route: AppRoutes.about, icon: CupertinoIcons.info_circle),
-    NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.person_alt_circle),
-    NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart),
-    NavItem(
-      label: "Reviews",
-      icon: Icons.reviews_outlined,
-      route:
-      "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
-    ),
-  ];
-
-  final List<NestedMenuItem> _shopItems = const [
-    NestedMenuItem(
-      title: 'Products & Services',
-      subItems: [
-        NavItem(label: 'Wallpapers', route: AppRoutes.wallpapers, icon: CupertinoIcons.photo),
-        NavItem(label: 'Floorings', route: AppRoutes.floorings, icon: CupertinoIcons.square_grid_2x2),
-        NavItem(label: 'Carpets', route: AppRoutes.carpets, icon: CupertinoIcons.layers),
-        NavItem(label: 'Blinds', route: AppRoutes.blinds, icon: CupertinoIcons.bars),
-        NavItem(label: 'Glass Films', route: AppRoutes.glassfilms, icon: CupertinoIcons.film),
-        NavItem(label: 'Artificial Turfs', route: AppRoutes.artificialturfs, icon: CupertinoIcons.tree),
-        NavItem(label: 'Gym Floorings', route: AppRoutes.gymfloorings, icon: CupertinoIcons.sportscourt),
-        NavItem(label: 'Awnings', route: AppRoutes.awnings, icon: CupertinoIcons.house),
-        NavItem(label: 'Mosquito Nets', route: AppRoutes.mosquitoNets, icon: CupertinoIcons.shield),
-        NavItem(label: 'Upholstery', route: AppRoutes.upholstery, icon: CupertinoIcons.bed_double),
-        NavItem(label: 'Curtains', route: AppRoutes.curtains, icon: CupertinoIcons.rectangle_grid_1x2),
-        NavItem(label: 'Stretch Ceiling', route: AppRoutes.stretchCeiling, icon: CupertinoIcons.arrow_up_square),
-      ],
-    ),
-  ];
-
   void _handleNavigation(String route) {
-    if (route.startsWith('http')) {
-      return;
-    }
+    if (route.startsWith('http')) return;
     if (ModalRoute.of(context)?.settings.name != route) {
       Navigator.pushNamed(context, route);
     }
@@ -64,20 +260,20 @@ class _GymFlooringsState extends State<GymFloorings> {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FBFB),
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: BinduNavigationBar(
-          navItems: _navItems,
-          shopItems: _shopItems,
+          navItems: _globalNavItems,
+          shopItems: _globalShopItems,
           onMenuItemTap: () => _handleNavigation,
         ),
       ),
       drawer: isDesktop
           ? null
           : BinduMobileDrawer(
-        navItems: _navItems,
-        shopItems: _shopItems,
+        navItems: _globalNavItems,
+        shopItems: _globalShopItems,
         onItemTap: () => _handleNavigation,
       ),
       body: SafeArea(
@@ -85,7 +281,7 @@ class _GymFlooringsState extends State<GymFloorings> {
           physics: const BouncingScrollPhysics(),
           slivers: [
             const SliverToBoxAdapter(
-              child: GymFlooringAnimatedSection(),
+              child: GymFlooringsAnimatedSection(),
             ),
             const SliverFillRemaining(
               hasScrollBody: false,
@@ -103,272 +299,69 @@ class _GymFlooringsState extends State<GymFloorings> {
   }
 }
 
-class GymFlooringItem {
-  final String title;
-  final String desc;
-  final String imgurl;
+class GymFlooringsAnimatedSection extends StatelessWidget {
+  const GymFlooringsAnimatedSection({super.key});
 
-  const GymFlooringItem({
-    required this.title,
-    required this.desc,
-    required this.imgurl,
-  });
-}
-
-class GymFlooringAnimatedSection extends StatefulWidget {
-  const GymFlooringAnimatedSection({super.key});
-
-  @override
-  State<GymFlooringAnimatedSection> createState() => _GymFlooringAnimatedSectionState();
-}
-
-class _GymFlooringAnimatedSectionState extends State<GymFlooringAnimatedSection>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<Offset> _leftSlideAnimation;
-  late Animation<Offset> _rightSlideAnimation;
-
-  final List<GymFlooringItem> _gymItems = const [
-    GymFlooringItem(
+  final List<DecorProductItem> _gymItems = const [
+    DecorProductItem(
       title: "Rubberized Dumbbell Mat",
-      imgurl: "assets/gy_aw_mo/gym1.png",
-      desc:
-      "Shock-absorbing rubberized floor section designed for heavy weight training and equipment protection.",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVcTkp0U8ES6Hei7zEh3S0jwWGyMwd5Thsf4wadnAi3g&s=104",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRS10N8ZTA7_3qNf6mZCWB-9TGKXxBRCubB7adA9GNU2A&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHqpeSi5HboaNeSC7gvyOf_Bz9H9anSI9lYrEid_o_qA&s=10",
+      ],
+      description: "Shock-absorbing rubberized floor section designed for heavy weight training and equipment protection.",
     ),
-    GymFlooringItem(
+    DecorProductItem(
       title: "Commercial Athletic Flooring",
-      imgurl: "assets/gy_aw_mo/gym2.png",
-      desc:
-      "High-end seamless rubber flooring with custom floor markings for cardio and functional fitness zones.",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaCbSVrTPbAR2DJSxsa4-Xn1lrekqR-NOXzuLxIvH9zw&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTThvKenYZJGOYpP3uffH32jGWQ8UdeImhwB4UYd_O0fw&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLz9umVq0WDQSGmpPFiKDayDA_NB_T1d0Tf20detA95g&s=10",
+      ],
+      description: "High-end seamless rubber flooring with custom floor markings for cardio and functional fitness zones.",
     ),
-    GymFlooringItem(
+    DecorProductItem(
       title: "Interlocking Rubber Tiles",
-      imgurl: "assets/gy_aw_mo/gym3.png",
-      desc:
-      "Durable puzzle-edge rubber tiles providing superior grip, impact absorption, and noise reduction.",
-    ),
-    GymFlooringItem(
-      title: "Seamless Speckled Rubber Roll",
-      imgurl: "assets/gy_aw_mo/gym4.png",
-      desc:
-      "Premium heavy-duty rubber roll flooring offering a modern aesthetic and long-lasting durability.",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrxH6rjFPbdrnrhsB1k7lrI-wv3NHVUP_eGPOYg8qsHw&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKQSbku_xphzghkuLu3Tyeo3_lsbT_K3-MzUNLglpSLA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMwhBAnGMDk4Erft7wg4C6CcJcsMFkkRVFtj94HfkE2g&s=10",
+      ],
+      description: "Durable puzzle-edge rubber tiles providing superior grip, impact absorption, and noise reduction.",
     ),
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-
-    _leftSlideAnimation = Tween<Offset>(
-      begin: const Offset(-0.8, 0.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-
-    _rightSlideAnimation = Tween<Offset>(
-      begin: const Offset(0.8, 0.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-
-    int crossAxisCount = 4;
-    if (screenWidth < 600) {
-      crossAxisCount = 1;
-    } else if (screenWidth < 900) {
-      crossAxisCount = 2;
-    } else if (screenWidth < 1200) {
-      crossAxisCount = 3;
-    }
+    int crossAxisCount = screenWidth < 600 ? 1 : (screenWidth < 900 ? 2 : 3);
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: screenWidth > 900 ? 32.0 : 16.0,
-        vertical: 20.0,
+        horizontal: screenWidth > 900 ? 40.0 : 16.0,
+        vertical: 24.0,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "High-Performance Gym Flooring",
-            textAlign: TextAlign.center,
-            style: GoogleFonts.cabin(
-              fontSize: screenWidth > 600 ? 28 : 22,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Container(
-            height: 3,
-            width: 50,
-            decoration: BoxDecoration(
-              color: const Color(0xFFC89D52),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            "Protect your surfaces and reduce impact with heavy-duty, noise-reducing sports rubber floorings.",
-            textAlign: TextAlign.center,
-            style: GoogleFonts.cabin(
-              fontSize: 13.5,
-              color: const Color(0xFF555555),
-            ),
-          ),
-          const SizedBox(height: 24),
+          Text("High-Performance Gym Flooring", style: GoogleFonts.cabin(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
+          const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _gymItems.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              mainAxisExtent: 380,
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 24,
+              mainAxisExtent: 520,
             ),
             itemBuilder: (context, index) {
-              final item = _gymItems[index];
-              final bool slideFromLeft = index % 2 == 0;
-
-              return SlideTransition(
-                position:
-                slideFromLeft ? _leftSlideAnimation : _rightSlideAnimation,
-                child: _GymFlooringCard(item: item),
-              );
+              return ProductGridCard(item: _gymItems[index]);
             },
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _GymFlooringCard extends StatefulWidget {
-  final GymFlooringItem item;
-
-  const _GymFlooringCard({required this.item});
-
-  @override
-  State<_GymFlooringCard> createState() => _GymFlooringCardState();
-}
-
-class _GymFlooringCardState extends State<_GymFlooringCard> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        transform: _isHovered
-            ? (Matrix4.identity()..translate(0, -4, 0))
-            : Matrix4.identity(),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: _isHovered
-                ? const Color(0xFF276B5A)
-                : const Color(0xFF276B5A).withOpacity(0.2),
-            width: 1.2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: _isHovered
-                  ? const Color(0xFF276B5A).withOpacity(0.15)
-                  : Colors.black.withOpacity(0.04),
-              blurRadius: _isHovered ? 12 : 6,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 180,
-              child: ClipRRect(
-                borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(10)),
-                child: Image.asset(
-                  widget.item.imgurl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: const Color(0xFFEBF5F2),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(CupertinoIcons.sportscourt,
-                              size: 36, color: Color(0xFF276B5A)),
-                          SizedBox(height: 6),
-                          Text("Image Not Found",
-                              style: TextStyle(
-                                  color: Color(0xFF276B5A), fontSize: 11)),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 15, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
-                    const SizedBox(height: 4),
-                    Text(widget.item.desc, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 12, fontWeight: FontWeight.w400, color: const Color(0xFF555555), height: 1.3)),
-                    const Spacer(),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          showContactFormDialog(context);
-                        },
-                        icon: const Icon(Icons.touch_app_outlined, size: 16, color: Colors.white),
-                        label: Text("Get in Touch", style: GoogleFonts.cabin(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF276B5A),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -386,43 +379,8 @@ class Awnings extends StatefulWidget {
 }
 
 class _AwningsState extends State<Awnings> {
-  final List<NavItem> _navItems = const [
-    NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
-    NavItem(label: "About", route: AppRoutes.about, icon: CupertinoIcons.info_circle),
-    NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.person_alt_circle),
-    NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart),
-    NavItem(
-      label: "Reviews",
-      icon: Icons.reviews_outlined,
-      route:
-      "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
-    ),
-  ];
-
-  final List<NestedMenuItem> _shopItems = const [
-    NestedMenuItem(
-      title: 'Products & Services',
-      subItems: [
-        NavItem(label: 'Wallpapers', route: AppRoutes.wallpapers, icon: CupertinoIcons.photo),
-        NavItem(label: 'Floorings', route: AppRoutes.floorings, icon: CupertinoIcons.square_grid_2x2),
-        NavItem(label: 'Carpets', route: AppRoutes.carpets, icon: CupertinoIcons.layers),
-        NavItem(label: 'Blinds', route: AppRoutes.blinds, icon: CupertinoIcons.bars),
-        NavItem(label: 'Glass Films', route: AppRoutes.glassfilms, icon: CupertinoIcons.film),
-        NavItem(label: 'Artificial Turfs', route: AppRoutes.artificialturfs, icon: CupertinoIcons.tree),
-        NavItem(label: 'Gym Floorings', route: AppRoutes.gymfloorings, icon: CupertinoIcons.sportscourt),
-        NavItem(label: 'Awnings', route: AppRoutes.awnings, icon: CupertinoIcons.house),
-        NavItem(label: 'Mosquito Nets', route: AppRoutes.mosquitoNets, icon: CupertinoIcons.shield),
-        NavItem(label: 'Upholstery', route: AppRoutes.upholstery, icon: CupertinoIcons.bed_double),
-        NavItem(label: 'Curtains', route: AppRoutes.curtains, icon: CupertinoIcons.rectangle_grid_1x2),
-        NavItem(label: 'Stretch Ceiling', route: AppRoutes.stretchCeiling, icon: CupertinoIcons.arrow_up_square),
-      ],
-    ),
-  ];
-
   void _handleNavigation(String route) {
-    if (route.startsWith('http')) {
-      return;
-    }
+    if (route.startsWith('http')) return;
     if (ModalRoute.of(context)?.settings.name != route) {
       Navigator.pushNamed(context, route);
     }
@@ -433,20 +391,20 @@ class _AwningsState extends State<Awnings> {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FBFB),
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: BinduNavigationBar(
-          navItems: _navItems,
-          shopItems: _shopItems,
+          navItems: _globalNavItems,
+          shopItems: _globalShopItems,
           onMenuItemTap: () => _handleNavigation,
         ),
       ),
       drawer: isDesktop
           ? null
           : BinduMobileDrawer(
-        navItems: _navItems,
-        shopItems: _shopItems,
+        navItems: _globalNavItems,
+        shopItems: _globalShopItems,
         onItemTap: () => _handleNavigation,
       ),
       body: SafeArea(
@@ -472,273 +430,76 @@ class _AwningsState extends State<Awnings> {
   }
 }
 
-class AwningItem {
-  final String title;
-  final String desc;
-  final String imgurl;
-
-  const AwningItem({
-    required this.title,
-    required this.desc,
-    required this.imgurl,
-  });
-}
-
-class AwningsAnimatedSection extends StatefulWidget {
+class AwningsAnimatedSection extends StatelessWidget {
   const AwningsAnimatedSection({super.key});
 
-  @override
-  State<AwningsAnimatedSection> createState() => _AwningsAnimatedSectionState();
-}
-
-class _AwningsAnimatedSectionState extends State<AwningsAnimatedSection>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<Offset> _leftSlideAnimation;
-  late Animation<Offset> _rightSlideAnimation;
-
-  final List<AwningItem> _awnings = const [
-    AwningItem(
+  final List<DecorProductItem> _awnings = const [
+    DecorProductItem(
       title: "Rooftop Louver Pergola",
-      imgurl: "assets/gy_aw_mo/awn1.png",
-      desc:
-      "Modern motorized louvered roof structure providing customizable shade for luxury rooftop terraces.",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdDt6ILehmhc-ZCIOi1hD78y3JZoE7Yj4zdMwhT-ND3Q&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlD_6REnRXeWBvonaZWyoHbyx0RmKrgp-DLcbNN-csLA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0TN4NE8OX94Lr1ogCq3sSLJWV8JIux8q_CWwV-QhBPg&s=10",
+      ],
+      description: "Modern motorized louvered roof structure providing customizable shade for luxury rooftop terraces.",
     ),
-    AwningItem(
+    DecorProductItem(
       title: "Balcony Patio Awning",
-      imgurl: "assets/gy_aw_mo/awn2.png",
-      desc:
-      "Sleek architectural canopy structure designed for outdoor lounge spaces and high-rise balconies.",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRV7mniXaDirbUcNs56VwuHdklwplbUDCwM8SrpqFvAQ&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRV7mniXaDirbUcNs56VwuHdklwplbUDCwM8SrpqFvAQ&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKAya6vmEyDOF6LRuqy__if6E6zeW4GZB7Bi7cxGgtKw&s=10",
+      ],
+      description: "Sleek architectural canopy structure designed for outdoor lounge spaces and high-rise balconies.",
     ),
-    AwningItem(
+    DecorProductItem(
       title: "Retractable Balcony Shade",
-      imgurl: "assets/gy_aw_mo/awn3.png",
-      desc:
-      "Heavy-duty motorized black folding arm awning offering instant sun & rain protection.",
-    ),
-    AwningItem(
-      title: "Commercial Terrace Pergola",
-      imgurl: "assets/gy_aw_mo/awn4.png",
-      desc:
-      "Weatherproof outdoor dining canopy designed for rooftop restaurants, cafes, and hospitality spaces.",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlaFMSD-L2QJEFsEwYiHy2ELigF61ZLH3mbdd_QC7dAA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTL8guIzHtBvbI1rbRDngXo7mcbDCkmnXxhrFGU4dWrjA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTttSBuUKWF0pr2sC0-NUzqNt9ji8FYmEBQQ5O8MeT43w&s",
+      ],
+      description: "Heavy-duty motorized black folding arm awning offering instant sun & rain protection.",
     ),
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-
-    _leftSlideAnimation = Tween<Offset>(
-      begin: const Offset(-0.8, 0.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-
-    _rightSlideAnimation = Tween<Offset>(
-      begin: const Offset(0.8, 0.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-
-    int crossAxisCount = 4;
-    if (screenWidth < 600) {
-      crossAxisCount = 1;
-    } else if (screenWidth < 900) {
-      crossAxisCount = 2;
-    } else if (screenWidth < 1200) {
-      crossAxisCount = 3;
-    }
+    int crossAxisCount = screenWidth < 600 ? 1 : (screenWidth < 900 ? 2 : 3);
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: screenWidth > 900 ? 32.0 : 16.0,
-        vertical: 20.0,
+        horizontal: screenWidth > 900 ? 40.0 : 16.0,
+        vertical: 24.0,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             "Architectural Outdoor Awnings",
-            textAlign: TextAlign.center,
             style: GoogleFonts.cabin(
-              fontSize: screenWidth > 600 ? 28 : 22,
+              fontSize: 26,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF276B5A),
             ),
           ),
-          const SizedBox(height: 6),
-          Container(
-            height: 3,
-            width: 50,
-            decoration: BoxDecoration(
-              color: const Color(0xFFC89D52),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            "Transform your outdoor spaces, balconies, and rooftops with weather-resistant awnings and pergolas.",
-            textAlign: TextAlign.center,
-            style: GoogleFonts.cabin(
-              fontSize: 13.5,
-              color: const Color(0xFF555555),
-            ),
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _awnings.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              mainAxisExtent: 380,
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 24,
+              mainAxisExtent: 520,
             ),
             itemBuilder: (context, index) {
-              final item = _awnings[index];
-              final bool slideFromLeft = index % 2 == 0;
-
-              return SlideTransition(
-                position:
-                slideFromLeft ? _leftSlideAnimation : _rightSlideAnimation,
-                child: _AwningCard(item: item),
-              );
+              return ProductGridCard(item: _awnings[index]);
             },
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _AwningCard extends StatefulWidget {
-  final AwningItem item;
-
-  const _AwningCard({required this.item});
-
-  @override
-  State<_AwningCard> createState() => _AwningCardState();
-}
-
-class _AwningCardState extends State<_AwningCard> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        transform: _isHovered
-            ? (Matrix4.identity()..translate(0, -4, 0))
-            : Matrix4.identity(),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: _isHovered
-                ? const Color(0xFF276B5A)
-                : const Color(0xFF276B5A).withOpacity(0.2),
-            width: 1.2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: _isHovered
-                  ? const Color(0xFF276B5A).withOpacity(0.15)
-                  : Colors.black.withOpacity(0.04),
-              blurRadius: _isHovered ? 12 : 6,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 180,
-              child: ClipRRect(
-                borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(10)),
-                child: Image.asset(
-                  widget.item.imgurl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: const Color(0xFFEBF5F2),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(CupertinoIcons.house,
-                              size: 36, color: Color(0xFF276B5A)),
-                          SizedBox(height: 6),
-                          Text("Image Not Found",
-                              style: TextStyle(
-                                  color: Color(0xFF276B5A), fontSize: 11)),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 15, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
-                    const SizedBox(height: 4),
-                    Text(widget.item.desc, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 12, fontWeight: FontWeight.w400, color: const Color(0xFF555555), height: 1.3)),
-                    const Spacer(),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          showContactFormDialog(context);
-                        },
-                        icon: const Icon(
-                            Icons.touch_app_outlined, size: 16, color: Colors.white),
-                        label: Text("Get in Touch", style: GoogleFonts.cabin(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF276B5A),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -756,43 +517,8 @@ class MosquitoNets extends StatefulWidget {
 }
 
 class _MosquitoNetsState extends State<MosquitoNets> {
-  final List<NavItem> _navItems = const [
-    NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
-    NavItem(label: "About", route: AppRoutes.about, icon: CupertinoIcons.info_circle),
-    NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.person_alt_circle),
-    NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart),
-    NavItem(
-      label: "Reviews",
-      icon: Icons.reviews_outlined,
-      route:
-      "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
-    ),
-  ];
-
-  final List<NestedMenuItem> _shopItems = const [
-    NestedMenuItem(
-      title: 'Products & Services',
-      subItems: [
-        NavItem(label: 'Wallpapers', route: AppRoutes.wallpapers, icon: CupertinoIcons.photo),
-        NavItem(label: 'Floorings', route: AppRoutes.floorings, icon: CupertinoIcons.square_grid_2x2),
-        NavItem(label: 'Carpets', route: AppRoutes.carpets, icon: CupertinoIcons.layers),
-        NavItem(label: 'Blinds', route: AppRoutes.blinds, icon: CupertinoIcons.bars),
-        NavItem(label: 'Glass Films', route: AppRoutes.glassfilms, icon: CupertinoIcons.film),
-        NavItem(label: 'Artificial Turfs', route: AppRoutes.artificialturfs, icon: CupertinoIcons.tree),
-        NavItem(label: 'Gym Floorings', route: AppRoutes.gymfloorings, icon: CupertinoIcons.sportscourt),
-        NavItem(label: 'Awnings', route: AppRoutes.awnings, icon: CupertinoIcons.house),
-        NavItem(label: 'Mosquito Nets', route: AppRoutes.mosquitoNets, icon: CupertinoIcons.shield),
-        NavItem(label: 'Upholstery', route: AppRoutes.upholstery, icon: CupertinoIcons.bed_double),
-        NavItem(label: 'Curtains', route: AppRoutes.curtains, icon: CupertinoIcons.rectangle_grid_1x2),
-        NavItem(label: 'Stretch Ceiling', route: AppRoutes.stretchCeiling, icon: CupertinoIcons.arrow_up_square),
-      ],
-    ),
-  ];
-
   void _handleNavigation(String route) {
-    if (route.startsWith('http')) {
-      return;
-    }
+    if (route.startsWith('http')) return;
     if (ModalRoute.of(context)?.settings.name != route) {
       Navigator.pushNamed(context, route);
     }
@@ -803,20 +529,20 @@ class _MosquitoNetsState extends State<MosquitoNets> {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FBFB),
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: BinduNavigationBar(
-          navItems: _navItems,
-          shopItems: _shopItems,
+          navItems: _globalNavItems,
+          shopItems: _globalShopItems,
           onMenuItemTap: () => _handleNavigation,
         ),
       ),
       drawer: isDesktop
           ? null
           : BinduMobileDrawer(
-        navItems: _navItems,
-        shopItems: _shopItems,
+        navItems: _globalNavItems,
+        shopItems: _globalShopItems,
         onItemTap: () => _handleNavigation,
       ),
       body: SafeArea(
@@ -842,274 +568,76 @@ class _MosquitoNetsState extends State<MosquitoNets> {
   }
 }
 
-class MosquitoNetItem {
-  final String title;
-  final String desc;
-  final String imgurl;
-
-  const MosquitoNetItem({
-    required this.title,
-    required this.desc,
-    required this.imgurl,
-  });
-}
-
-class MosquitoNetAnimatedSection extends StatefulWidget {
+class MosquitoNetAnimatedSection extends StatelessWidget {
   const MosquitoNetAnimatedSection({super.key});
 
-  @override
-  State<MosquitoNetAnimatedSection> createState() =>
-      _MosquitoNetAnimatedSectionState();
-}
-
-class _MosquitoNetAnimatedSectionState
-    extends State<MosquitoNetAnimatedSection>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<Offset> _leftSlideAnimation;
-  late Animation<Offset> _rightSlideAnimation;
-
-  final List<MosquitoNetItem> _mosquitoItems = const [
-    MosquitoNetItem(
+  final List<DecorProductItem> _mosquitoItems = const [
+    DecorProductItem(
       title: "Outdoor Lawn Dome Net",
-      imgurl: "assets/gy_aw_mo/mo1.png",
-      desc:
-      "Portable outdoor pop-up mesh dome designed to create insect-free lounge seating in garden areas.",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5F888CmSGKGOPmplz4Or_pWEbllerd6HoJx-UyviISg&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT51KEf8gAfu26Q4O2rEtE2itBi3Owpa_Ul8OPW1w8j4g&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5I6N6BfKP09fhmde4S0mjICrUfVShcJTXOqwE-H6z0A&s=10",
+      ],
+      description: "Portable outdoor pop-up mesh dome designed to create insect-free lounge seating in garden areas.",
     ),
-    MosquitoNetItem(
+    DecorProductItem(
       title: "Gazebo Mesh Screen Enclosure",
-      imgurl: "assets/gy_aw_mo/mo2.png",
-      desc:
-      "Full perimeter transparent mosquito mesh netting for outdoor gazebos, patios, and pergolas.",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnVTuJPjEmS3_ruYlgPxf-WIoDHfYpvIMBErVBYZkNrg&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4Yzd5jgKJ10TatrdZp9nKarb_U0YKtjxuv-UIgsAAFg&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJDazpdej3cWSvvHSlS5B3t7SJ3bRX81TlnDZIRVGqlg&s=10",
+      ],
+      description: "Full perimeter transparent mosquito mesh netting for outdoor gazebos, patios, and pergolas.",
     ),
-    MosquitoNetItem(
+    DecorProductItem(
       title: "Pleated Window Mesh Screen",
-      imgurl: "assets/gy_aw_mo/mo3.png",
-      desc:
-      "Retractable accordion-style mosquito net for smooth sliding windows and balcony doors.",
-    ),
-    MosquitoNetItem(
-      title: "Magnetic Door Screen Net",
-      imgurl: "assets/gy_aw_mo/mo4.png",
-      desc:
-      "Self-closing magnetic mesh door screen offering effortless hands-free entry and bug protection.",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGhE0J-vBCgyoqhDadqgVw2bewchQflkE8l_j1CXUsJg&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuWsXBFfjvH9po3PP8y8b3HVtwbHJqioyTRIo1AyuzeA&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZoY9DePKcyxOZfWeb7Ovd4l9vm8Ix05dsGpRrJnAyUw&s=10",
+      ],
+      description: "Retractable accordion-style mosquito net for smooth sliding windows and balcony doors.",
     ),
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-
-    _leftSlideAnimation = Tween<Offset>(
-      begin: const Offset(-0.8, 0.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-
-    _rightSlideAnimation = Tween<Offset>(
-      begin: const Offset(0.8, 0.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-
-    int crossAxisCount = 4;
-    if (screenWidth < 600) {
-      crossAxisCount = 1;
-    } else if (screenWidth < 900) {
-      crossAxisCount = 2;
-    } else if (screenWidth < 1200) {
-      crossAxisCount = 3;
-    }
+    int crossAxisCount = screenWidth < 600 ? 1 : (screenWidth < 900 ? 2 : 3);
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: screenWidth > 900 ? 32.0 : 16.0,
-        vertical: 20.0,
+        horizontal: screenWidth > 900 ? 40.0 : 16.0,
+        vertical: 24.0,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             "Mosquito & Insect Protection Nets",
-            textAlign: TextAlign.center,
             style: GoogleFonts.cabin(
-              fontSize: screenWidth > 600 ? 28 : 22,
+              fontSize: 26,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF276B5A),
             ),
           ),
-          const SizedBox(height: 6),
-          Container(
-            height: 3,
-            width: 50,
-            decoration: BoxDecoration(
-              color: const Color(0xFFC89D52),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            "Enjoy fresh air without insect pests with our premium indoor & outdoor mesh enclosures.",
-            textAlign: TextAlign.center,
-            style: GoogleFonts.cabin(
-              fontSize: 13.5,
-              color: const Color(0xFF555555),
-            ),
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _mosquitoItems.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              mainAxisExtent: 380,
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 24,
+              mainAxisExtent: 520,
             ),
             itemBuilder: (context, index) {
-              final item = _mosquitoItems[index];
-              final bool slideFromLeft = index % 2 == 0;
-
-              return SlideTransition(
-                position:
-                slideFromLeft ? _leftSlideAnimation : _rightSlideAnimation,
-                child: _MosquitoNetCard(item: item),
-              );
+              return ProductGridCard(item: _mosquitoItems[index]);
             },
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _MosquitoNetCard extends StatefulWidget {
-  final MosquitoNetItem item;
-
-  const _MosquitoNetCard({required this.item});
-
-  @override
-  State<_MosquitoNetCard> createState() => _MosquitoNetCardState();
-}
-
-class _MosquitoNetCardState extends State<_MosquitoNetCard> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        transform: _isHovered
-            ? (Matrix4.identity()..translate(0, -4, 0))
-            : Matrix4.identity(),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: _isHovered
-                ? const Color(0xFF276B5A)
-                : const Color(0xFF276B5A).withOpacity(0.2),
-            width: 1.2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: _isHovered
-                  ? const Color(0xFF276B5A).withOpacity(0.15)
-                  : Colors.black.withOpacity(0.04),
-              blurRadius: _isHovered ? 12 : 6,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 180,
-              child: ClipRRect(
-                borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(10)),
-                child: Image.asset(
-                  widget.item.imgurl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: const Color(0xFFEBF5F2),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(CupertinoIcons.shield,
-                              size: 36, color: Color(0xFF276B5A)),
-                          SizedBox(height: 6),
-                          Text("Image Not Found",
-                              style: TextStyle(
-                                  color: Color(0xFF276B5A), fontSize: 11)),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 15, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
-                    const SizedBox(height: 4),
-                    Text(widget.item.desc, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 12, fontWeight: FontWeight.w400, color: const Color(0xFF555555), height: 1.3)),
-                    const Spacer(),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          showContactFormDialog(context);
-                        },
-                        icon: const Icon(Icons.touch_app_outlined, size: 16, color: Colors.white),
-                        label: Text("Get in Touch", style: GoogleFonts.cabin(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF276B5A),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

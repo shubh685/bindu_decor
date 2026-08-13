@@ -1,259 +1,15 @@
-import 'package:flutter/material.dart';
+import 'package:bindu_decor/Nav_Widgets/Navigation.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'Home_Page.dart';
-import 'Nav_Widgets/Navigation.dart';
 
-// =============================================================================
-// SHARED MODELS & REUSABLE COMPONENTS
-// =============================================================================
+// ============================================================================
+// GLOBAL NAVIGATION CONFIGURATIONS
+// ============================================================================
 
-class ProductItem {
-  final String title;
-  final String desc;
-  final String imgurl;
-
-  const ProductItem({
-    required this.title,
-    required this.desc,
-    required this.imgurl,
-  });
-}
-
-class ProductAnimatedSection extends StatefulWidget {
-  final String sectionTitle;
-  final String sectionSubtitle;
-  final List<ProductItem> items;
-
-  const ProductAnimatedSection({
-    super.key,
-    required this.sectionTitle,
-    required this.sectionSubtitle,
-    required this.items,
-  });
-
-  @override
-  State<ProductAnimatedSection> createState() =>
-      _ProductAnimatedSectionState();
-}
-
-class _ProductAnimatedSectionState extends State<ProductAnimatedSection>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<Offset> _leftSlideAnimation;
-  late Animation<Offset> _rightSlideAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-
-    _leftSlideAnimation = Tween<Offset>(
-      begin: const Offset(-0.8, 0.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-
-    _rightSlideAnimation = Tween<Offset>(
-      begin: const Offset(0.8, 0.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-
-    int crossAxisCount = 4;
-    if (screenWidth < 600) {
-      crossAxisCount = 1;
-    } else if (screenWidth < 900) {
-      crossAxisCount = 2;
-    } else if (screenWidth < 1200) {
-      crossAxisCount = 3;
-    }
-
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: screenWidth > 900 ? 32.0 : 16.0,
-        vertical: 20.0,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(widget.sectionTitle, textAlign: TextAlign.center, style: GoogleFonts.cabin(fontSize: screenWidth > 600 ? 28 : 22, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
-          const SizedBox(height: 6),
-          Container(
-            height: 3,
-            width: 50,
-            decoration: BoxDecoration(
-              color: const Color(0xFFC89D52),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            widget.sectionSubtitle,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.cabin(
-              fontSize: 13.5,
-              color: const Color(0xFF555555),
-            ),
-          ),
-          const SizedBox(height: 24),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: widget.items.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              mainAxisExtent: 380,
-            ),
-            itemBuilder: (context, index) {
-              final item = widget.items[index];
-              final bool slideFromLeft = index % 2 == 0;
-
-              return SlideTransition(
-                position:
-                slideFromLeft ? _leftSlideAnimation : _rightSlideAnimation,
-                child: ProductCard(item: item),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ProductCard extends StatefulWidget {
-  final ProductItem item;
-
-  const ProductCard({super.key, required this.item});
-
-  @override
-  State<ProductCard> createState() => _ProductCardState();
-}
-
-class _ProductCardState extends State<ProductCard> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        transform: _isHovered
-            ? (Matrix4.identity()..translate(0, -4, 0))
-            : Matrix4.identity(),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: _isHovered
-                ? const Color(0xFF276B5A)
-                : const Color(0xFF276B5A).withOpacity(0.2),
-            width: 1.2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: _isHovered
-                  ? const Color(0xFF276B5A).withOpacity(0.15)
-                  : Colors.black.withOpacity(0.04),
-              blurRadius: _isHovered ? 12 : 6,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 180,
-              child: ClipRRect(
-                borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(10)),
-                child: Image.asset(
-                  widget.item.imgurl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: const Color(0xFFEBF5F2),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(CupertinoIcons.photo, size: 36, color: Color(0xFF276B5A)),
-                          SizedBox(height: 6),
-                          Text("Image Not Found", style: TextStyle(color: Color(0xFF276B5A), fontSize: 11)),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 15, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
-                    const SizedBox(height: 4),
-                    Text(widget.item.desc, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 12, fontWeight: FontWeight.w400, color: const Color(0xFF555555), height: 1.3)),
-                    const Spacer(),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          showContactFormDialog(context);
-                        },
-                        icon: const Icon(Icons.touch_app_outlined, size: 16, color: Colors.white),
-                        label: Text("Get in Touch", style: GoogleFonts.cabin(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF276B5A),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Nav Data for Integration
-final List<NavItem> _navItems = const [
+final List<NavItem> _globalNavItems = const [
   NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
   NavItem(label: "About", route: AppRoutes.about, icon: CupertinoIcons.info_circle),
   NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.person_alt_circle),
@@ -266,7 +22,7 @@ final List<NavItem> _navItems = const [
   ),
 ];
 
-final List<NestedMenuItem> _shopItems = const [
+final List<NestedMenuItem> _globalShopItems = const [
   NestedMenuItem(
     title: 'Products & Services',
     subItems: [
@@ -286,15 +42,202 @@ final List<NestedMenuItem> _shopItems = const [
   ),
 ];
 
-void _handleNavigation(BuildContext context, String route) {
-  if (route.startsWith('http')) return;
-  if (ModalRoute.of(context)?.settings.name != route) {
-    Navigator.pushNamed(context, route);
+// ============================================================================
+// DATA MODEL
+// ============================================================================
+
+class DecorProductItem {
+  final String title;
+  final List<String> imageUrls;
+  final String description;
+
+  const DecorProductItem({
+    required this.title,
+    required this.imageUrls,
+    required this.description,
+  });
+}
+
+// ============================================================================
+// COMMON PRODUCT GRID CARD WIDGET
+// ============================================================================
+
+class ProductGridCard extends StatefulWidget {
+  final DecorProductItem item;
+
+  const ProductGridCard({super.key, required this.item});
+
+  @override
+  State<ProductGridCard> createState() => _ProductGridCardState();
+}
+
+class _ProductGridCardState extends State<ProductGridCard> {
+  int _selectedImageIndex = 0;
+  bool _isFavorite = false;
+
+  Widget _buildProductImage(String path) {
+    if (path.isEmpty) {
+      return _buildPlaceholder();
+    }
+
+    return Image.network(
+      path,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          color: const Color(0xFFF2F2F2),
+          child: const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF276B5A)),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      color: const Color(0xFFF2F2F2),
+      child: const Center(
+        child: Icon(CupertinoIcons.photo, color: Colors.grey, size: 32),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentImage = widget.item.imageUrls.isNotEmpty
+        ? widget.item.imageUrls[_selectedImageIndex]
+        : '';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Main Image Display Area
+        Expanded(
+          child: Stack(
+            children: [
+              GestureDetector(
+                onTap: () => showContactFormDialog(context),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4.0),
+                  child: Container(
+                    width: double.infinity,
+                    color: const Color(0xFFF5F5F5),
+                    child: _buildProductImage(currentImage),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 10,
+                right: 10,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isFavorite = !_isFavorite;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.7),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _isFavorite ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+                      size: 18,
+                      color: _isFavorite ? Colors.red : Colors.black87,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // Title
+        Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF222222))),
+        const SizedBox(height: 2),
+
+        // Thumbnails & Inquire Action Button
+        Row(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: List.generate(widget.item.imageUrls.length, (idx) {
+                    final isSelected = idx == _selectedImageIndex;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedImageIndex = idx;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 6),
+                        width: 26,
+                        height: 26,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: isSelected ? Colors.black87 : Colors.transparent,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(1),
+                          child: _buildProductImage(widget.item.imageUrls[idx]),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
+
+            InkWell(
+              onTap: () => showContactFormDialog(context),
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF276B5A),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.touch_app_outlined, size: 12, color: Colors.white),
+                    const SizedBox(width: 4),
+                    Text(
+                      "Inquire",
+                      style: GoogleFonts.cabin(
+                        fontSize: 11,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
 
 // =============================================================================
-// 1. UPHOLSTERY CLASS
+// 1. UPHOLSTERY SECTION
 // =============================================================================
 
 class Upholstery extends StatefulWidget {
@@ -305,65 +248,40 @@ class Upholstery extends StatefulWidget {
 }
 
 class _UpholsteryState extends State<Upholstery> {
-  final List<ProductItem> _upholsteryItems = const [
-    ProductItem(
-      title: "Modular Curved Lounge Sofa",
-      imgurl: "assets/up_cur_sc/uph1.png",
-      desc:
-      "Modern curved modular sofa set in olive green and beige textured fabrics with warm ambient wall lights.",
-    ),
-    ProductItem(
-      title: "Floral Printed Sofa",
-      imgurl: "assets/up_cur_sc/uph2.png",
-      desc:
-      "Vibrant artistic floral fabric sofa with rich wooden trim finish and custom patterned throw pillows.",
-    ),
-    ProductItem(
-      title: "Dual-Tone Leatherette Sofa",
-      imgurl: "assets/up_cur_sc/uph3.png",
-      desc:
-      "Contemporary tan orange and cream leatherette padded sofa with sleek metal leg support.",
-    ),
-    ProductItem(
-      title: "L-Shaped Sectional Sofa",
-      imgurl: "assets/up_cur_sc/uph4.png",
-      desc:
-      "Spacious white fabric and terracotta leatherette sectional sofa designed for ultimate living room comfort.",
-    ),
-  ];
+  void _handleNavigation(String route) {
+    if (route.startsWith('http')) return;
+    if (ModalRoute.of(context)?.settings.name != route) {
+      Navigator.pushNamed(context, route);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FBFB),
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: BinduNavigationBar(
-          navItems: _navItems,
-          shopItems: _shopItems,
-          onMenuItemTap: () => (route) => _handleNavigation(context, route),
+          navItems: _globalNavItems,
+          shopItems: _globalShopItems,
+          onMenuItemTap: () => _handleNavigation,
         ),
       ),
       drawer: isDesktop
           ? null
           : BinduMobileDrawer(
-        navItems: _navItems,
-        shopItems: _shopItems,
-        onItemTap: () => (route) => _handleNavigation(context, route),
+        navItems: _globalNavItems,
+        shopItems: _globalShopItems,
+        onItemTap: () => _handleNavigation,
       ),
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(
-              child: ProductAnimatedSection(
-                sectionTitle: "Luxury Upholstery Fabrics & Sofas",
-                sectionSubtitle:
-                "Transform your furniture with high-grade leatherette, velvet, and custom textured upholstery fabrics.",
-                items: _upholsteryItems,
-              ),
+            const SliverToBoxAdapter(
+              child: UpholsteryAnimatedSection(),
             ),
             const SliverFillRemaining(
               hasScrollBody: false,
@@ -381,8 +299,83 @@ class _UpholsteryState extends State<Upholstery> {
   }
 }
 
+class UpholsteryAnimatedSection extends StatelessWidget {
+  const UpholsteryAnimatedSection({super.key});
+
+  final List<DecorProductItem> _upholsteryItems = const [
+    DecorProductItem(
+      title: "Modular Curved Lounge Sofa",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkRhQssdHo3-JIMolcjjqkDzYGPBwkZGtfeVvxP1f4ng&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9xpJbTRV0CF8opUBVj4T4-wr6RczL1eFiq1y2T00qyg&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQra5VULvZHxVb2zzQQbY4_fgh_dn4h7NdII0_rZt6Ekw&s=10",
+      ],
+      description: "Modern curved modular sofa set in olive green and beige textured fabrics with warm ambient wall lights.",
+    ),
+    DecorProductItem(
+      title: "Floral Printed Sofa",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsrdBEmz6tUd8qMklwgczwA3nenU3kBnpIbw2P4c9JLw&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxt-qePejPp7S892nn5fYThdDM8ymS_w1tUwryI8ws3w&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyJxd9-gsvOJ8MHgyg8kUGAq0aynrKmeJ-Lt_lq4Vzmg&s=10",
+      ],
+      description: "Vibrant artistic floral fabric sofa with rich wooden trim finish and custom patterned throw pillows.",
+    ),
+    DecorProductItem(
+      title: "Dual-Tone Leatherette Sofa",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM5tNTTTWRARJmmYn4V6WJ9rG9Bi6xePOxs-ARGKYLCQ&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHFd8HQjzUx6SQTkzeQ0a4q6NtheUv9uOIorYPp1unsw&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQso9kXxUKdz4bVDJK4HO5rNwOeCgE_B9-RY17j8dFlLA&s",
+      ],
+      description: "Contemporary tan orange and cream leatherette padded sofa with sleek metal leg support.",
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount = screenWidth < 600 ? 1 : (screenWidth < 900 ? 2 : 3);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth > 900 ? 40.0 : 16.0,
+        vertical: 24.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "Luxury Upholstery Fabrics & Sofas",
+            style: GoogleFonts.cabin(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF276B5A),
+            ),
+          ),
+          const SizedBox(height: 16),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _upholsteryItems.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 24,
+              mainAxisExtent: 520,
+            ),
+            itemBuilder: (context, index) {
+              return ProductGridCard(item: _upholsteryItems[index]);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // =============================================================================
-// 2. CURTAINS CLASS
+// 2. CURTAINS SECTION
 // =============================================================================
 
 class Curtains extends StatefulWidget {
@@ -393,65 +386,40 @@ class Curtains extends StatefulWidget {
 }
 
 class _CurtainsState extends State<Curtains> {
-  final List<ProductItem> _curtainItems = const [
-    ProductItem(
-      title: "Boho Palm Print & Navy Drapes",
-      imgurl: "assets/up_cur_sc/cur1.png",
-      desc:
-      "Stylish cream palm print eyelet curtains paired with solid royal blue drapes and fringe tassel trim.",
-    ),
-    ProductItem(
-      title: "Yellow Wildflower Floral Drapes",
-      imgurl: "assets/up_cur_sc/cur2.png",
-      desc:
-      "Bright mustard yellow eyelet curtains combined with delicate floral stem patterned drapes.",
-    ),
-    ProductItem(
-      title: "Royal Blue & Gold Layered Drapes",
-      imgurl: "assets/up_cur_sc/cur3.png",
-      desc:
-      "Luxury dual-color royal blue and mustard curtains with tied-back blackout layers over soft sheer fabric.",
-    ),
-    ProductItem(
-      title: "Floral Branch & Chocolate Drapes",
-      imgurl: "assets/up_cur_sc/cur4.png",
-      desc:
-      "Elegant brown blossom floral print curtains paired with rich solid chocolate brown grommet drapes.",
-    ),
-  ];
+  void _handleNavigation(String route) {
+    if (route.startsWith('http')) return;
+    if (ModalRoute.of(context)?.settings.name != route) {
+      Navigator.pushNamed(context, route);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FBFB),
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: BinduNavigationBar(
-          navItems: _navItems,
-          shopItems: _shopItems,
-          onMenuItemTap: () => (route) => _handleNavigation(context, route),
+          navItems: _globalNavItems,
+          shopItems: _globalShopItems,
+          onMenuItemTap: () => _handleNavigation,
         ),
       ),
       drawer: isDesktop
           ? null
           : BinduMobileDrawer(
-        navItems: _navItems,
-        shopItems: _shopItems,
-        onItemTap: () => (route) => _handleNavigation(context, route),
+        navItems: _globalNavItems,
+        shopItems: _globalShopItems,
+        onItemTap: () => _handleNavigation,
       ),
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(
-              child: ProductAnimatedSection(
-                sectionTitle: "Designer Curtains & Window Drapes",
-                sectionSubtitle:
-                "Elevate your interior ambience with custom printed, sheer, and blackout curtain solutions.",
-                items: _curtainItems,
-              ),
+            const SliverToBoxAdapter(
+              child: CurtainsAnimatedSection(),
             ),
             const SliverFillRemaining(
               hasScrollBody: false,
@@ -469,8 +437,83 @@ class _CurtainsState extends State<Curtains> {
   }
 }
 
+class CurtainsAnimatedSection extends StatelessWidget {
+  const CurtainsAnimatedSection({super.key});
+
+  final List<DecorProductItem> _curtainItems = const [
+    DecorProductItem(
+      title: "Boho Palm Print & Navy Drapes",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSTPR_ATqgSAd4j0jqrSkBV7QPLDBe0nVO0twMhFfMtA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSb562mQjYbWcicnMLAEuZdWwTgE0DEQh32_SrnKNxDDg&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDCH0SaeY8vnwbfl9GGu1_FDTMNNpbnck8ikEKeE9H0w&s",
+      ],
+      description: "Stylish cream palm print eyelet curtains paired with solid royal blue drapes and fringe tassel trim.",
+    ),
+    DecorProductItem(
+      title: "Yellow Wildflower Floral Drapes",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpDTGGEt4ZMcIHTjRk7O-2ItFwf0nEXFF4V6J1atV_Lw&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMmAkaaFiFkf_xHWwDarlvv8Oi0VpRW3tGqSNEvxC9lA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvXcXPFlAZcYSulfyU2WFLZqowL_YDLvPIAfc3nuhwcg&s=10",
+      ],
+      description: "Bright mustard yellow eyelet curtains combined with delicate floral stem patterned drapes.",
+    ),
+    DecorProductItem(
+      title: "Royal Blue & Gold Layered Drapes",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf5xEKHnMqzCP59cosJBE_UavvQHrJOA2nz1KDlqx33g&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbtEWamz6HLoRmkHsFaiXFsS2zyfvg-PJaEp-Zelp1wQ&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSm47Qt0RfK1KJ9QJul4Ig7bvruSMjgMoR78Dw2FhwmRw&s",
+      ],
+      description: "Luxury dual-color royal blue and mustard curtains with tied-back blackout layers over soft sheer fabric.",
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount = screenWidth < 600 ? 1 : (screenWidth < 900 ? 2 : 3);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth > 900 ? 40.0 : 16.0,
+        vertical: 24.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "Designer Curtains & Window Drapes",
+            style: GoogleFonts.cabin(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF276B5A),
+            ),
+          ),
+          const SizedBox(height: 16),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _curtainItems.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 24,
+              mainAxisExtent: 520,
+            ),
+            itemBuilder: (context, index) {
+              return ProductGridCard(item: _curtainItems[index]);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // =============================================================================
-// 3. STRETCH CEILING CLASS
+// 3. STRETCH CEILING SECTION
 // =============================================================================
 
 class StretchCeiling extends StatefulWidget {
@@ -481,65 +524,40 @@ class StretchCeiling extends StatefulWidget {
 }
 
 class _StretchCeilingState extends State<StretchCeiling> {
-  final List<ProductItem> _stretchCeilingItems = const [
-    ProductItem(
-      title: "Glossy Mirror Stretch Ceiling",
-      imgurl: "assets/up_cur_sc/sc1.png",
-      desc:
-      "High-gloss dark reflective stretch ceiling with integrated perimeter strip lighting for a spacious interior look.",
-    ),
-    ProductItem(
-      title: "Multi-Tiered Wooden Stretch Ceiling",
-      imgurl: "assets/up_cur_sc/sc2.png",
-      desc:
-      "Architectural multi-level ceiling design featuring warm LED backlighting and central circular accents.",
-    ),
-    ProductItem(
-      title: "Sky Print Backlit Stretch Ceiling",
-      imgurl: "assets/up_cur_sc/sc3.png",
-      desc:
-      "Illuminated sky and snow forest print stretch ceiling panel bringing a natural outdoor feel indoors.",
-    ),
-    ProductItem(
-      title: "3D Butterfly Artwork Stretch Ceiling",
-      imgurl: "assets/up_cur_sc/sc4.png",
-      desc:
-      "Vibrant 3D printed butterfly artwork stretch ceiling illuminated with soft perimeter cove lights.",
-    ),
-  ];
+  void _handleNavigation(String route) {
+    if (route.startsWith('http')) return;
+    if (ModalRoute.of(context)?.settings.name != route) {
+      Navigator.pushNamed(context, route);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FBFB),
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: BinduNavigationBar(
-          navItems: _navItems,
-          shopItems: _shopItems,
-          onMenuItemTap: () => (route) => _handleNavigation(context, route),
+          navItems: _globalNavItems,
+          shopItems: _globalShopItems,
+          onMenuItemTap: () => _handleNavigation,
         ),
       ),
       drawer: isDesktop
           ? null
           : BinduMobileDrawer(
-        navItems: _navItems,
-        shopItems: _shopItems,
-        onItemTap: () => (route) => _handleNavigation(context, route),
+        navItems: _globalNavItems,
+        shopItems: _globalShopItems,
+        onItemTap: () => _handleNavigation,
       ),
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(
-              child: ProductAnimatedSection(
-                sectionTitle: "Decorative Stretch Ceilings",
-                sectionSubtitle:
-                "Modern translucent, printed, glossy, and backlit ceiling solutions for luxury residential and commercial spaces.",
-                items: _stretchCeilingItems,
-              ),
+            const SliverToBoxAdapter(
+              child: StretchCeilingAnimatedSection(),
             ),
             const SliverFillRemaining(
               hasScrollBody: false,
@@ -552,6 +570,81 @@ class _StretchCeilingState extends State<StretchCeiling> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class StretchCeilingAnimatedSection extends StatelessWidget {
+  const StretchCeilingAnimatedSection({super.key});
+
+  final List<DecorProductItem> _stretchCeilingItems = const [
+    DecorProductItem(
+      title: "Glossy Mirror Stretch Ceiling",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDLDPB52KffAPZmuAPuVztlL2jconnP8GXBWCD42hakA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTe_G75vtiXEGL4jyAGPr0ON4xLF6p94YXCqnqBT21kLg&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRG_hf8wsx84KsohNAzAjTS52vWElP6fC5O0ef0mSy2w&s=10",
+      ],
+      description: "High-gloss dark reflective stretch ceiling with integrated perimeter strip lighting for a spacious interior look.",
+    ),
+    DecorProductItem(
+      title: "Multi-Tiered Wooden Stretch Ceiling",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeUctTmuvuv1HtPNyobLOWywyWBRucDCPYqjrJXw2OLA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5zk4uU55L1uOvbnS4IKNoaV12ek1LhhUWrSB7mxxLHg&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAkvNGzoawpID_qsnVBj6rk6xoEYmAUN7DqWiLiEL9Bg&s",
+      ],
+      description: "Architectural multi-level ceiling design featuring warm LED backlighting and central circular accents.",
+    ),
+    DecorProductItem(
+      title: "Sky Print Backlit Stretch Ceiling",
+      imageUrls: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVD6rqC8QjlcD7n4L8Hewldk2ayd2ZaOpgaiL1GL1ajA&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNwNawkBbFVrH6CKOtc1FKIHroTxdDkaYEchvemfHk3Q&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsk4lqdAT0ovA9K5abcLe7GbfGUbO1g-hmR6l6WS-RFQ&s=10",
+      ],
+      description: "Illuminated sky and snow forest print stretch ceiling panel bringing a natural outdoor feel indoors.",
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount = screenWidth < 600 ? 1 : (screenWidth < 900 ? 2 : 3);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth > 900 ? 40.0 : 16.0,
+        vertical: 24.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "Decorative Stretch Ceilings",
+            style: GoogleFonts.cabin(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF276B5A),
+            ),
+          ),
+          const SizedBox(height: 16),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _stretchCeilingItems.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 24,
+              mainAxisExtent: 520,
+            ),
+            itemBuilder: (context, index) {
+              return ProductGridCard(item: _stretchCeilingItems[index]);
+            },
+          ),
+        ],
       ),
     );
   }
