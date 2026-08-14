@@ -242,7 +242,7 @@ class _TimelineViewState extends State<TimelineView> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("Timeline", style: GoogleFonts.arvo(fontSize: isMobile ? 28 : 36, fontWeight: FontWeight.bold, color: Colors.brown.shade800, letterSpacing: 0.5)),
+        Text("Timeline", style: GoogleFonts.arvo(fontSize: isMobile ? 28 : 36, fontWeight: FontWeight.bold, color: Colors.purple, letterSpacing: 0.5)),
         const SizedBox(height: 6),
         Container(
           height: 3,
@@ -318,11 +318,11 @@ class _TimelineViewState extends State<TimelineView> {
                             ),
                             child: Text(event.year, style: GoogleFonts.arvo(fontSize: 14, fontWeight: FontWeight.bold))),
                           const SizedBox(height: 6),
-                          Text(event.title, style: GoogleFonts.arvo(fontSize: isMobile ? 18 : 22, fontWeight: FontWeight.bold, color: Colors.brown.shade800)),
+                          Text(event.title, style: GoogleFonts.arvo(fontSize: isMobile ? 18 : 22, fontWeight: FontWeight.bold, color: Colors.purple)),
                           const SizedBox(height: 10),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(event.description, textAlign: TextAlign.center, maxLines: 4, overflow: TextOverflow.ellipsis, style: GoogleFonts.arvo(fontSize: isMobile ? 12 : 14, color: Colors.black87, height: 1.4)),
+                            child: Text(event.description, textAlign: TextAlign.center, maxLines: 4, overflow: TextOverflow.ellipsis, style: GoogleFonts.arvo(fontSize: isMobile ? 12 : 14, color:Colors.purple.shade800, height: 1.4)),
                           ),
                         ],
                       ),
@@ -467,9 +467,9 @@ class _MissionVisionAnimatedSectionState extends State<MissionVisionAnimatedSect
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: GoogleFonts.arvo(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.brown.shade800)),
+          Text(title, style: GoogleFonts.arvo(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.purple)),
           const SizedBox(height: 10),
-          Text(description, style: GoogleFonts.cabin(fontSize: 13.5, fontWeight: FontWeight.w400, color: Colors.brown.shade800, height: 1.5)),
+          Text(description, style: GoogleFonts.cabin(fontSize: 13.5, fontWeight: FontWeight.w400, height: 1.5)),
         ],
       ),
     );
@@ -613,14 +613,7 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "Meet Our Team",
-            style: GoogleFonts.cabin(
-              fontSize: isDesktop ? 32 : 26,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
+          Text("Meet Our Team", style: GoogleFonts.imFellEnglishSc(fontSize: isDesktop ? 32 : 26, fontWeight: FontWeight.bold, color: Colors.purple)),
           const SizedBox(height: 6),
           Container(
             height: 3,
@@ -755,32 +748,21 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.cabin(
+                    style: GoogleFonts.imFellEnglishSc(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1B4D3E),
+                      color: Colors.purple,
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    role,
-                    textAlign: TextAlign.center,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.cabin(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF4A4A4A),
-                      height: 1.4,
-                    ),
-                  ),
+                  Text(role, textAlign: TextAlign.center, maxLines: 3, overflow: TextOverflow.ellipsis, style: GoogleFonts.imFellEnglishSc(fontSize: 14.5, fontWeight: FontWeight.w500, color: const Color(0xFF4A4A4A), height: 1.4)),
                   const SizedBox(height: 10),
                   Text(
                     "\"$desc\"",
                     textAlign: TextAlign.center,
                     maxLines: 4,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.cabin(
+                    style: GoogleFonts.imFellEnglishSc(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w400,
                       color: const Color(0xFF4A4A4A),
@@ -851,7 +833,7 @@ Widget _lastLeast(BuildContext context) {
             children: [
               Text("Last but", style: GoogleFonts.arvo(fontSize: isDesktop ? 32 : 26, fontWeight: FontWeight.bold)),
               const SizedBox(width: 8),
-              Text("Not The Least", style: GoogleFonts.arvo(fontSize: isDesktop ? 32 : 26, fontWeight: FontWeight.bold, color: Colors.brown.shade800))
+              Text("Not The Least", style: GoogleFonts.imFellEnglishSc(fontSize: isDesktop ? 32 : 26, fontWeight: FontWeight.bold, color: Colors.purple))
             ],
           ),
           Container(

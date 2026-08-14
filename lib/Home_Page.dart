@@ -193,10 +193,10 @@ Widget _mainImage(BuildContext context) {
               child: Container(
                 padding: EdgeInsets.all(buttonPadding),
                 decoration: BoxDecoration(
-                  color: Colors.brown.shade800,
+                  color: Colors.purple,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text("Explore Collection", style: GoogleFonts.arvo(fontWeight: FontWeight.w500, fontSize: buttonFontSize, color: Colors.white)),
+                child: Text("Explore Collection", style: GoogleFonts.imFellEnglishSc(fontWeight: FontWeight.w500, fontSize: buttonFontSize, color: Colors.white)),
               ),
             ),
           ),
@@ -215,7 +215,7 @@ Widget _subTitle(BuildContext context) {
 
   return Container(
     width: double.infinity,
-    color: Colors.brown.shade800,
+    color: Colors.purple,
     padding: EdgeInsets.symmetric(
       horizontal: horizontalPadding,
       vertical: verticalPadding,
@@ -226,7 +226,7 @@ Widget _subTitle(BuildContext context) {
         Text(
           "the spaces have been waiting in silence. one thoughtful detail, and \n suddenly the whole room remembers how to feel like home.",
           textAlign: TextAlign.center,
-          style: GoogleFonts.arvo(
+          style: GoogleFonts.imFellEnglishSc(
             fontSize: fontSize, fontWeight: FontWeight.w400, fontStyle: FontStyle.italic, color: Colors.white, height: 1.6)),
         const SizedBox(height: 8),
         const Row(
@@ -354,7 +354,7 @@ class _ExploreByCategorySectionState extends State<ExploreByCategorySection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Explore by Category", style: GoogleFonts.arvo(fontSize: screenWidth >= 900 ? 32 : (screenWidth >= 600 ? 26 : 22), fontWeight: FontWeight.bold, color: Colors.brown.shade800, letterSpacing: 0.8)),
+          Text("Explore by Category", style: GoogleFonts.imFellEnglishSc(fontSize: screenWidth >= 900 ? 32 : (screenWidth >= 600 ? 26 : 22), fontWeight: FontWeight.bold, color: Colors.purple, letterSpacing: 0.8)),
           const SizedBox(height: 8),
           Container(
             height: 3,
@@ -599,7 +599,7 @@ class _AnimatedHighlightTileState extends State<AnimatedHighlightTile>
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.cabin(
+                style: GoogleFonts.imFellEnglishSc(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -705,7 +705,7 @@ class _OurDetailsState extends State<OurDetails> {
       },
       child: Container(
         width: double.infinity,
-        color: Colors.brown.shade800,
+        color: Colors.purple,
         padding: const EdgeInsets.symmetric(vertical: 36.0, horizontal: 16.0),
         child: Column(
           children: [
@@ -912,11 +912,11 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("About Us", style: GoogleFonts.arvo(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.brown.shade800, letterSpacing: -0.5)),
+                      Text("About Us", style: GoogleFonts.imFellEnglishSc(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.purple, letterSpacing: -0.5)),
                       const SizedBox(height: 20),
                       Text(
                         "Interior Design introduces people to modernism, relaxation and beauty. Our team at Bindu Decor ensures a perfect blend of function and appearance. We have picked up a notoriety of being consistent with its promise and are pleased to state that the majority of our customers will bear declaration to our greatness in administration crosswise over India.",
-                        style: GoogleFonts.arvo(
+                        style: GoogleFonts.imFellEnglishSc(
                           fontSize: 15,
                           height: 1.6,
                           color: const Color(0xFF4A4A4A),
@@ -929,7 +929,7 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
                           Navigator.pushNamed(context, AppRoutes.about);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.brown.shade800,
+                          backgroundColor: Colors.purple,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
                           shape: RoundedRectangleBorder(
@@ -937,7 +937,7 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
                           ),
                           elevation: 0,
                         ),
-                        child: Text("Read More", style: GoogleFonts.arvo(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                        child: Text("Read More", style: GoogleFonts.imFellEnglishSc(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
                       ),
                     ],
                   ),
@@ -986,11 +986,11 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("About Us", style: GoogleFonts.arvo(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black)),
+                  Text("About Us", style: GoogleFonts.imFellEnglishSc(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.purple)),
                   const SizedBox(height: 16),
                   Text(
                     "Interior Design introduces people to modernism, relaxation and beauty. Our team at Bindu Decor ensures a perfect blend of function and appearance. We have picked up a notoriety of being consistent with its promise and are pleased to state that the majority of our customers will bear declaration to our greatness in administration crosswise over India.",
-                    style: GoogleFonts.arvo(
+                    style: GoogleFonts.imFellEnglishSc(
                       fontSize: 14,
                       height: 1.5,
                       color: const Color(0xFF4A4A4A),
@@ -1002,7 +1002,7 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
                       Navigator.pushNamed(context, AppRoutes.about);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: Colors.purple,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                       shape: RoundedRectangleBorder(

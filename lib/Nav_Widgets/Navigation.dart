@@ -105,7 +105,7 @@ class BinduNavigationBar extends StatelessWidget {
                       enabled: false,
                       child: Text(
                         shopGroup.title.toUpperCase(),
-                        style: GoogleFonts.arvo(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.brown.shade800, letterSpacing: 1.0))),
+                        style: GoogleFonts.imFellEnglishSc(fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 1.0))),
                   );
 
                   // Sub-items with Icons
@@ -137,14 +137,12 @@ class BinduNavigationBar extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (item.icon != null) ...[
-                    Icon(item.icon, size: 20, color: const Color(0xFF276B5A)),
+                    Icon(item.icon, size: 22, color: Colors.purple.shade800),
                     const SizedBox(width: 6),
                   ],
-                  Text(
-                    item.label,
-                    style: GoogleFonts.arvo(fontSize: 18, fontWeight: FontWeight.w500, color: const Color(0xFF276B5A))),
+                  Text(item.label, style: GoogleFonts.imFellEnglishSc(fontSize: 18, color: Colors.purple)),
                   const SizedBox(width: 4),
-                  const Icon(Icons.arrow_drop_down, size: 20, color: Color(0xFF276B5A)),
+                  const Icon(Icons.arrow_drop_down, size: 20),
                 ],
               ),
             ),
@@ -216,10 +214,10 @@ class _NavItem extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 22, color: Colors.brown.shade800),
+              Icon(icon, size: 22, color: Colors.purple.shade800),
               const SizedBox(width: 6),
             ],
-            Text(label, style: GoogleFonts.arvo(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.brown.shade800)),
+            Text(label, style: GoogleFonts.gloock(fontSize: 20, fontWeight: FontWeight.w400, color: Colors.purple)),
           ],
         ),
       ),
@@ -268,9 +266,9 @@ class BinduMobileDrawer extends StatelessWidget {
         items.add(
           ExpansionTile(
             leading: navItem.icon != null
-                ? Icon(navItem.icon, color: Colors.brown.shade800)
+                ? Icon(navItem.icon, color: Colors.black87)
                 : null,
-            title: Text(navItem.label, style: GoogleFonts.cabin(fontSize: 18, fontWeight: FontWeight.w500, color: const Color(0xFF276B5A),)),
+            title: Text(navItem.label, style: GoogleFonts.cabin(fontSize:20, fontWeight: FontWeight.w500)),
             children: shopItems.map((category) {
               return ExpansionTile(
                 tilePadding: const EdgeInsets.only(left: 24),
@@ -282,13 +280,7 @@ class BinduMobileDrawer extends StatelessWidget {
                         ? Icon(subItem.icon, size: 18, color: const Color(0xFF276B5A))
                         : null,
                     title: Text(
-                      subItem.label,
-                      style: GoogleFonts.cabin(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF4A4A4A),
-                      ),
-                    ),
+                      subItem.label, style: GoogleFonts.cabin(fontSize: 15, fontWeight: FontWeight.w500, color: const Color(0xFF4A4A4A))),
                     onTap: () => _handleNavigation(context, subItem.route),
                   );
                 }).toList(),
@@ -305,12 +297,7 @@ class BinduMobileDrawer extends StatelessWidget {
                 : null,
             title: Text(
               navItem.label,
-              style: GoogleFonts.arvo(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF276B5A),
-              ),
-            ),
+              style: GoogleFonts.arvo(fontSize: 18, fontWeight: FontWeight.w500)),
             onTap: () => _handleNavigation(context, navItem.route),
           ),
         );
