@@ -613,7 +613,14 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Meet Our Team", style: GoogleFonts.cabin(fontSize: isDesktop ? 32 : 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
+          Text(
+            "Meet Our Team",
+            style: GoogleFonts.cabin(
+              fontSize: isDesktop ? 32 : 26,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF276B5A),
+            ),
+          ),
           const SizedBox(height: 6),
           Container(
             height: 3,
@@ -636,7 +643,7 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
             )
           else
             SizedBox(
-              height: 380,
+              height: 420, // Slightly increased height to account for bottom stacked reflection
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -663,49 +670,126 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
   }) {
     return Container(
       margin: const EdgeInsets.all(8),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF276B5A), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          )
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
+        alignment: Alignment.bottomCenter,
         children: [
-          Container(
-            width: 90,
-            height: 90,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.brown.shade800, width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF276B5A).withOpacity(0.15),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
+          // 3rd Bottom Reflection Layer (Lowest)
+          Positioned(
+            bottom: 0,
+            left: 24,
+            right: 24,
+            child: Container(
+              height: 20,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE2ECFA).withOpacity(0.4),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(16),
                 ),
-              ],
-            ),
-            child: ClipOval(
-              child: _buildDynamicImage(imageUrl),
+              ),
             ),
           ),
-          const SizedBox(height: 16),
-          Text(tit, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.arvo(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.brown.shade800)),
-          const SizedBox(height: 6),
-          Text(role, textAlign: TextAlign.center, maxLines: 3, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 14.5, fontWeight: FontWeight.w500, color: const Color(0xFF4A4A4A), height: 1.4)),
-          const SizedBox(height: 6),
-          Text(desc, textAlign: TextAlign.center, maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.arvo(fontSize: 13.5, fontWeight: FontWeight.w400, color: Colors.brown.shade800, height: 1.4),
+          // 2nd Bottom Reflection Layer (Middle Stack)
+          Positioned(
+            bottom: 8,
+            left: 12,
+            right: 12,
+            child: Container(
+              height: 20,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEEF4FC).withOpacity(0.8),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(16),
+                ),
+              ),
+            ),
+          ),
+          // Main Foreground Card
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0xFF276B5A).withOpacity(0.12),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  )
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 90,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF276B5A).withOpacity(0.15),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.person, size: 40),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    tit,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.cabin(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1B4D3E),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    role,
+                    textAlign: TextAlign.center,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.cabin(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF4A4A4A),
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "\"$desc\"",
+                    textAlign: TextAlign.center,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.cabin(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF4A4A4A),
+                      height: 1.6,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

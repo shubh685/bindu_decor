@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'Home_Page.dart';
+import 'Pro_Details.dart';
 
 // ============================================================================
 // GLOBAL NAVIGATION CONFIGURATIONS
@@ -42,21 +43,6 @@ final List<NestedMenuItem> _globalShopItems = const [
   ),
 ];
 
-// ============================================================================
-// DATA MODEL
-// ============================================================================
-
-class DecorProductItem {
-  final String title;
-  final List<String> imageUrls;
-  final String description;
-
-  const DecorProductItem({
-    required this.title,
-    required this.imageUrls,
-    required this.description,
-  });
-}
 
 // ============================================================================
 // COMMON PRODUCT GRID CARD WIDGET
@@ -74,6 +60,16 @@ class ProductGridCard extends StatefulWidget {
 class _ProductGridCardState extends State<ProductGridCard> {
   int _selectedImageIndex = 0;
   bool _isFavorite = false;
+
+  void _openDetailDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => ProductDetailPage(
+        item: widget.item,
+        initialImageIndex: _selectedImageIndex,
+      ),
+    );
+  }
 
   Widget _buildProductImage(String path) {
     if (path.isEmpty) {
@@ -116,16 +112,17 @@ class _ProductGridCardState extends State<ProductGridCard> {
         ? widget.item.imageUrls[_selectedImageIndex]
         : '';
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Main Image Display Area
-        Expanded(
-          child: Stack(
-            children: [
-              GestureDetector(
-                onTap: () => showContactFormDialog(context),
-                child: ClipRRect(
+    return InkWell(
+      onTap: _openDetailDialog,
+      borderRadius: BorderRadius.circular(8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Main Image Display Area with InkWell / Tap Gesture
+          Expanded(
+            child: Stack(
+              children: [
+                ClipRRect(
                   borderRadius: BorderRadius.circular(4.0),
                   child: Container(
                     width: double.infinity,
@@ -133,105 +130,114 @@ class _ProductGridCardState extends State<ProductGridCard> {
                     child: _buildProductImage(currentImage),
                   ),
                 ),
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isFavorite = !_isFavorite;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.7),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        _isFavorite ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+                        size: 18,
+                        color: _isFavorite ? Colors.red : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Title
+          Text(
+            widget.item.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.cabin(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF222222),
+            ),
+          ),
+          const SizedBox(height: 2),
+
+          // Thumbnails & Quick Inquire Button
+          Row(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: List.generate(widget.item.imageUrls.length, (idx) {
+                      final isSelected = idx == _selectedImageIndex;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedImageIndex = idx;
+                          });
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 6),
+                          width: 26,
+                          height: 26,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: isSelected ? Colors.black87 : Colors.transparent,
+                              width: 1.5,
+                            ),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(1),
+                            child: _buildProductImage(widget.item.imageUrls[idx]),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
               ),
-              Positioned(
-                top: 10,
-                right: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isFavorite = !_isFavorite;
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.7),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      _isFavorite ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
-                      size: 18,
-                      color: _isFavorite ? Colors.red : Colors.black87,
-                    ),
+
+              InkWell(
+                onTap: _openDetailDialog,
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF276B5A),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.touch_app_outlined, size: 12, color: Colors.white),
+                      const SizedBox(width: 4),
+                      Text(
+                        "Inquire",
+                        style: GoogleFonts.cabin(
+                          fontSize: 11,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ],
           ),
-        ),
-        const SizedBox(height: 8),
-
-        // Title
-        Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cabin(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF222222))),
-        const SizedBox(height: 2),
-
-        // Thumbnails & Inquire Action Button
-        Row(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(widget.item.imageUrls.length, (idx) {
-                    final isSelected = idx == _selectedImageIndex;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedImageIndex = idx;
-                        });
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 6),
-                        width: 26,
-                        height: 26,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: isSelected ? Colors.black87 : Colors.transparent,
-                            width: 1.5,
-                          ),
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(1),
-                          child: _buildProductImage(widget.item.imageUrls[idx]),
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ),
-
-            InkWell(
-              onTap: () => showContactFormDialog(context),
-              borderRadius: BorderRadius.circular(4),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF276B5A),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.touch_app_outlined, size: 12, color: Colors.white),
-                    const SizedBox(width: 4),
-                    Text(
-                      "Inquire",
-                      style: GoogleFonts.cabin(
-                        fontSize: 11,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
