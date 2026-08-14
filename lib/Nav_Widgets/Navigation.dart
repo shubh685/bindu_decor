@@ -105,14 +105,7 @@ class BinduNavigationBar extends StatelessWidget {
                       enabled: false,
                       child: Text(
                         shopGroup.title.toUpperCase(),
-                        style: GoogleFonts.cabin(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          color: const Color(0xFF276B5A),
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                    ),
+                        style: GoogleFonts.arvo(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.brown.shade800, letterSpacing: 1.0))),
                   );
 
                   // Sub-items with Icons
@@ -124,17 +117,10 @@ class BinduNavigationBar extends StatelessWidget {
                         child: Row(
                           children: [
                             if (subItem.icon != null) ...[
-                              Icon(subItem.icon, size: 18, color: const Color(0xFF276B5A)),
+                              Icon(subItem.icon, size: 18, color: Colors.brown.shade800),
                               const SizedBox(width: 10),
                             ],
-                            Text(
-                              subItem.label,
-                              style: GoogleFonts.cabin(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xFF4A4A4A),
-                              ),
-                            ),
+                            Text(subItem.label, style: GoogleFonts.arvo(fontSize: 15, fontWeight: FontWeight.w400, color: const Color(0xFF4A4A4A))),
                           ],
                         ),
                       ),
@@ -156,12 +142,7 @@ class BinduNavigationBar extends StatelessWidget {
                   ],
                   Text(
                     item.label,
-                    style: GoogleFonts.cabin(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF276B5A),
-                    ),
-                  ),
+                    style: GoogleFonts.arvo(fontSize: 18, fontWeight: FontWeight.w500, color: const Color(0xFF276B5A))),
                   const SizedBox(width: 4),
                   const Icon(Icons.arrow_drop_down, size: 20, color: Color(0xFF276B5A)),
                 ],
@@ -221,15 +202,9 @@ class BinduNavigationBar extends StatelessWidget {
 // ==========================================
 
 class _NavItem extends StatelessWidget {
-  final String label;
-  final IconData? icon;
-  final VoidCallback onTap;
+  final String label;final IconData? icon;final VoidCallback onTap;
 
-  const _NavItem({
-    required this.label,
-    this.icon,
-    required this.onTap,
-  });
+  const _NavItem({required this.label, this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -241,10 +216,10 @@ class _NavItem extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 20, color: const Color(0xFF276B5A)),
+              Icon(icon, size: 22, color: Colors.brown.shade800),
               const SizedBox(width: 6),
             ],
-            Text(label, style: GoogleFonts.manrope(fontSize: 18, fontWeight: FontWeight.w500, color: const Color(0xFF276B5A))),
+            Text(label, style: GoogleFonts.arvo(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.brown.shade800)),
           ],
         ),
       ),
@@ -293,27 +268,13 @@ class BinduMobileDrawer extends StatelessWidget {
         items.add(
           ExpansionTile(
             leading: navItem.icon != null
-                ? Icon(navItem.icon, color: const Color(0xFF276B5A))
+                ? Icon(navItem.icon, color: Colors.brown.shade800)
                 : null,
-            title: Text(
-              navItem.label,
-              style: GoogleFonts.cabin(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF276B5A),
-              ),
-            ),
+            title: Text(navItem.label, style: GoogleFonts.cabin(fontSize: 18, fontWeight: FontWeight.w500, color: const Color(0xFF276B5A),)),
             children: shopItems.map((category) {
               return ExpansionTile(
                 tilePadding: const EdgeInsets.only(left: 24),
-                title: Text(
-                  category.title,
-                  style: GoogleFonts.cabin(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF276B5A),
-                  ),
-                ),
+                title: Text(category.title, style: GoogleFonts.cabin(fontSize: 15, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
                 children: category.subItems.map((subItem) {
                   return ListTile(
                     contentPadding: const EdgeInsets.only(left: 40),
@@ -344,7 +305,7 @@ class BinduMobileDrawer extends StatelessWidget {
                 : null,
             title: Text(
               navItem.label,
-              style: GoogleFonts.cabin(
+              style: GoogleFonts.arvo(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
                 color: const Color(0xFF276B5A),
