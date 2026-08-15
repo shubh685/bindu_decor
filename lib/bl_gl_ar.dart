@@ -254,12 +254,6 @@ class Blinds extends StatefulWidget {
 }
 
 class _BlindsState extends State<Blinds> {
-  void _handleNavigation(String route) {
-    if (route.startsWith('http')) return;
-    if (ModalRoute.of(context)?.settings.name != route) {
-      Navigator.pushNamed(context, route);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +266,7 @@ class _BlindsState extends State<Blinds> {
         child: BinduNavigationBar(
           navItems: _globalNavItems,
           shopItems: _globalShopItems,
-          onMenuItemTap: () => _handleNavigation,
+          onMenuItemTap: () => context.navigateTo,
         ),
       ),
       drawer: isDesktop
@@ -280,7 +274,7 @@ class _BlindsState extends State<Blinds> {
           : BinduMobileDrawer(
         navItems: _globalNavItems,
         shopItems: _globalShopItems,
-        onItemTap: () => _handleNavigation,
+        onItemTap: () => context.navigateTo,
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -392,12 +386,7 @@ class GlassFilms extends StatefulWidget {
 }
 
 class _GlassFilmsState extends State<GlassFilms> {
-  void _handleNavigation(String route) {
-    if (route.startsWith('http')) return;
-    if (ModalRoute.of(context)?.settings.name != route) {
-      Navigator.pushNamed(context, route);
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -410,7 +399,7 @@ class _GlassFilmsState extends State<GlassFilms> {
         child: BinduNavigationBar(
           navItems: _globalNavItems,
           shopItems: _globalShopItems,
-          onMenuItemTap: () => _handleNavigation,
+          onMenuItemTap: () => context.navigateTo,
         ),
       ),
       drawer: isDesktop
@@ -418,7 +407,7 @@ class _GlassFilmsState extends State<GlassFilms> {
           : BinduMobileDrawer(
         navItems: _globalNavItems,
         shopItems: _globalShopItems,
-        onItemTap: () => _handleNavigation,
+        onItemTap: () => context.navigateTo,
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -530,12 +519,7 @@ class ArtificialTurfs extends StatefulWidget {
 }
 
 class _ArtificialTurfsState extends State<ArtificialTurfs> {
-  void _handleNavigation(String route) {
-    if (route.startsWith('http')) return;
-    if (ModalRoute.of(context)?.settings.name != route) {
-      Navigator.pushNamed(context, route);
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -548,7 +532,7 @@ class _ArtificialTurfsState extends State<ArtificialTurfs> {
         child: BinduNavigationBar(
           navItems: _globalNavItems,
           shopItems: _globalShopItems,
-          onMenuItemTap: () => _handleNavigation,
+          onMenuItemTap: () => context.navigateTo,
         ),
       ),
       drawer: isDesktop
@@ -556,7 +540,7 @@ class _ArtificialTurfsState extends State<ArtificialTurfs> {
           : BinduMobileDrawer(
         navItems: _globalNavItems,
         shopItems: _globalShopItems,
-        onItemTap: () => _handleNavigation,
+        onItemTap: () => context.navigateTo,
       ),
       body: SafeArea(
         child: CustomScrollView(

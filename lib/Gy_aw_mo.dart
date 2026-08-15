@@ -254,12 +254,7 @@ class GymFloorings extends StatefulWidget {
 }
 
 class _GymFlooringsState extends State<GymFloorings> {
-  void _handleNavigation(String route) {
-    if (route.startsWith('http')) return;
-    if (ModalRoute.of(context)?.settings.name != route) {
-      Navigator.pushNamed(context, route);
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +267,7 @@ class _GymFlooringsState extends State<GymFloorings> {
         child: BinduNavigationBar(
           navItems: _globalNavItems,
           shopItems: _globalShopItems,
-          onMenuItemTap: () => _handleNavigation,
+          onMenuItemTap: () => context.navigateTo,
         ),
       ),
       drawer: isDesktop
@@ -280,7 +275,7 @@ class _GymFlooringsState extends State<GymFloorings> {
           : BinduMobileDrawer(
         navItems: _globalNavItems,
         shopItems: _globalShopItems,
-        onItemTap: () => _handleNavigation,
+        onItemTap: () => context.navigateTo,
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -385,12 +380,7 @@ class Awnings extends StatefulWidget {
 }
 
 class _AwningsState extends State<Awnings> {
-  void _handleNavigation(String route) {
-    if (route.startsWith('http')) return;
-    if (ModalRoute.of(context)?.settings.name != route) {
-      Navigator.pushNamed(context, route);
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -403,7 +393,7 @@ class _AwningsState extends State<Awnings> {
         child: BinduNavigationBar(
           navItems: _globalNavItems,
           shopItems: _globalShopItems,
-          onMenuItemTap: () => _handleNavigation,
+          onMenuItemTap: () => context.navigateTo,
         ),
       ),
       drawer: isDesktop
@@ -411,7 +401,7 @@ class _AwningsState extends State<Awnings> {
           : BinduMobileDrawer(
         navItems: _globalNavItems,
         shopItems: _globalShopItems,
-        onItemTap: () => _handleNavigation,
+        onItemTap: () => context.navigateTo,
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -523,12 +513,6 @@ class MosquitoNets extends StatefulWidget {
 }
 
 class _MosquitoNetsState extends State<MosquitoNets> {
-  void _handleNavigation(String route) {
-    if (route.startsWith('http')) return;
-    if (ModalRoute.of(context)?.settings.name != route) {
-      Navigator.pushNamed(context, route);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -541,7 +525,7 @@ class _MosquitoNetsState extends State<MosquitoNets> {
         child: BinduNavigationBar(
           navItems: _globalNavItems,
           shopItems: _globalShopItems,
-          onMenuItemTap: () => _handleNavigation,
+          onMenuItemTap: () => context.navigateTo,
         ),
       ),
       drawer: isDesktop
@@ -549,7 +533,7 @@ class _MosquitoNetsState extends State<MosquitoNets> {
           : BinduMobileDrawer(
         navItems: _globalNavItems,
         shopItems: _globalShopItems,
-        onItemTap: () => _handleNavigation,
+        onItemTap: () => context.navigateTo,
       ),
       body: SafeArea(
         child: CustomScrollView(

@@ -15,11 +15,11 @@ class Clients extends StatefulWidget {
 
 class _ClientsState extends State<Clients> {
   final List<NavItem> _navItems = const [
-    NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
+    NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home_rounded),
     NavItem(label: "About", route: AppRoutes.about, icon: CupertinoIcons.info_circle),
-    NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.person_alt_circle),
-    NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart),
-    NavItem(label: "Reviews", icon: Icons.reviews_outlined, route:"https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D"),
+    NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.person_alt_circle_fill),
+    NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart_fill),
+    NavItem(label: "Reviews", icon: Icons.rate_review_rounded, route:"https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D"),
   ];
 
   final List<NestedMenuItem> _shopItems = const [
@@ -42,28 +42,32 @@ class _ClientsState extends State<Clients> {
     ),
   ];
 
-  void _handleNavigation(String route) {
-    if (route.startsWith('http')) {
-      return;
-    }
 
-    if (ModalRoute.of(context)?.settings.name != route) {
-      Navigator.pushNamed(context, route);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF9F6),
+      backgroundColor: const Color(0xFFFAFAF8),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
-        child: BinduNavigationBar(
-          navItems: _navItems,
-          shopItems: _shopItems,
-          onMenuItemTap: () => _handleNavigation,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.9),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF0F382C).withOpacity(0.06),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              )
+            ],
+          ),
+          child: BinduNavigationBar(
+            navItems: _navItems,
+            shopItems: _shopItems,
+            onMenuItemTap: () => context.navigateTo,
+          ),
         ),
       ),
       drawer: isDesktop
@@ -71,7 +75,7 @@ class _ClientsState extends State<Clients> {
           : BinduMobileDrawer(
         navItems: _navItems,
         shopItems: _shopItems,
-        onItemTap: () => _handleNavigation,
+        onItemTap: () => context.navigateTo,
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -118,13 +122,11 @@ class _ClientLogoListState extends State<_ClientLogoList>
   void initState() {
     super.initState();
 
-    // Standard smooth duration for headers
     _headerController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
     );
 
-    // Headers slide Top to Down when scrolled into view
     _topToBottomTextAnim = Tween<Offset>(
       begin: const Offset(0.0, -1.0),
       end: Offset.zero,
@@ -184,7 +186,6 @@ class _ClientLogoListState extends State<_ClientLogoList>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Header scroll detector
           VisibilityDetector(
             key: const Key('header_visibility_key'),
             onVisibilityChanged: (info) {
@@ -195,55 +196,69 @@ class _ClientLogoListState extends State<_ClientLogoList>
             },
             child: Column(
               children: [
-                // 1. First Text
                 SlideTransition(
                   position: _topToBottomTextAnim,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF276B5A).withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(20),
+                      color: const Color(0xFF0F382C).withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: const Color(0xFF0F382C).withOpacity(0.15)),
                     ),
-                    child: Text("TRUSTED BY INDUSTRY LEADER", style: GoogleFonts.cabin(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0, color: const Color(0xFF276B5A))),
+                    child: Text(
+                        "TRUSTED BY INDUSTRY LEADERS",
+                        style: GoogleFonts.spaceGrotesk(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2.5,
+                            color: const Color(0xFF0F382C)
+                        )
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+
+                SlideTransition(
+                  position: _topToBottomTextAnim,
+                  child: Text(
+                      "Our Esteemed Clients",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.playfairDisplay(
+                          fontSize: screenWidth >= 900 ? 42 : 30,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF0F382C),
+                          letterSpacing: 0.5
+                      )
                   ),
                 ),
                 const SizedBox(height: 12),
 
-                // 2. Second Text
-                SlideTransition(
-                  position: _topToBottomTextAnim,
-                  child: Text("Our Esteemed Clients", textAlign: TextAlign.center, style: GoogleFonts.cabin(fontSize: screenWidth >= 900 ? 36 : 28, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A), letterSpacing: 0.5)),
-                ),
-                const SizedBox(height: 10),
-
-                // Decorative Gold Line
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
                       height: 2,
                       width: 24,
-                      color: const Color(0xFFC89D52).withOpacity(0.4),
+                      color: const Color(0xFFD4AF37).withOpacity(0.4),
                     ),
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 6),
                       height: 4,
-                      width: 40,
+                      width: 44,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFC89D52),
+                        gradient: const LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFF8C6D23)]),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                     Container(
                       height: 2,
                       width: 24,
-                      color: const Color(0xFFC89D52).withOpacity(0.4),
+                      color: const Color(0xFFD4AF37).withOpacity(0.4),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
 
-                // 3. Third Text
                 SlideTransition(
                   position: _topToBottomTextAnim,
                   child: Padding(
@@ -251,9 +266,9 @@ class _ClientLogoListState extends State<_ClientLogoList>
                     child: Text(
                       "Proudly serving corporate offices, luxury residences, and commercial venues across India.",
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.cabin(
-                        fontSize: 15,
-                        color: Colors.black54,
+                      style: GoogleFonts.outfit(
+                        fontSize: 16,
+                        color: const Color(0xFF4A5568),
                       ),
                     ),
                   ),
@@ -261,9 +276,8 @@ class _ClientLogoListState extends State<_ClientLogoList>
               ],
             ),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 44),
 
-          // Client Cards Grid (Each image animates one by one on scroll)
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: screenWidth >= 1200
@@ -276,8 +290,8 @@ class _ClientLogoListState extends State<_ClientLogoList>
               itemCount: teamMembers.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,
-                crossAxisSpacing: screenWidth >= 768 ? 24 : 12,
-                mainAxisSpacing: screenWidth >= 768 ? 24 : 12,
+                crossAxisSpacing: screenWidth >= 768 ? 24 : 14,
+                mainAxisSpacing: screenWidth >= 768 ? 24 : 14,
                 childAspectRatio: 2.1,
               ),
               itemBuilder: (context, index) {
@@ -319,7 +333,6 @@ class _AnimatedClientCardState extends State<_AnimatedClientCard>
       duration: const Duration(milliseconds: 600),
     );
 
-    // Card slides in from left to right as scrolled into view
     _leftToRightImageAnim = Tween<Offset>(
       begin: const Offset(-0.8, 0.0),
       end: Offset.zero,
@@ -356,18 +369,21 @@ class _AnimatedClientCardState extends State<_AnimatedClientCard>
             transform: isHovered
                 ? (Matrix4.identity()..translate(0, -6, 0))
                 : Matrix4.identity(),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFF276B5A), width: 2),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isHovered ? const Color(0xFFD4AF37) : const Color(0xFF0F382C).withOpacity(0.12),
+                width: isHovered ? 2.0 : 1.5,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: isHovered
-                      ? const Color(0xFF276B5A).withOpacity(0.12)
-                      : Colors.black.withOpacity(0.04),
-                  blurRadius: isHovered ? 16 : 8,
-                  offset: isHovered ? const Offset(0, 8) : const Offset(0, 2),
+                      ? const Color(0xFF0F382C).withOpacity(0.12)
+                      : const Color(0xFF0F382C).withOpacity(0.04),
+                  blurRadius: isHovered ? 20 : 10,
+                  offset: isHovered ? const Offset(0, 10) : const Offset(0, 4),
                 ),
               ],
             ),
@@ -406,9 +422,9 @@ Widget _buildDynamicImage(String imagePath) {
 
 Widget _imageFallback() {
   return Container(
-    color: const Color(0xFFF5F5F5),
+    color: const Color(0xFFFAFAF8),
     child: const Center(
-      child: Icon(Icons.business, size: 36, color: Color(0xFF276B5A)),
+      child: Icon(Icons.business_rounded, size: 36, color: Color(0xFF0F382C)),
     ),
   );
 }

@@ -1,15 +1,25 @@
-import 'dart:convert';
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:bindu_decor/Home_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_icon_class/font_awesome_icon_class.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+
+// ==========================================
+// LUXURY BRANDING COLOR PALETTE
+// ==========================================
+class LuxuryTheme {
+  static const Color primaryDark = Color(0xFF1E4D40);  // Rich Royal Emerald
+  static const Color primaryAccent = Color(0xFFC5A059); // Muted Brass Gold
+  static const Color bgCream = Color(0xFFFBF9F5);       // Elegant Soft Cream
+  static const Color textDark = Color(0xFF222222);      // Deep Charcoal
+  static const Color textMuted = Color(0xFF666666);     // Neutral Subtext
+}
 
 // ==========================================
 // NAVIGATION DATA MODELS
@@ -58,11 +68,18 @@ class BinduNavigationBar extends StatelessWidget {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFEEEEEE), width: 1.0),
+      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+      decoration: BoxDecoration(
+        color: LuxuryTheme.bgCream.withOpacity(0.95),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: const Border(
+          bottom: BorderSide(color: Color(0xFFE8E3D9), width: 1.0),
         ),
       ),
       child: SafeArea(
@@ -86,12 +103,14 @@ class BinduNavigationBar extends StatelessWidget {
 
     for (var item in navItems) {
       if (item.label.toLowerCase() == 'shop') {
-        // Desktop Shop Item with Icon & Popup Menu
+        // Desktop Shop Item with Popup Menu
         navWidgets.add(
           PopupMenuButton<String>(
-            offset: const Offset(0, 40),
-            elevation: 4,
+            offset: const Offset(0, 52),
+            elevation: 12,
+            shadowColor: Colors.black.withOpacity(0.15),
             color: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             tooltip: item.label,
             onSelected: (value) => _handleNavigation(context, value),
             itemBuilder: (BuildContext context) {
@@ -99,13 +118,15 @@ class BinduNavigationBar extends StatelessWidget {
 
               for (var shopGroup in shopItems) {
                 if (shopGroup.subItems.isNotEmpty) {
-                  // Category Header (e.g., PRODUCTS & SERVICES)
+                  // Category Header
                   menuEntries.add(
                     PopupMenuItem<String>(
                       enabled: false,
                       child: Text(
                         shopGroup.title.toUpperCase(),
-                        style: GoogleFonts.imFellEnglishSc(fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 1.0))),
+                        style: GoogleFonts.cormorantGaramond(
+                          fontWeight: FontWeight.w700, fontSize: 12.5, letterSpacing: 2.0, color: LuxuryTheme.primaryAccent,)),
+                    ),
                   );
 
                   // Sub-items with Icons
@@ -113,15 +134,15 @@ class BinduNavigationBar extends StatelessWidget {
                     menuEntries.add(
                       PopupMenuItem<String>(
                         value: subItem.route,
-                        height: 40,
+                        height: 44,
                         child: Row(
                           children: [
                             if (subItem.icon != null) ...[
-                              Icon(subItem.icon, size: 18, color: Colors.brown.shade800),
-                              const SizedBox(width: 10),
+                              Icon(subItem.icon, size: 18, color: LuxuryTheme.primaryDark),
+                              const SizedBox(width: 12),
                             ],
-                            Text(subItem.label, style: GoogleFonts.arvo(fontSize: 15, fontWeight: FontWeight.w400, color: const Color(0xFF4A4A4A))),
-                          ],
+                            Text(subItem.label, style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.w700, color: LuxuryTheme.textDark,)),
+                          ]
                         ),
                       ),
                     );
@@ -131,18 +152,23 @@ class BinduNavigationBar extends StatelessWidget {
               }
               return menuEntries;
             },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 14.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (item.icon != null) ...[
-                    Icon(item.icon, size: 22, color: Colors.purple.shade800),
+                    Icon(item.icon, size: 16, color: LuxuryTheme.primaryDark),
                     const SizedBox(width: 6),
                   ],
-                  Text(item.label, style: GoogleFonts.imFellEnglishSc(fontSize: 18, color: Colors.purple)),
+                  Text(
+                    item.label.toUpperCase(),
+                    style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: LuxuryTheme.primaryDark)),
                   const SizedBox(width: 4),
-                  const Icon(Icons.arrow_drop_down, size: 20),
+                  const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: LuxuryTheme.primaryDark),
                 ],
               ),
             ),
@@ -157,7 +183,7 @@ class BinduNavigationBar extends StatelessWidget {
           ),
         );
       }
-      navWidgets.add(const SizedBox(width: 20));
+      navWidgets.add(const SizedBox(width: 10));
     }
 
     return Row(
@@ -169,7 +195,7 @@ class BinduNavigationBar extends StatelessWidget {
   Widget _buildMobileMenuButton(BuildContext context) {
     return Builder(
       builder: (innerContext) => IconButton(
-        icon: const Icon(Icons.menu, color: Colors.black),
+        icon: const Icon(Icons.menu_rounded, color: LuxuryTheme.primaryDark, size: 28),
         onPressed: () {
           Scaffold.of(innerContext).openDrawer();
         },
@@ -177,9 +203,27 @@ class BinduNavigationBar extends StatelessWidget {
     );
   }
 
+  // Replace this method in BinduNavigationBar class
   Future<void> _handleNavigation(BuildContext context, String route) async {
-    if (onMenuItemTap != null) {
-      onMenuItemTap!();
+    await NavigationHandler.handleNavigation(context, route, onTap: onMenuItemTap);
+  }
+}
+
+// Navigation.dart - Add this at the end of the file, before the BinduFooter class
+
+// ==========================================
+// REUSABLE NAVIGATION HANDLER
+// ==========================================
+
+class NavigationHandler {
+  /// Handles navigation for both internal routes and external URLs
+  static Future<void> handleNavigation(
+      BuildContext context,
+      String route, {
+        VoidCallback? onTap,
+      }) async {
+    if (onTap != null) {
+      onTap();
     }
 
     if (route.startsWith('http://') || route.startsWith('https://')) {
@@ -190,17 +234,30 @@ class BinduNavigationBar extends StatelessWidget {
         debugPrint('Could not launch $url');
       }
     } else {
-      Navigator.pushNamed(context, route);
+      // Check if we're already on the same route to avoid unnecessary navigation
+      final String? currentRoute = ModalRoute.of(context)?.settings.name;
+      if (currentRoute != route) {
+        Navigator.pushNamed(context, route);
+      }
     }
   }
-}
 
+  /// Creates a navigation callback that can be used with onMenuItemTap
+  static VoidCallback createNavigationCallback(
+      BuildContext context,
+      String route,
+      ) {
+    return () => handleNavigation(context, route);
+  }
+}
 // ==========================================
 // NAVIGATION WIDGETS
 // ==========================================
 
 class _NavItem extends StatelessWidget {
-  final String label;final IconData? icon;final VoidCallback onTap;
+  final String label;
+  final IconData? icon;
+  final VoidCallback onTap;
 
   const _NavItem({required this.label, this.icon, required this.onTap});
 
@@ -208,16 +265,17 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 22, color: Colors.purple.shade800),
+              Icon(icon, size: 16, color: LuxuryTheme.primaryDark),
               const SizedBox(width: 6),
             ],
-            Text(label, style: GoogleFonts.unkempt(fontSize: 20, fontWeight: FontWeight.w400, color: Colors.purple)),
+            Text(label.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: LuxuryTheme.primaryDark)),
           ],
         ),
       ),
@@ -244,13 +302,15 @@ class BinduMobileDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: LuxuryTheme.bgCream,
       child: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           children: [
             _buildLogo(context),
-            const Divider(),
+            const SizedBox(height: 16),
+            const Divider(color: Color(0xFFE8E3D9)),
+            const SizedBox(height: 8),
             ..._buildDrawerItems(context),
           ],
         ),
@@ -264,66 +324,66 @@ class BinduMobileDrawer extends StatelessWidget {
     for (var navItem in navItems) {
       if (navItem.label.toLowerCase() == 'shop') {
         items.add(
-          ExpansionTile(
-            leading: navItem.icon != null
-                ? Icon(navItem.icon, color: Colors.black87)
-                : null,
-            title: Text(navItem.label, style: GoogleFonts.cabin(fontSize:20, fontWeight: FontWeight.w500)),
-            children: shopItems.map((category) {
-              return ExpansionTile(
-                tilePadding: const EdgeInsets.only(left: 24),
-                title: Text(category.title, style: GoogleFonts.cabin(fontSize: 15, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
-                children: category.subItems.map((subItem) {
-                  return ListTile(
-                    contentPadding: const EdgeInsets.only(left: 40),
-                    leading: subItem.icon != null
-                        ? Icon(subItem.icon, size: 18, color: const Color(0xFF276B5A))
-                        : null,
-                    title: Text(
-                      subItem.label, style: GoogleFonts.cabin(fontSize: 15, fontWeight: FontWeight.w500, color: const Color(0xFF4A4A4A))),
-                    onTap: () => _handleNavigation(context, subItem.route),
-                  );
-                }).toList(),
-              );
-            }).toList(),
+          Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              leading: navItem.icon != null
+                  ? Icon(navItem.icon, color: LuxuryTheme.primaryDark)
+                  : null,
+              title: Text(
+                navItem.label.toUpperCase(),
+                style: GoogleFonts.cinzel(fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: LuxuryTheme.primaryDark),
+              ),
+              children: shopItems.map((category) {
+                return ExpansionTile(
+                  tilePadding: const EdgeInsets.only(left: 20),
+                  title: Text(
+                    category.title.toUpperCase(),
+                    style: GoogleFonts.cormorantGaramond(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: LuxuryTheme.primaryAccent),
+                  ),
+                  children: category.subItems.map((subItem) {
+                    return ListTile(
+                      contentPadding: const EdgeInsets.only(left: 36),
+                      leading: subItem.icon != null
+                          ? Icon(subItem.icon, size: 18, color: LuxuryTheme.primaryDark)
+                          : null,
+                      title: Text(
+                        subItem.label,
+                        style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.w500, color: LuxuryTheme.textDark),
+                      ),
+                      onTap: () => _handleNavigation(context, subItem.route),
+                    );
+                  }).toList(),
+                );
+              }).toList(),
+            ),
           ),
         );
-        items.add(const SizedBox(height: 8));
+        items.add(const SizedBox(height: 4));
       } else {
         items.add(
           ListTile(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             leading: navItem.icon != null
-                ? Icon(navItem.icon, color: const Color(0xFF276B5A))
+                ? Icon(navItem.icon, color: LuxuryTheme.primaryDark)
                 : null,
             title: Text(
-              navItem.label,
-              style: GoogleFonts.arvo(fontSize: 18, fontWeight: FontWeight.w500)),
+              navItem.label.toUpperCase(),
+              style: GoogleFonts.cinzel(fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: LuxuryTheme.primaryDark),
+            ),
             onTap: () => _handleNavigation(context, navItem.route),
           ),
         );
-        items.add(const SizedBox(height: 8));
+        items.add(const SizedBox(height: 4));
       }
     }
 
     return items;
   }
 
+  // Replace this method in BinduMobileDrawer class
   Future<void> _handleNavigation(BuildContext context, String route) async {
-    if (onItemTap != null) {
-      onItemTap!();
-    }
-    Navigator.pop(context); // Close Drawer
-
-    if (route.startsWith('http://') || route.startsWith('https://')) {
-      final Uri url = Uri.parse(route);
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      } else {
-        debugPrint('Could not launch $url');
-      }
-    } else {
-      Navigator.pushNamed(context, route);
-    }
+    await NavigationHandler.handleNavigation(context, route, onTap: onItemTap);
   }
 }
 
@@ -333,12 +393,12 @@ class BinduMobileDrawer extends StatelessWidget {
 
 Widget _buildLogo(BuildContext context) {
   return SizedBox(
-    height: 72,
+    height: 65,
     child: InkWell(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
       },
-      child: Image.asset("assets/images/bindu.png"),
+      child: Image.asset("assets/images/bindu.png", fit: BoxFit.contain),
     ),
   );
 }
@@ -364,20 +424,17 @@ class _BinduFooterState extends State<BinduFooter>
   late Animation<Offset> _emailAnim;
   late Animation<Offset> _workingHoursAnim;
 
-  // Track if the animation has already been triggered
   bool _hasAnimated = false;
 
   @override
   void initState() {
     super.initState();
 
-    // Duration normalized to 1 second for a smooth staggered reveal
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
 
-    // 1. Logo & Title (Top -> Bottom)
     _logoAnim = Tween<Offset>(
       begin: const Offset(0.0, -0.5),
       end: Offset.zero,
@@ -386,7 +443,6 @@ class _BinduFooterState extends State<BinduFooter>
       curve: const Interval(0.0, 0.35, curve: Curves.easeOut),
     ));
 
-    // 2. Address (Left -> Right)
     _addressAnim = Tween<Offset>(
       begin: const Offset(-0.5, 0.0),
       end: Offset.zero,
@@ -395,7 +451,6 @@ class _BinduFooterState extends State<BinduFooter>
       curve: const Interval(0.2, 0.5, curve: Curves.easeOut),
     ));
 
-    // 3. Phone (Left -> Right)
     _phoneAnim = Tween<Offset>(
       begin: const Offset(-0.5, 0.0),
       end: Offset.zero,
@@ -404,7 +459,6 @@ class _BinduFooterState extends State<BinduFooter>
       curve: const Interval(0.35, 0.65, curve: Curves.easeOut),
     ));
 
-    // 4. Email (Left -> Right)
     _emailAnim = Tween<Offset>(
       begin: const Offset(-0.5, 0.0),
       end: Offset.zero,
@@ -413,7 +467,6 @@ class _BinduFooterState extends State<BinduFooter>
       curve: const Interval(0.5, 0.8, curve: Curves.easeOut),
     ));
 
-    // 5. Working Hours (Right -> Left)
     _workingHoursAnim = Tween<Offset>(
       begin: const Offset(0.5, 0.0),
       end: Offset.zero,
@@ -421,8 +474,6 @@ class _BinduFooterState extends State<BinduFooter>
       parent: _controller,
       curve: const Interval(0.65, 1.0, curve: Curves.easeOut),
     ));
-
-    // Note: _controller.forward() removed from here so it waits for scroll visibility
   }
 
   @override
@@ -454,13 +505,6 @@ class _BinduFooterState extends State<BinduFooter>
     }
   }
 
-  void _handleNavigation(String route) {
-    if (route.startsWith('http')) return;
-    if (ModalRoute.of(context)?.settings.name != route) {
-      Navigator.pushNamed(context, route);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -474,7 +518,6 @@ class _BinduFooterState extends State<BinduFooter>
     return VisibilityDetector(
       key: const Key('bindu_footer_visibility'),
       onVisibilityChanged: (info) {
-        // Trigger animation when at least 10% of the footer is scrolled into view
         if (info.visibleFraction > 0.1 && !_hasAnimated) {
           _hasAnimated = true;
           _controller.forward();
@@ -482,10 +525,15 @@ class _BinduFooterState extends State<BinduFooter>
       },
       child: Container(
         width: double.infinity,
-        color: const Color(0xFF276B5A),
+        decoration: const BoxDecoration(
+          color: LuxuryTheme.primaryDark,
+          border: Border(
+            top: BorderSide(color: LuxuryTheme.primaryAccent, width: 2.0),
+          ),
+        ),
         padding: EdgeInsets.symmetric(
-          vertical: 40.0,
-          horizontal: isDesktop ? 60.0 : 24.0,
+          vertical: 56.0,
+          horizontal: isDesktop ? 64.0 : 24.0,
         ),
         child: isDesktop
             ? Row(
@@ -505,9 +553,9 @@ class _BinduFooterState extends State<BinduFooter>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildLogoSection(),
-            const SizedBox(height: 30),
+            const SizedBox(height: 36),
             _buildContactSection(addressText, emailText, phoneText),
-            const SizedBox(height: 30),
+            const SizedBox(height: 36),
             _buildRightSection(),
           ],
         ),
@@ -523,8 +571,8 @@ class _BinduFooterState extends State<BinduFooter>
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            height: 90,
-            width: 135,
+            height: 75,
+            width: 140,
             child: Image.asset(
               "assets/images/bindu.png",
               errorBuilder: (context, error, stackTrace) => Container(
@@ -532,7 +580,7 @@ class _BinduFooterState extends State<BinduFooter>
                 height: 90,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white70, width: 2),
+                  border: Border.all(color: LuxuryTheme.primaryAccent, width: 2),
                 ),
                 child: const Center(
                   child: Text("BINDU", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -541,7 +589,9 @@ class _BinduFooterState extends State<BinduFooter>
             ),
           ),
           const SizedBox(height: 12),
-          Text("BINDU DECOR", style: GoogleFonts.cabin(color: Colors.white, fontSize: 16, letterSpacing: 2, fontWeight: FontWeight.w600)),
+          Text("BINDU DÉCOR", style: GoogleFonts.cormorantGaramond(color: Colors.white, fontSize: 22, letterSpacing: 3, fontWeight: FontWeight.w700,),),
+          const SizedBox(height: 4),
+          Text("Curating Luxury Living Spaces", style: GoogleFonts.plusJakartaSans(color: Colors.white60, fontSize: 12)),
         ],
       ),
     );
@@ -554,14 +604,8 @@ class _BinduFooterState extends State<BinduFooter>
       children: [
         Text(
           "CONTACT DETAILS",
-          style: GoogleFonts.cabin(
-            color: const Color(0xFFD4B16A),
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
-          ),
-        ),
-        const SizedBox(height: 16),
+          style: GoogleFonts.cormorantGaramond(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
+        const SizedBox(height: 18),
         SlideTransition(
           position: _addressAnim,
           child: InkWell(
@@ -571,29 +615,17 @@ class _BinduFooterState extends State<BinduFooter>
               children: [
                 const Padding(
                   padding: EdgeInsets.only(top: 2.0),
-                  child: Icon(
-                    Icons.location_on_outlined,
-                    color: Colors.white70,
-                    size: 18,
-                  ),
+                  child: Icon(Icons.location_on_outlined, color: LuxuryTheme.primaryAccent, size: 18),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Expanded(
-                  child: Text(
-                    address,
-                    style: GoogleFonts.cabin(
-                      color: Colors.white,
-                      fontSize: 15,
-                      decoration: TextDecoration.underline,
-                      decorationColor: Colors.white54,
-                    ),
-                  ),
+                  child: Text(address, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: 14, height: 1.5, decorationColor: Colors.white38,)),
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
         SlideTransition(
           position: _phoneAnim,
           child: InkWell(
@@ -603,25 +635,17 @@ class _BinduFooterState extends State<BinduFooter>
               children: [
                 const Padding(
                   padding: EdgeInsets.only(top: 2.0),
-                  child: Icon(Icons.phone_outlined, color: Colors.white70, size: 18),
+                  child: Icon(Icons.phone_outlined, color: LuxuryTheme.primaryAccent, size: 18),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Expanded(
-                  child: Text(
-                    phone,
-                    style: GoogleFonts.cabin(
-                      color: Colors.white,
-                      fontSize: 15,
-                      decoration: TextDecoration.underline,
-                      decorationColor: Colors.white54,
-                    ),
-                  ),
+                  child: Text(phone, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: 14,  decorationColor: Colors.white38)),
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
         SlideTransition(
           position: _emailAnim,
           child: InkWell(
@@ -631,19 +655,11 @@ class _BinduFooterState extends State<BinduFooter>
               children: [
                 const Padding(
                   padding: EdgeInsets.only(top: 2.0),
-                  child: Icon(Icons.email_outlined, color: Colors.white70, size: 18),
+                  child: Icon(Icons.email_outlined, color: LuxuryTheme.primaryAccent, size: 18),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Expanded(
-                  child: Text(
-                    email,
-                    style: GoogleFonts.cabin(
-                      color: Colors.white,
-                      fontSize: 15,
-                      decoration: TextDecoration.underline,
-                      decorationColor: Colors.white54,
-                    ),
-                  ),
+                  child: Text(email, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: 14, decorationColor: Colors.white38)),
                 ),
               ],
             ),
@@ -662,17 +678,17 @@ class _BinduFooterState extends State<BinduFooter>
         children: [
           Text(
             "WORKING HOURS",
-            style: GoogleFonts.cabin(
-              color: const Color(0xFFD4B16A),
-              fontSize: 14,
+            style: GoogleFonts.cinzel(
+              color: LuxuryTheme.primaryAccent,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
+              letterSpacing: 2.0,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           Text(
             "10:30 AM to 7:00 PM IST | Mon - Sat",
-            style: GoogleFonts.cabin(color: Colors.white70, fontSize: 15),
+            style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.85), fontSize: 14, height: 1.5),
           ),
         ],
       ),
@@ -713,9 +729,6 @@ Widget _contactForm(BuildContext context) {
     'Other / Custom Design',
   ];
 
-  const Color primaryColor = Color(0xFF276B5A);
-  const Color goldAccent = Color(0xFFC89D52);
-
   InputDecoration buildInputDecoration({
     required String label,
     required String hint,
@@ -724,30 +737,31 @@ Widget _contactForm(BuildContext context) {
     return InputDecoration(
       labelText: label,
       hintText: hint,
-      prefixIcon: Icon(icon, color: primaryColor),
-      labelStyle: GoogleFonts.cabin(color: Colors.black87, fontSize: 13),
-      hintStyle: GoogleFonts.cabin(color: Colors.black38, fontSize: 13),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      prefixIcon: Icon(icon, color: LuxuryTheme.primaryDark, size: 20),
+      labelStyle: GoogleFonts.plusJakartaSans(color: LuxuryTheme.textDark, fontSize: 13),
+      hintStyle: GoogleFonts.plusJakartaSans(color: LuxuryTheme.textMuted, fontSize: 13),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      filled: true,
+      fillColor: LuxuryTheme.bgCream,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.black26),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.black26),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: primaryColor, width: 1.5),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: LuxuryTheme.primaryDark, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Colors.redAccent),
       ),
     );
   }
 
-  // Submit form via HTTP API Call
   Future<void> sendInquiryApi(StateSetter setDialogState) async {
     if (!formKey.currentState!.validate()) return;
 
@@ -755,12 +769,9 @@ Widget _contactForm(BuildContext context) {
       isLoading = true;
     });
 
-    final String generatedReqId =
-        'BD-${DateTime.now().millisecondsSinceEpoch}';
+    final String generatedReqId = 'BD-${DateTime.now().millisecondsSinceEpoch}';
 
-    final Uri apiUrl = Uri.parse(
-      'http://192.168.1.10/bindu_decor/send_inquiry.php',
-    );
+    final Uri apiUrl = Uri.parse('http://192.168.1.10/bindu_decor/send_inquiry.php');
 
     try {
       final response = await http
@@ -781,12 +792,6 @@ Widget _contactForm(BuildContext context) {
       )
           .timeout(const Duration(seconds: 30));
 
-      debugPrint('================ INQUIRY API ================');
-      debugPrint('URL: $apiUrl');
-      debugPrint('STATUS: ${response.statusCode}');
-      debugPrint('BODY: ${response.body}');
-      debugPrint('================================================');
-
       if (!context.mounted) return;
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
@@ -796,52 +801,23 @@ Widget _contactForm(BuildContext context) {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'Server Error ${response.statusCode}: ${response.body}',
-            ),
+            content: Text('Server Error ${response.statusCode}: ${response.body}'),
             backgroundColor: Colors.redAccent,
           ),
         );
-
         return;
       }
 
-      Map<String, dynamic> responseData;
-
-      try {
-        responseData = jsonDecode(response.body);
-      } catch (jsonError) {
-        debugPrint('JSON ERROR: $jsonError');
-        debugPrint('RAW RESPONSE: ${response.body}');
-
-        setDialogState(() {
-          isLoading = false;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Server returned an invalid response. Check PHP error.',
-            ),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
-
-        return;
-      }
+      Map<String, dynamic> responseData = jsonDecode(response.body);
 
       if (responseData['success'] == true) {
         if (!context.mounted) return;
-
         Navigator.of(context).pop();
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              responseData['message'] ??
-                  'Inquiry submitted successfully!',
-            ),
-            backgroundColor: primaryColor,
+            content: Text(responseData['message'] ?? 'Inquiry submitted successfully!'),
+            backgroundColor: LuxuryTheme.primaryDark,
           ),
         );
       } else {
@@ -851,72 +827,28 @@ Widget _contactForm(BuildContext context) {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              responseData['message'] ??
-                  'Unable to submit inquiry.',
-            ),
+            content: Text(responseData['message'] ?? 'Unable to submit inquiry.'),
             backgroundColor: Colors.redAccent,
           ),
         );
       }
-    } on TimeoutException catch (e) {
-      debugPrint('TIMEOUT ERROR: $e');
-
+    } catch (e) {
       if (!context.mounted) return;
-
-      setDialogState(() {
-        isLoading = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Request timed out. Check whether the PHP server is running.',
-          ),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-    } on SocketException catch (e) {
-      debugPrint('SOCKET ERROR: $e');
-
-      if (!context.mounted) return;
-
-      setDialogState(() {
-        isLoading = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Cannot connect to PHP server. Check IP address and Apache.',
-          ),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-    } catch (e, stackTrace) {
-      debugPrint('GENERAL ERROR: $e');
-      debugPrint('STACK TRACE: $stackTrace');
-
-      if (!context.mounted) return;
-
       setDialogState(() {
         isLoading = false;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Connection Error: $e',
-          ),
+          content: Text('Connection Error: $e'),
           backgroundColor: Colors.redAccent,
         ),
       );
     }
   }
 
-  // Open WhatsApp directly with Price Request Message
   Future<void> openWhatsApp() async {
-    const String phoneNumber = '919586518360';
+    const String phoneNumber = '91 9586518360';
     final String name = nameController.text.trim();
     final String location = locationController.text.trim();
 
@@ -957,8 +889,8 @@ Widget _contactForm(BuildContext context) {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
           ),
         ],
       ),
@@ -970,11 +902,17 @@ Widget _contactForm(BuildContext context) {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Header
+                  // Dialog Header
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-                    decoration: const BoxDecoration(color: primaryColor),
+                    padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 24),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [LuxuryTheme.primaryDark, Color(0xFF14372E)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
                     child: Column(
                       children: [
                         Row(
@@ -984,7 +922,7 @@ Widget _contactForm(BuildContext context) {
                             const Icon(
                               Icons.mark_email_read_outlined,
                               size: 38,
-                              color: Colors.white,
+                              color: LuxuryTheme.primaryAccent,
                             ),
                             IconButton(
                               onPressed: isLoading ? null : () => Navigator.of(context).pop(),
@@ -995,30 +933,24 @@ Widget _contactForm(BuildContext context) {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        Text(
-                          'Inquiry Form',
-                          style: GoogleFonts.cabin(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
+                        Text('DESIGN CONSULTATION', style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w700, color: LuxuryTheme.primaryAccent, letterSpacing: 2.0,)),
+                        const SizedBox(height: 4),
+                        Text('Get In Touch With Us', style: GoogleFonts.cormorantGaramond(fontSize: 28, fontWeight: FontWeight.w700, color: Colors.white)),
+                        const SizedBox(height: 8),
                         Text(
                           'Tell us your location & preferred style. Our design experts will recommend tailored solutions for you.',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.cabin(
+                          style: GoogleFonts.plusJakartaSans(
                             fontSize: 13,
                             color: Colors.white.withOpacity(0.85),
-                            height: 1.3,
+                            height: 1.4,
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  // Form
+                  // Form Controls
                   Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Form(
@@ -1029,7 +961,7 @@ Widget _contactForm(BuildContext context) {
                             controller: nameController,
                             enabled: !isLoading,
                             textCapitalization: TextCapitalization.words,
-                            style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
+                            style: GoogleFonts.plusJakartaSans(fontSize: 14, color: LuxuryTheme.textDark),
                             decoration: buildInputDecoration(
                               label: 'Full Name',
                               hint: 'Enter your full name',
@@ -1051,7 +983,7 @@ Widget _contactForm(BuildContext context) {
                               FilteringTextInputFormatter.digitsOnly,
                               LengthLimitingTextInputFormatter(10),
                             ],
-                            style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
+                            style: GoogleFonts.plusJakartaSans(fontSize: 14, color: LuxuryTheme.textDark),
                             decoration: buildInputDecoration(
                               label: 'Mobile Number',
                               hint: 'Enter 10-digit phone number',
@@ -1072,7 +1004,7 @@ Widget _contactForm(BuildContext context) {
                             controller: emailController,
                             enabled: !isLoading,
                             keyboardType: TextInputType.emailAddress,
-                            style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
+                            style: GoogleFonts.plusJakartaSans(fontSize: 14, color: LuxuryTheme.textDark),
                             decoration: buildInputDecoration(
                               label: 'Email ID',
                               hint: 'Enter your email address',
@@ -1094,7 +1026,7 @@ Widget _contactForm(BuildContext context) {
                             controller: locationController,
                             enabled: !isLoading,
                             textCapitalization: TextCapitalization.words,
-                            style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
+                            style: GoogleFonts.plusJakartaSans(fontSize: 14, color: LuxuryTheme.textDark),
                             decoration: buildInputDecoration(
                               label: 'Your Location / City',
                               hint: 'e.g., Borivali, Mumbai',
@@ -1110,7 +1042,7 @@ Widget _contactForm(BuildContext context) {
                           const SizedBox(height: 16),
                           DropdownButtonFormField<String>(
                             value: selectedDesignType,
-                            style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
+                            style: GoogleFonts.plusJakartaSans(fontSize: 14, color: LuxuryTheme.textDark),
                             decoration: buildInputDecoration(
                               label: 'Design Category',
                               hint: 'Select design category',
@@ -1134,22 +1066,22 @@ Widget _contactForm(BuildContext context) {
                           ),
                           const SizedBox(height: 24),
 
-                          // Actions Row (Send Inquiry & WhatsApp Buttons)
+                          // Actions Row
                           Row(
                             children: [
-                              // Send Inquiry Button
                               Expanded(
                                 flex: 3,
                                 child: SizedBox(
-                                  height: 48,
+                                  height: 50,
                                   child: ElevatedButton(
                                     onPressed: isLoading ? null : () => sendInquiryApi(setDialogState),
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: goldAccent,
+                                      backgroundColor: LuxuryTheme.primaryDark,
                                       foregroundColor: Colors.white,
                                       elevation: 2,
+                                      shadowColor: LuxuryTheme.primaryDark.withOpacity(0.3),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                                        borderRadius: BorderRadius.circular(25),
                                       ),
                                     ),
                                     child: isLoading
@@ -1165,15 +1097,10 @@ Widget _contactForm(BuildContext context) {
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          'Send Inquiry',
-                                          style: GoogleFonts.cabin(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
+                                          'SEND INQUIRY',
+                                          style: GoogleFonts.cormorantGaramond(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.0, color: Colors.white)),
                                         const SizedBox(width: 6),
-                                        const Icon(Icons.send_rounded, size: 16),
+                                        const Icon(Icons.send_rounded, size: 14),
                                       ],
                                     ),
                                   ),
@@ -1181,34 +1108,27 @@ Widget _contactForm(BuildContext context) {
                               ),
                               const SizedBox(width: 10),
 
-                              // WhatsApp Button
                               Expanded(
                                 flex: 2,
                                 child: SizedBox(
-                                  height: 48,
+                                  height: 50,
                                   child: ElevatedButton(
                                     onPressed: openWhatsApp,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF25D366), // WhatsApp Green
+                                      backgroundColor: const Color(0xFF25D366),
                                       foregroundColor: Colors.white,
                                       elevation: 2,
+                                      shadowColor: const Color(0xFF25D366).withOpacity(0.3),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                                        borderRadius: BorderRadius.circular(25),
                                       ),
                                     ),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        const Icon(Icons.chat_bubble_outline, size: 18),
+                                        FaIcon(FontAwesomeIcons.whatsapp, size: 14),
                                         const SizedBox(width: 6),
-                                        Text(
-                                          'Ask Price',
-                                          style: GoogleFonts.cabin(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
+                                        Text('ASK PRICE', style: GoogleFonts.cinzel(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.0, color: Colors.white)),
                                       ],
                                     ),
                                   ),
@@ -1228,4 +1148,19 @@ Widget _contactForm(BuildContext context) {
       ),
     ),
   );
+}
+
+extension NavigationExtension on BuildContext {
+  /// Navigate to a route or open URL
+  Future<void> navigateTo(String route, {VoidCallback? onTap}) {
+    return NavigationHandler.handleNavigation(this, route, onTap: onTap);
+  }
+
+  /// Check if current route matches the given route
+  bool isCurrentRoute(String route) {
+    return ModalRoute
+        .of(this)
+        ?.settings
+        .name == route;
+  }
 }

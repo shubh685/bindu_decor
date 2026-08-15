@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -42,13 +43,13 @@ class About extends StatefulWidget {
 
 class _AboutState extends State<About> {
   final List<NavItem> _navItems = const [
-    NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
-    NavItem(label: "About", route: AppRoutes.about, icon: CupertinoIcons.info_circle),
+    NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home_rounded),
+    NavItem(label: "About", route: AppRoutes.about, icon: CupertinoIcons.info_circle_fill),
     NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.person_alt_circle),
-    NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart),
+    NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart_fill),
     NavItem(
       label: "Reviews",
-      icon: Icons.reviews_outlined,
+      icon: Icons.rate_review_rounded,
       route:
       "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
     ),
@@ -74,27 +75,31 @@ class _AboutState extends State<About> {
     ),
   ];
 
-  void _handleNavigation(String route) {
-    if (route.startsWith('http')) {
-      return;
-    }
-
-    if (ModalRoute.of(context)?.settings.name != route) {
-      Navigator.pushNamed(context, route);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFAFAF8),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
-        child: BinduNavigationBar(
-          navItems: _navItems,
-          shopItems: _shopItems,
-          onMenuItemTap: () => _handleNavigation,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.9),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF0F382C).withOpacity(0.06),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              )
+            ],
+          ),
+          child: BinduNavigationBar(
+            navItems: _navItems,
+            shopItems: _shopItems,
+            onMenuItemTap: () => context.navigateTo,
+          ),
         ),
       ),
       drawer: isDesktop
@@ -102,22 +107,22 @@ class _AboutState extends State<About> {
           : BinduMobileDrawer(
         navItems: _navItems,
         shopItems: _shopItems,
-        onItemTap: () => _handleNavigation,
+        onItemTap: () => context.navigateTo,
       ),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24),
+                padding: const EdgeInsets.symmetric(vertical: 36),
                 child: Column(
                   children: [
                     const TimelineView(),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 48),
                     const MissionVisionAnimatedSection(),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 48),
                     const MeetTeamAnimatedSection(),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 48),
                     _lastLeast(context)
                   ],
                 ),
@@ -161,46 +166,46 @@ class _TimelineViewState extends State<TimelineView> {
       title: 'Phase 01',
       description:
       'Started our business with the distributorship of Bhor Ind Ltd. (Manufacturers of P.V.C flooring and wallpapers).',
-      icon: Icons.event,
-      gradient: [Color(0xFF00C9FF), Color(0xFF92FE9D)],
+      icon: Icons.history_edu_rounded,
+      gradient: [Color(0xFF0F382C), Color(0xFF1E5E4B)],
     ),
     TimelineEvent(
       year: '1988',
       title: 'Phase 02',
       description: 'We were the distributor of Sintex water tanks.',
-      icon: Icons.event,
-      gradient: [Color(0xFFF7971E), Color(0xFFFFD200)],
+      icon: Icons.water_drop_rounded,
+      gradient: [Color(0xFFD4AF37), Color(0xFFFFD700)],
     ),
     TimelineEvent(
       year: '1989',
       title: 'Phase 03',
       description:
       'We were also the distributors of Armstrong World Industries (U.K) for their flooring tiles.',
-      icon: Icons.event,
-      gradient: [Color(0xFFFF512F), Color(0xFFF09819)],
+      icon: Icons.grid_view_rounded,
+      gradient: [Color(0xFF164E3D), Color(0xFF2E8B70)],
     ),
     TimelineEvent(
       year: '2000',
       title: 'Phase 04',
       description:
       'We became the channel partners of Grass Impex (Llumar films-USA based manufacturers of decorative and sun control films).',
-      icon: Icons.event,
-      gradient: [Color(0xFFFF416C), Color(0xFFFF4B2B)],
+      icon: Icons.wb_sunny_rounded,
+      gradient: [Color(0xFF8C6D23), Color(0xFFC5A059)],
     ),
     TimelineEvent(
       year: '2018',
       title: 'Phase 05',
       description: 'We became the channel partners of Ddecor.',
-      icon: Icons.event,
-      gradient: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+      icon: Icons.auto_awesome_rounded,
+      gradient: [Color(0xFF0F382C), Color(0xFF2E8B70)],
     ),
     TimelineEvent(
       year: '2021',
       title: 'Phase 06',
       description:
       'We introduced exclusive furnishings catering to drapes and upholstery.',
-      icon: Icons.event,
-      gradient: [Color(0xFF276B5A), Color(0xFF3B9A82)],
+      icon: Icons.chair_rounded,
+      gradient: [Color(0xFFB8860B), Color(0xFFE6CA65)],
     ),
   ];
 
@@ -237,24 +242,32 @@ class _TimelineViewState extends State<TimelineView> {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isMobile = screenWidth < 700;
-    final double itemWidth = isMobile ? 260 : 320;
+    final double itemWidth = isMobile ? 280 : 340;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("Timeline", style: GoogleFonts.arvo(fontSize: isMobile ? 28 : 36, fontWeight: FontWeight.bold, color: Colors.purple, letterSpacing: 0.5)),
-        const SizedBox(height: 6),
+        Text(
+            "Our Journey Timeline",
+            style: GoogleFonts.playfairDisplay(
+                fontSize: isMobile ? 30 : 40,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF0F382C),
+                letterSpacing: 0.8
+            )
+        ),
+        const SizedBox(height: 8),
         Container(
-          height: 3,
-          width: 50,
+          height: 4,
+          width: 60,
           decoration: BoxDecoration(
-            color: const Color(0xFFC89D52),
+            gradient: const LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFF8C6D23)]),
             borderRadius: BorderRadius.circular(2),
           ),
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 36),
         SizedBox(
-          height: isMobile ? 320 : 310,
+          height: isMobile ? 340 : 330,
           child: Listener(
             onPointerDown: (_) => setState(() => _isUserInteracting = true),
             onPointerUp: (_) => setState(() => _isUserInteracting = false),
@@ -274,21 +287,29 @@ class _TimelineViewState extends State<TimelineView> {
                     alignment: Alignment.center,
                     children: [
                       Positioned(
-                        top: isMobile ? 80 : 90,
+                        top: isMobile ? 85 : 95,
                         left: isFirst ? itemWidth / 2 : 0,
                         right: isLast ? itemWidth / 2 : 0,
                         child: Container(
                           height: 3,
-                          color: const Color(0xFF276B5A).withOpacity(0.3),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                const Color(0xFFD4AF37).withOpacity(0.2),
+                                const Color(0xFF0F382C).withOpacity(0.4),
+                                const Color(0xFFD4AF37).withOpacity(0.2),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 20),
                           Container(
-                            width: isMobile ? 90 : 110,
-                            height: isMobile ? 60 : 80,
+                            width: isMobile ? 80 : 95,
+                            height: isMobile ? 70 : 85,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(24),
                               gradient: LinearGradient(
@@ -298,31 +319,57 @@ class _TimelineViewState extends State<TimelineView> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: event.gradient.first.withOpacity(0.35),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 6),
+                                  color: event.gradient.first.withOpacity(0.3),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 8),
                                 ),
                               ],
                             ),
-                            child: Icon(event.icon, color: Colors.white, size: isMobile ? 28 : 35),
+                            child: Icon(event.icon, color: Colors.white, size: isMobile ? 30 : 38),
                           ),
                           const SizedBox(height: 20),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 2,
+                              horizontal: 14,
+                              vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFC89D52).withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(12),
+                              color: const Color(0xFFD4AF37).withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.4)),
                             ),
-                            child: Text(event.year, style: GoogleFonts.arvo(fontSize: 14, fontWeight: FontWeight.bold))),
-                          const SizedBox(height: 6),
-                          Text(event.title, style: GoogleFonts.arvo(fontSize: isMobile ? 18 : 22, fontWeight: FontWeight.bold, color: Colors.purple)),
-                          const SizedBox(height: 10),
+                            child: Text(
+                                event.year,
+                                style: GoogleFonts.spaceGrotesk(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFF8C6D23)
+                                )
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                              event.title,
+                              style: GoogleFonts.plusJakartaSans(
+                                  fontSize: isMobile ? 18 : 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF0F382C)
+                              )
+                          ),
+                          const SizedBox(height: 8),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(event.description, textAlign: TextAlign.center, maxLines: 4, overflow: TextOverflow.ellipsis, style: GoogleFonts.arvo(fontSize: isMobile ? 12 : 14, color:Colors.purple.shade800, height: 1.4)),
+                            child: Text(
+                                event.description,
+                                textAlign: TextAlign.center,
+                                maxLines: 4,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.outfit(
+                                    fontSize: isMobile ? 13 : 14,
+                                    color: const Color(0xFF4A5568),
+                                    height: 1.5
+                                )
+                            ),
                           ),
                         ],
                       ),
@@ -365,7 +412,6 @@ class _MissionVisionAnimatedSectionState extends State<MissionVisionAnimatedSect
       vsync: this,
     );
 
-    // Our Mission: Slides in from Left (-1.0 to 0.0)
     _leftSlideAnimation = Tween<Offset>(
       begin: const Offset(-1.0, 0.0),
       end: Offset.zero,
@@ -373,7 +419,6 @@ class _MissionVisionAnimatedSectionState extends State<MissionVisionAnimatedSect
       CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
     );
 
-    // Our Vision: Slides in from Right (1.0 to 0.0)
     _rightSlideAnimation = Tween<Offset>(
       begin: const Offset(1.0, 0.0),
       end: Offset.zero,
@@ -397,6 +442,7 @@ class _MissionVisionAnimatedSectionState extends State<MissionVisionAnimatedSect
       position: _leftSlideAnimation,
       child: _buildMiViCard(
         title: "Our Mission",
+        icon: Icons.compass_calibration_rounded,
         description:
         "Interior Design introduces people to modernism, relaxation and beauty. Our team at Bindu Decor ensures a perfect blend of function and appearance. We have picked up a notoriety of being consistent with its promise and are pleased to state that the majority of our customers will bear declaration to our greatness in administration crosswise over India.",
       ),
@@ -406,6 +452,7 @@ class _MissionVisionAnimatedSectionState extends State<MissionVisionAnimatedSect
       position: _rightSlideAnimation,
       child: _buildMiViCard(
         title: "Our Vision",
+        icon: Icons.visibility_rounded,
         description:
         "Our vision is to be at your service, at your doorstep, at your Convenience.",
       ),
@@ -421,56 +468,100 @@ class _MissionVisionAnimatedSectionState extends State<MissionVisionAnimatedSect
       },
       child: isDesktop
           ? Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+        padding: const EdgeInsets.symmetric(horizontal: 48.0),
         child: IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(child: missionCard),
+              const SizedBox(width: 24),
               Expanded(child: visionCard),
             ],
           ),
         ),
       )
           : SizedBox(
-        height: 310,
+        height: 330,
         child: ListView(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
-            SizedBox(width: screenWidth * 0.82, child: missionCard),
+            SizedBox(width: screenWidth * 0.85, child: missionCard),
             const SizedBox(width: 16),
-            SizedBox(width: screenWidth * 0.82, child: visionCard),
+            SizedBox(width: screenWidth * 0.85, child: visionCard),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMiViCard({required String title, required String description}) {
+  Widget _buildMiViCard({
+    required String title,
+    required IconData icon,
+    required String description,
+  }) {
     return Container(
-      margin: const EdgeInsets.all(8),
-      padding: const EdgeInsets.all(20),
+      // Removed fixed height: 415 to prevent overflow on smaller screens
+      margin: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF276B5A), width: 1.5),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFF0F382C).withOpacity(0.12),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          )
+            color: const Color(0xFF0F382C).withOpacity(0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: GoogleFonts.arvo(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.purple)),
-          const SizedBox(height: 10),
-          Text(description, style: GoogleFonts.cabin(fontSize: 13.5, fontWeight: FontWeight.w400, height: 1.5)),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          // Changed to start so content flows naturally without forced centering gaps
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, // Shrinks height to fit content nicely
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F382C).withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: const Color(0xFF0F382C), size: 24),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  // Added Expanded so long titles wrap instead of overflowing horizontally
+                  child: Text(
+                    title,
+                    style: GoogleFonts.cormorantGaramond(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF0F382C),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              description,
+              style: GoogleFonts.outfit(
+                fontSize: 14.5,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFF4A5568),
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -541,7 +632,6 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
       vsync: this,
     );
 
-    // Left direction animation for Rajesh Chitalia & Dinesh Chitalia
     _leftSlideAnimation = Tween<Offset>(
       begin: const Offset(-1.0, 0.0),
       end: Offset.zero,
@@ -549,7 +639,6 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
       CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
     );
 
-    // Right direction animation for Venisha Chitalia
     _rightSlideAnimation = Tween<Offset>(
       begin: const Offset(1.0, 0.0),
       end: Offset.zero,
@@ -570,7 +659,6 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
     final bool isDesktop = screenWidth >= 900;
 
     final List<Widget> cards = [
-      // Rajesh Chitalia Card - Left Direction
       SlideTransition(
         position: _leftSlideAnimation,
         child: _teamCard(
@@ -580,7 +668,6 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
           imageUrl: teamMembers[0].imageUrl,
         ),
       ),
-      // Dinesh Chitalia Card - Left Direction
       SlideTransition(
         position: _leftSlideAnimation,
         child: _teamCard(
@@ -590,13 +677,12 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
           imageUrl: teamMembers[1].imageUrl,
         ),
       ),
-      // Venisha Chitalia Card - Right Direction
       SlideTransition(
         position: _rightSlideAnimation,
         child: _teamCard(
           tit: teamMembers[2].name,
           role: teamMembers[2].role,
-          desc: teamMembers[2].desc,
+          desc:teamMembers[2].desc,
           imageUrl: teamMembers[2].imageUrl,
         ),
       ),
@@ -613,20 +699,20 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Meet Our Team", style: GoogleFonts.imFellEnglishSc(fontSize: isDesktop ? 32 : 26, fontWeight: FontWeight.bold, color: Colors.purple)),
-          const SizedBox(height: 6),
+          Text("Meet Our Leadership", style: GoogleFonts.playfairDisplay(fontSize: isDesktop ? 36 : 28, fontWeight: FontWeight.bold, color: const Color(0xFF0F382C))),
+          const SizedBox(height: 8),
           Container(
-            height: 3,
-            width: 50,
+            height: 4,
+            width: 60,
             decoration: BoxDecoration(
-              color: const Color(0xFFC89D52),
+              gradient: const LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFF8C6D23)]),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           if (isDesktop)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              padding: const EdgeInsets.symmetric(horizontal: 48.0),
               child: IntrinsicHeight(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -636,15 +722,15 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
             )
           else
             SizedBox(
-              height: 420, // Slightly increased height to account for bottom stacked reflection
+              height: 440,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: cards.length,
-                separatorBuilder: (context, index) => const SizedBox(width: 12),
+                separatorBuilder: (context, index) => const SizedBox(width: 14),
                 itemBuilder: (context, index) {
                   return SizedBox(
-                    width: screenWidth * 0.70,
+                    width: screenWidth * 0.75,
                     child: cards[index],
                   );
                 },
@@ -666,7 +752,6 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [
-          // 3rd Bottom Reflection Layer (Lowest)
           Positioned(
             bottom: 0,
             left: 24,
@@ -674,14 +759,13 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
             child: Container(
               height: 20,
               decoration: BoxDecoration(
-                color: const Color(0xFFE2ECFA).withOpacity(0.4),
+                color: const Color(0xFFD4AF37).withOpacity(0.15),
                 borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(16),
+                  bottom: Radius.circular(20),
                 ),
               ),
             ),
           ),
-          // 2nd Bottom Reflection Layer (Middle Stack)
           Positioned(
             bottom: 8,
             left: 12,
@@ -689,30 +773,29 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
             child: Container(
               height: 20,
               decoration: BoxDecoration(
-                color: const Color(0xFFEEF4FC).withOpacity(0.8),
+                color: const Color(0xFF0F382C).withOpacity(0.08),
                 borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(16),
+                  bottom: Radius.circular(20),
                 ),
               ),
             ),
           ),
-          // Main Foreground Card
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFF276B5A).withOpacity(0.12),
+                  color: const Color(0xFF0F382C).withOpacity(0.1),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
+                    color: const Color(0xFF0F382C).withOpacity(0.06),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
                   )
                 ],
               ),
@@ -721,54 +804,30 @@ class _MeetTeamAnimatedSectionState extends State<MeetTeamAnimatedSection>
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    width: 90,
-                    height: 90,
+                    width: 96,
+                    height: 96,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFFD4AF37), width: 2),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF276B5A).withOpacity(0.15),
-                          blurRadius: 6,
-                          offset: const Offset(0, 3),
+                          color: const Color(0xFF0F382C).withOpacity(0.12),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
                     child: ClipOval(
-                      child: Image.asset(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.person, size: 40),
+                      child: Image.asset(imageUrl, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.person, size: 40, color: Color(0xFF0F382C)),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    tit,
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.imFellEnglishSc(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.purple,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(role, textAlign: TextAlign.center, maxLines: 3, overflow: TextOverflow.ellipsis, style: GoogleFonts.imFellEnglishSc(fontSize: 14.5, fontWeight: FontWeight.w500, color: const Color(0xFF4A4A4A), height: 1.4)),
-                  const SizedBox(height: 10),
-                  Text(
-                    "\"$desc\"",
-                    textAlign: TextAlign.center,
-                    maxLines: 4,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.imFellEnglishSc(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(0xFF4A4A4A),
-                      height: 1.6,
-                    ),
-                  ),
+                  const SizedBox(height: 18),
+                  Text(tit, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cormorantGaramond(fontSize: 19, fontWeight: FontWeight.bold, color: const Color(0xFF0F382C),)), const SizedBox(height: 4),
+                  Text(role, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.spaceGrotesk(fontSize: 13.5, fontWeight: FontWeight.w600, color: const Color(0xFF8C6D23))),
+                  const SizedBox(height: 12),
+                  Text("\"$desc\"", textAlign: TextAlign.center, maxLines: 5, overflow: TextOverflow.ellipsis, style: GoogleFonts.outfit(fontSize: 13.5, fontWeight: FontWeight.w400, color: const Color(0xFF4A5568), height: 1.5)),
                 ],
               ),
             ),
@@ -805,8 +864,8 @@ Widget _buildDynamicImage(String imagePath) {
 
 Widget _imageFallback() {
   return Container(
-    color: const Color(0xFFEBF5F2),
-    child: const Icon(Icons.person, size: 48, color: Color(0xFF276B5A)),
+    color: const Color(0xFF0F382C).withOpacity(0.08),
+    child: const Icon(Icons.person, size: 48, color: Color(0xFF0F382C)),
   );
 }
 
@@ -819,35 +878,72 @@ Widget _lastLeast(BuildContext context) {
   final bool isDesktop = screenWidth >= 900;
 
   return Padding(
-    padding: const EdgeInsets.all(12.0),
+    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
     child: Container(
-      padding: const EdgeInsets.only(top: 10, bottom: 10, right: 8, left: 8),
+      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(width: 2, color: Colors.black),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white,
+            const Color(0xFF0F382C).withOpacity(0.03),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(width: 1.5, color: const Color(0xFFD4AF37).withOpacity(0.5)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F382C).withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Last but", style: GoogleFonts.arvo(fontSize: isDesktop ? 32 : 26, fontWeight: FontWeight.bold)),
+              Text(
+                  "Last but",
+                  style: GoogleFonts.playfairDisplay(
+                      fontSize: isDesktop ? 34 : 26,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF0F382C)
+                  )
+              ),
               const SizedBox(width: 8),
-              Text("Not The Least", style: GoogleFonts.imFellEnglishSc(fontSize: isDesktop ? 32 : 26, fontWeight: FontWeight.bold, color: Colors.purple))
+              Text(
+                  "Not The Least",
+                  style: GoogleFonts.playfairDisplay(
+                      fontSize: isDesktop ? 34 : 26,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF8C6D23)
+                  )
+              )
             ],
           ),
+          const SizedBox(height: 8),
           Container(
             height: 3,
             width: 50,
             decoration: BoxDecoration(
-              color: const Color(0xFFC89D52),
+              color: const Color(0xFFD4AF37),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 16),
           Text(
-            "Our team of Supervisors, Technicians and back office ensures the smooth functioning and execution of work thereby ensuring that our projects are completed on time with perfection as per the client’s satisfaction.",
-            textAlign: TextAlign.center, style: GoogleFonts.arvo(fontSize: 14.8, fontWeight: FontWeight.w400, color: const Color(0xFF4A4A4A), height: 1.4))
+              "Our team of Supervisors, Technicians and back office ensures the smooth functioning and execution of work thereby ensuring that our projects are completed on time with perfection as per the client’s satisfaction.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.outfit(
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xFF4A5568),
+                  height: 1.6
+              )
+          )
         ],
       ),
     ),

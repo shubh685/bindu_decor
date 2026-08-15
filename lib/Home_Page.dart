@@ -74,27 +74,19 @@ class _HomePageState extends State<HomePage> {
     ),
   ];
 
-  void _handleNavigation(String route) {
-    if (route.startsWith('http')) {
-      return;
-    }
-
-    if (ModalRoute.of(context)?.settings.name != route) {
-      Navigator.pushNamed(context, route);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
 
     return Scaffold(
+      backgroundColor: LuxuryTheme.bgCream,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
+        preferredSize: const Size.fromHeight(85),
         child: BinduNavigationBar(
           navItems: _navItems,
           shopItems: _shopItems,
-          onMenuItemTap: () => _handleNavigation,
+          onMenuItemTap: () => context.navigateTo,
         ),
       ),
       drawer: isDesktop
@@ -102,23 +94,21 @@ class _HomePageState extends State<HomePage> {
           : BinduMobileDrawer(
         navItems: _navItems,
         shopItems: _shopItems,
-        onItemTap: () => _handleNavigation,
+        onItemTap: () => context.navigateTo,
       ),
       body: SafeArea(
         child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                child: Column(
-                  children: [
-                    _mainImage(context),
-                    _subTitle(context),
-                    const ExploreByCategorySection(),
-                    const OurDetails(),
-                    const MoreInfo(),
-                  ],
-                ),
+              child: Column(
+                children: [
+                  _mainImage(context),
+                  _subTitle(context),
+                  const ExploreByCategorySection(),
+                  const OurDetails(),
+                  const MoreInfo(),
+                ],
               ),
             ),
             const SliverFillRemaining(
@@ -145,25 +135,25 @@ Widget _mainImage(BuildContext context) {
   final double screenWidth = MediaQuery.of(context).size.width;
 
   double imageHeight;
-  double buttonTopPadding;
+  double buttonBottomPadding;
   double buttonFontSize;
-  double buttonPadding;
+  double buttonHorizontalPadding;
 
   if (screenWidth >= 1200) {
-    imageHeight = 450;
-    buttonTopPadding = 295;
-    buttonFontSize = 20;
-    buttonPadding = 14;
+    imageHeight = 540;
+    buttonBottomPadding = 60;
+    buttonFontSize = 14;
+    buttonHorizontalPadding = 32;
   } else if (screenWidth >= 600) {
-    imageHeight = 350;
-    buttonTopPadding = 250;
-    buttonFontSize = 18;
-    buttonPadding = 12;
+    imageHeight = 420;
+    buttonBottomPadding = 45;
+    buttonFontSize = 13;
+    buttonHorizontalPadding = 24;
   } else {
-    imageHeight = 250;
-    buttonTopPadding = 120;
-    buttonFontSize = 16;
-    buttonPadding = 10;
+    imageHeight = 320;
+    buttonBottomPadding = 30;
+    buttonFontSize = 12;
+    buttonHorizontalPadding = 20;
   }
 
   return SizedBox(
@@ -172,33 +162,84 @@ Widget _mainImage(BuildContext context) {
     child: Stack(
       fit: StackFit.expand,
       children: [
+        Image.asset(
+          "assets/images/main_img.png", fit: BoxFit.cover, alignment: Alignment.center),
+        // Modern Gradient Overlay
         Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/images/main_img.png"),
-              fit: BoxFit.cover,
-              alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black.withOpacity(0.15),
+                LuxuryTheme.primaryDark.withOpacity(0.4),
+                LuxuryTheme.primaryDark.withOpacity(0.85),
+              ],
+              stops: const [0.0, 0.6, 1.0],
             ),
           ),
         ),
         Positioned(
-          top: buttonTopPadding,
-          left: 0,
-          right: 0,
-          child: Center(
-            child: InkWell(
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Wallpapers())),
-              child: Container(
-                padding: EdgeInsets.all(buttonPadding),
-                decoration: BoxDecoration(
-                  color: Colors.purple,
-                  borderRadius: BorderRadius.circular(4),
+          left: 24,
+          right: 24,
+          bottom: buttonBottomPadding,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("CURATED LUXURY INTERIORS", style: GoogleFonts.cormorantGaramond(fontSize: screenWidth >= 900 ? 18 : 12, fontWeight: FontWeight.w600, letterSpacing: screenWidth >= 900 ? 4.0 : 2.0, color: LuxuryTheme.primaryAccent)),
+              const SizedBox(height: 10),
+              Text("Transforming Living Spaces Into Masterpieces", textAlign: TextAlign.center, style: GoogleFonts.cormorantGaramond(fontSize: screenWidth >= 900 ? 46 : (screenWidth >= 600 ? 34 : 24), fontWeight: FontWeight.w700, color: Colors.white, height: 1.1,)),
+              const SizedBox(height: 24),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Wallpapers()),
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: buttonHorizontalPadding,
+                      vertical: 14,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFD4AF37), Color(0xFFC5A059)],
+                      ),
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFC5A059).withOpacity(0.4),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "EXPLORE COLLECTION",
+                          style: GoogleFonts.cinzel(
+                            fontWeight: FontWeight.w700,
+                            fontSize: buttonFontSize,
+                            color: LuxuryTheme.primaryDark,
+                            letterSpacing: 2.0,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 16,
+                          color: LuxuryTheme.primaryDark,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                child: Text("Explore Collection", style: GoogleFonts.imFellEnglishSc(fontWeight: FontWeight.w500, fontSize: buttonFontSize, color: Colors.white)),
               ),
-            ),
+            ],
           ),
         ),
       ],
@@ -209,42 +250,61 @@ Widget _mainImage(BuildContext context) {
 Widget _subTitle(BuildContext context) {
   final double screenWidth = MediaQuery.of(context).size.width;
 
-  final double fontSize = screenWidth >= 900 ? 22 : (screenWidth >= 600 ? 18 : 15);
-  final double horizontalPadding = screenWidth >= 900 ? 120 : (screenWidth >= 600 ? 40 : 20);
-  final double verticalPadding = screenWidth >= 900 ? 20 : 15;
+  final double fontSize = screenWidth >= 900 ? 24 : (screenWidth >= 600 ? 19 : 16);
+  final double horizontalPadding = screenWidth >= 900 ? 140 : (screenWidth >= 600 ? 40 : 20);
 
   return Container(
     width: double.infinity,
-    color: Colors.purple,
+    decoration: const BoxDecoration(
+      gradient: LinearGradient(
+        colors: [LuxuryTheme.primaryDark, Color(0xFF14372E)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+    ),
     padding: EdgeInsets.symmetric(
       horizontal: horizontalPadding,
-      vertical: verticalPadding,
+      vertical: 36,
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-          "the spaces have been waiting in silence. one thoughtful detail, and \n suddenly the whole room remembers how to feel like home.",
+          "\"The spaces have been waiting in silence. One thoughtful detail, and suddenly the whole room remembers how to feel like home.\"",
           textAlign: TextAlign.center,
-          style: GoogleFonts.imFellEnglishSc(
-            fontSize: fontSize, fontWeight: FontWeight.w400, fontStyle: FontStyle.italic, color: Colors.white, height: 1.6)),
-        const SizedBox(height: 8),
-        const Row(
+          style: GoogleFonts.cormorantGaramond(
+            fontSize: fontSize,
+            fontWeight: FontWeight.w500,
+            fontStyle: FontStyle.italic,
+            color: const Color(0xFFFBF9F5),
+            height: 1.5,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
-              child: Divider(
-                color: Colors.white70,
-                thickness: 0.8,
+            Container(
+              height: 1,
+              width: 60,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.transparent, LuxuryTheme.primaryAccent.withOpacity(0.8)],
+                ),
               ),
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Icon(Icons.local_florist, color: Colors.white, size: 28),
+              child: Icon(Icons.star_outline_rounded, color: LuxuryTheme.primaryAccent, size: 20),
             ),
-            Expanded(
-              child: Divider(
-                color: Colors.white70,
-                thickness: 0.8,
+            Container(
+              height: 1,
+              width: 60,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [LuxuryTheme.primaryAccent.withOpacity(0.8), Colors.transparent],
+                ),
               ),
             ),
           ],
@@ -256,19 +316,19 @@ Widget _subTitle(BuildContext context) {
 
 // ==========================================
 // EXPLORE BY CATEGORY SECTION
-//
-// ================
-// ==========================
+// ==========================================
 
 class CategoryItem {
   final String title;
   final String imageUrl;
   final String route;
+  final Color badgeColor;
 
   const CategoryItem({
     required this.title,
     required this.imageUrl,
     this.route = AppRoutes.shop,
+    required this.badgeColor,
   });
 }
 
@@ -285,18 +345,18 @@ class _ExploreByCategorySectionState extends State<ExploreByCategorySection> {
   int _currentPage = 0;
 
   final List<CategoryItem> _categories = const [
-    CategoryItem(title: "Wallpapers", imageUrl: "assets/images/wallpapers.png", route: AppRoutes.wallpapers),
-    CategoryItem(title: "Floorings", imageUrl: "assets/images/floorings.png", route: AppRoutes.floorings),
-    CategoryItem(title: "Carpets", imageUrl: "assets/images/carpets.png", route: AppRoutes.carpets),
-    CategoryItem(title: "Blinds", imageUrl: "assets/images/blinds.png", route: AppRoutes.blinds),
-    CategoryItem(title: "Glass Films", imageUrl: "assets/images/glass-films.png", route: AppRoutes.glassfilms),
-    CategoryItem(title: "Artificial Turfs", imageUrl: "assets/images/arti-turfs.png", route: AppRoutes.artificialturfs),
-    CategoryItem(title: "Gym Floorings", imageUrl: "assets/images/gym_floor.png", route: AppRoutes.gymfloorings),
-    CategoryItem(title: "Awnings", imageUrl: "assets/images/awnings.png", route: AppRoutes.awnings),
-    CategoryItem(title: "Mosquito Nets", imageUrl: "assets/images/mos_net.png", route: AppRoutes.mosquitoNets),
-    CategoryItem(title: "Upholstery", imageUrl: "assets/images/upholstery.png", route: AppRoutes.upholstery),
-    CategoryItem(title: "Curtains", imageUrl: "assets/images/curtains.png", route: AppRoutes.curtains),
-    CategoryItem(title: "Stretch Ceiling", imageUrl: "assets/images/str_ceil.png", route: AppRoutes.stretchCeiling),
+    CategoryItem(title: "Wallpapers", imageUrl: "assets/images/wallpapers.png", route: AppRoutes.wallpapers, badgeColor: Color(0xFFC0392B)),
+    CategoryItem(title: "Floorings", imageUrl: "assets/images/floorings.png", route: AppRoutes.floorings, badgeColor: Color(0xFFC0392B)),
+    CategoryItem(title: "Carpets", imageUrl: "assets/images/carpets.png", route: AppRoutes.carpets, badgeColor: Color(0xFFC0392B)),
+    CategoryItem(title: "Blinds", imageUrl: "assets/images/blinds.png", route: AppRoutes.blinds, badgeColor: Color(0xFFC0392B)),
+    CategoryItem(title: "Glass Films", imageUrl: "assets/images/glass-films.png", route: AppRoutes.glassfilms, badgeColor: Color(0xFFC0392B)),
+    CategoryItem(title: "Artificial Turfs", imageUrl: "assets/images/arti-turfs.png", route: AppRoutes.artificialturfs, badgeColor: Color(0xFFC0392B)),
+    CategoryItem(title: "Gym Floorings", imageUrl: "assets/images/gym_floor.png", route: AppRoutes.gymfloorings, badgeColor: Color(0xFFC0392B)),
+    CategoryItem(title: "Awnings", imageUrl: "assets/images/awnings.png", route: AppRoutes.awnings, badgeColor: Color(0xFFC0392B)),
+    CategoryItem(title: "Mosquito Nets", imageUrl: "assets/images/mos_net.png", route: AppRoutes.mosquitoNets, badgeColor: Color(0xFFC0392B)),
+    CategoryItem(title: "Upholstery", imageUrl: "assets/images/upholstery.png", route: AppRoutes.upholstery, badgeColor: Color(0xFFC0392B)),
+    CategoryItem(title: "Curtains", imageUrl: "assets/images/curtains.png", route: AppRoutes.curtains, badgeColor: Color(0xFFC0392B)),
+    CategoryItem(title: "Stretch Ceiling", imageUrl: "assets/images/str_ceil.png", route: AppRoutes.stretchCeiling, badgeColor: Color(0xFFC0392B)),
   ];
 
   @override
@@ -307,7 +367,7 @@ class _ExploreByCategorySectionState extends State<ExploreByCategorySection> {
   }
 
   void _startAutoPlay() {
-    _autoPlayTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+    _autoPlayTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
       if (_pageController.hasClients) {
         final double width = MediaQuery.of(context).size.width;
         final int itemsPerPage = _getItemsPerPage(width);
@@ -320,8 +380,8 @@ class _ExploreByCategorySectionState extends State<ExploreByCategorySection> {
 
         _pageController.animateToPage(
           nextPage,
-          duration: const Duration(milliseconds: 600),
-          curve: Curves.easeInOut,
+          duration: const Duration(milliseconds: 700),
+          curve: Curves.fastOutSlowIn,
         );
       }
     });
@@ -348,25 +408,27 @@ class _ExploreByCategorySectionState extends State<ExploreByCategorySection> {
 
     return Container(
       padding: EdgeInsets.symmetric(
-        vertical: 36.0,
-        horizontal: screenWidth >= 900 ? 32.0 : 16.0,
+        vertical: 48.0,
+        horizontal: screenWidth >= 900 ? 40.0 : 18.0,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Explore by Category", style: GoogleFonts.imFellEnglishSc(fontSize: screenWidth >= 900 ? 32 : (screenWidth >= 600 ? 26 : 22), fontWeight: FontWeight.bold, color: Colors.purple, letterSpacing: 0.8)),
-          const SizedBox(height: 8),
+          Text("EXPLORE COLLECTIONS", style: GoogleFonts.cormorantGaramond(fontSize: 13, fontWeight: FontWeight.w700, color: LuxuryTheme.primaryAccent, letterSpacing: 3.0)),
+          const SizedBox(height: 6),
+          Text("Bespoke Interior Elements", style: GoogleFonts.cormorantGaramond(fontSize: screenWidth >= 900 ? 38 : (screenWidth >= 600 ? 30 : 24), fontWeight: FontWeight.w700, color: LuxuryTheme.primaryDark)),
+          const SizedBox(height: 12),
           Container(
-            height: 3,
-            width: 60,
+            height: 2,
+            width: 50,
             decoration: BoxDecoration(
-              color: const Color(0xFFC89D52),
+              color: LuxuryTheme.primaryAccent,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 36),
           SizedBox(
-            height: screenWidth >= 900 ? 320 : (screenWidth >= 600 ? 300 : 280),
+            height: screenWidth >= 900 ? 350 : (screenWidth >= 600 ? 330 : 310),
             child: PageView.builder(
               controller: _pageController,
               itemCount: totalPages,
@@ -386,7 +448,7 @@ class _ExploreByCategorySectionState extends State<ExploreByCategorySection> {
                   children: pageItems.map((category) {
                     return Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: _CategoryCard(item: category),
                       ),
                     );
@@ -395,32 +457,29 @@ class _ExploreByCategorySectionState extends State<ExploreByCategorySection> {
               },
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           Wrap(
             alignment: WrapAlignment.center,
             spacing: 8.0,
             runSpacing: 8.0,
-            children: List.generate(_categories.length, (itemIndex) {
-              final int activeGroupStart = _currentPage * itemsPerPage;
-              final int activeGroupEnd = activeGroupStart + itemsPerPage;
-              final bool isActive = itemIndex >= activeGroupStart && itemIndex < activeGroupEnd;
+            children: List.generate(totalPages, (pageIndex) {
+              final bool isActive = _currentPage == pageIndex;
 
               return GestureDetector(
                 onTap: () {
-                  final int targetPage = itemIndex ~/ itemsPerPage;
                   _pageController.animateToPage(
-                    targetPage,
+                    pageIndex,
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.easeInOut,
                   );
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  height: 10,
-                  width: isActive ? 24 : 10,
+                  height: 6,
+                  width: isActive ? 32 : 12,
                   decoration: BoxDecoration(
-                    color: isActive ? const Color(0xFF3B9A82) : const Color(0xFF3B9A82).withOpacity(0.25),
-                    borderRadius: BorderRadius.circular(5),
+                    color: isActive ? LuxuryTheme.primaryAccent : LuxuryTheme.primaryDark.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(3),
                   ),
                 ),
               );
@@ -439,72 +498,94 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shadowColor: const Color(0xFF3B9A82).withOpacity(0.15),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () {
-          Navigator.pushNamed(context, item.route);
-        },
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Image.asset(
-                item.imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: const Color(0xFFEBF5F2),
-                  child: const Center(
-                    child: Icon(
-                      Icons.image_not_supported,
-                      color: Color(0xFF3B9A82),
-                      size: 40,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, item.route);
+          },
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Image.asset(
+                  item.imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: const Color(0xFFEBF5F2),
+                    child: const Center(
+                      child: Icon(Icons.image_not_supported, color: LuxuryTheme.primaryDark, size: 40)),
+                  ),
+                ),
+              ),
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        LuxuryTheme.primaryDark.withOpacity(0.2),
+                        LuxuryTheme.primaryDark.withOpacity(0.9),
+                      ],
+                      stops: const [0.3, 0.7, 1.0],
                     ),
                   ),
                 ),
               ),
-            ),
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.75),
-                    ],
-                    stops: const [0.5, 1.0],
+              // Category Specific Vibrant Accent Line
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: item.badgeColor,
                   ),
                 ),
               ),
-            ),
-            Positioned(
-              left: 12,
-              right: 12,
-              bottom: 16,
-              child: Text(
-                item.title,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.cabin(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  shadows: const [
-                    Shadow(
-                      color: Colors.black45,
-                      offset: Offset(0, 1),
-                      blurRadius: 4,
-                    )
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: 20,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: item.badgeColor.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text("DESIGN", style: GoogleFonts.cinzel(fontSize: 9, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 1.5)),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(item.title, style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 0.5))),
+                        const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white70, size: 14),
+                      ],
+                    ),
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -512,7 +593,7 @@ class _CategoryCard extends StatelessWidget {
 }
 
 // ==========================================
-// OUR DETAILS SECTION (With Scroll Animation Trigger)
+// OUR DETAILS SECTION
 // ==========================================
 
 class FeatureItem {
@@ -550,7 +631,7 @@ class _AnimatedHighlightTileState extends State<AnimatedHighlightTile>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 2), // Normalized to standard 2 seconds
+      duration: const Duration(seconds: 2),
       vsync: this,
     );
 
@@ -586,7 +667,7 @@ class _AnimatedHighlightTileState extends State<AnimatedHighlightTile>
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -599,24 +680,25 @@ class _AnimatedHighlightTileState extends State<AnimatedHighlightTile>
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.imFellEnglishSc(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                style: GoogleFonts.cormorantGaramond(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w700,
+                  color: LuxuryTheme.primaryAccent,
                 ),
               );
             },
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
-            widget.item.subtitle,
+            widget.item.subtitle.toUpperCase(),
             textAlign: TextAlign.center,
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.cabin(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Colors.white70,
+            style: GoogleFonts.cinzel(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Colors.white.withOpacity(0.9),
+              letterSpacing: 1.2,
             ),
           ),
         ],
@@ -639,10 +721,10 @@ class _OurDetailsState extends State<OurDetails> {
   bool _isVisible = false;
 
   final List<FeatureItem> highlights = const [
-    FeatureItem(targetValue: 40, suffix: "+", subtitle: "Years in the industry"),
-    FeatureItem(targetValue: 27000, suffix: "+", subtitle: "Sites"),
-    FeatureItem(targetValue: 800, suffix: "+", subtitle: "Satisfied Architectures"),
-    FeatureItem(targetValue: 20, suffix: "", subtitle: "Professional & Dedicated Team"),
+    FeatureItem(targetValue: 40, suffix: "+", subtitle: "Years in industry"),
+    FeatureItem(targetValue: 27000, suffix: "+", subtitle: "Completed Sites"),
+    FeatureItem(targetValue: 800, suffix: "+", subtitle: "Satisfied Architects"),
+    FeatureItem(targetValue: 20, suffix: "", subtitle: "Dedicated Experts"),
   ];
 
   int _getItemsPerPage(double width) {
@@ -705,12 +787,18 @@ class _OurDetailsState extends State<OurDetails> {
       },
       child: Container(
         width: double.infinity,
-        color: Colors.purple,
-        padding: const EdgeInsets.symmetric(vertical: 36.0, horizontal: 16.0),
+        decoration: const BoxDecoration(
+          color: LuxuryTheme.primaryDark,
+          border: Border(
+            top: BorderSide(color: LuxuryTheme.primaryAccent, width: 1.5),
+            bottom: BorderSide(color: LuxuryTheme.primaryAccent, width: 1.5),
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 16.0),
         child: Column(
           children: [
             SizedBox(
-              height: 65,
+              height: 75,
               child: PageView.builder(
                 controller: _page,
                 itemCount: totalPages,
@@ -742,7 +830,11 @@ class _OurDetailsState extends State<OurDetails> {
                               ),
                             ),
                             if (!isLastInRow && itemsPerPage > 1)
-                              Container(height: 60, width: 1, color: Colors.white30),
+                              Container(
+                                height: 40,
+                                width: 1,
+                                color: LuxuryTheme.primaryAccent.withOpacity(0.3),
+                              ),
                           ],
                         ),
                       );
@@ -752,7 +844,7 @@ class _OurDetailsState extends State<OurDetails> {
               ),
             ),
             if (totalPages > 1) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(totalPages, (index) {
@@ -768,11 +860,11 @@ class _OurDetailsState extends State<OurDetails> {
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                      height: 8,
-                      width: isActive ? 24 : 8,
+                      height: 6,
+                      width: isActive ? 24 : 6,
                       decoration: BoxDecoration(
-                        color: isActive ? const Color(0xFFE91E63) : Colors.white38,
-                        borderRadius: BorderRadius.circular(4),
+                        color: isActive ? LuxuryTheme.primaryAccent : Colors.white24,
+                        borderRadius: BorderRadius.circular(3),
                       ),
                     ),
                   );
@@ -787,7 +879,7 @@ class _OurDetailsState extends State<OurDetails> {
 }
 
 // ==========================================
-// MORE INFO SECTION (Scroll Animation Triggered)
+// MORE INFO SECTION
 // ==========================================
 
 class MoreInfo extends StatefulWidget {
@@ -809,7 +901,7 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
 
     _animController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800), // Standard smooth duration
+      duration: const Duration(milliseconds: 800),
     );
 
     _leftCardSlide = Tween<Offset>(
@@ -851,8 +943,8 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(
-          vertical: 48.0,
-          horizontal: isDesktop ? 48.0 : 16.0,
+          vertical: 56.0,
+          horizontal: isDesktop ? 48.0 : 20.0,
         ),
         child: Center(
           child: ConstrainedBox(
@@ -866,7 +958,7 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
 
   Widget _buildDesktopLayout(BuildContext context) {
     return SizedBox(
-      height: 480,
+      height: 500,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.centerLeft,
@@ -878,15 +970,27 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
             width: 680,
             child: SlideTransition(
               position: _rightImageSlide,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(2),
-                child: Image.asset(
-                  "assets/images/about-show.png",
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: const Color(0xFFE2E8E6),
-                    child: const Center(
-                      child: Icon(Icons.image, size: 60, color: Colors.grey),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.12),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(
+                    "assets/images/about-show.png",
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: const Color(0xFFE2E8E6),
+                      child: const Center(
+                        child: Icon(Icons.image, size: 60, color: Colors.grey),
+                      ),
                     ),
                   ),
                 ),
@@ -895,52 +999,73 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
           ),
           Positioned(
             left: 0,
-            top: 30,
-            bottom: 30,
+            top: 35,
+            bottom: 35,
             width: 560,
             child: SlideTransition(
               position: _leftCardSlide,
-              child: Material(
-                elevation: 10,
-                shadowColor: Colors.black.withOpacity(0.18),
-                borderRadius: BorderRadius.circular(2),
-                color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 44.0, vertical: 36.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("About Us", style: GoogleFonts.imFellEnglishSc(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.purple, letterSpacing: -0.5)),
-                      const SizedBox(height: 20),
-                      Text(
-                        "Interior Design introduces people to modernism, relaxation and beauty. Our team at Bindu Decor ensures a perfect blend of function and appearance. We have picked up a notoriety of being consistent with its promise and are pleased to state that the majority of our customers will bear declaration to our greatness in administration crosswise over India.",
-                        style: GoogleFonts.imFellEnglishSc(
-                          fontSize: 15,
-                          height: 1.6,
-                          color: const Color(0xFF4A4A4A),
-                          fontWeight: FontWeight.w400,
-                        ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 30,
+                      offset: const Offset(0, 15),
+                    ),
+                  ],
+                  border: Border.all(color: const Color(0xFFE8E3D9)),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 48.0, vertical: 40.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("ABOUT BINDU DÉCOR", style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: LuxuryTheme.primaryAccent, letterSpacing: 2.5)),const SizedBox(height: 8),
+                    Text(
+                      "Interior Design introduces people to modernism, relaxation and beauty. Our team at Bindu Decor ensures a perfect blend of function and appearance. We have picked up a notoriety of being consistent with its promise and are pleased to state that the majority of our customers will bear declaration to our greatness in administration crosswise over India.",
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 14,
+                        height: 1.7,
+                        color: LuxuryTheme.textMuted,
+                        fontWeight: FontWeight.w400,
                       ),
-                      const SizedBox(height: 28),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.about);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2),
+                    ),
+                    const SizedBox(height: 28),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, AppRoutes.about);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: LuxuryTheme.primaryDark,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        elevation: 4,
+                        shadowColor: LuxuryTheme.primaryDark.withOpacity(0.3),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "READ MORE",
+                            style: GoogleFonts.cinzel(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 1.5,
+                            ),
                           ),
-                          elevation: 0,
-                        ),
-                        child: Text("Read More", style: GoogleFonts.imFellEnglishSc(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.arrow_forward_rounded, size: 14),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -957,7 +1082,7 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
         SlideTransition(
           position: _rightImageSlide,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(16),
             child: AspectRatio(
               aspectRatio: 16 / 9,
               child: Image.asset(
@@ -976,49 +1101,74 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
         const SizedBox(height: 20),
         SlideTransition(
           position: _leftCardSlide,
-          child: Material(
-            elevation: 4,
-            shadowColor: Colors.black.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(6),
-            color: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("About Us", style: GoogleFonts.imFellEnglishSc(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.purple)),
-                  const SizedBox(height: 16),
-                  Text(
-                    "Interior Design introduces people to modernism, relaxation and beauty. Our team at Bindu Decor ensures a perfect blend of function and appearance. We have picked up a notoriety of being consistent with its promise and are pleased to state that the majority of our customers will bear declaration to our greatness in administration crosswise over India.",
-                    style: GoogleFonts.imFellEnglishSc(
-                      fontSize: 14,
-                      height: 1.5,
-                      color: const Color(0xFF4A4A4A),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+              border: Border.all(color: const Color(0xFFE8E3D9)),
+            ),
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "ABOUT BINDU DÉCOR",
+                  style: GoogleFonts.cinzel(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: LuxuryTheme.primaryAccent,
+                    letterSpacing: 2.0,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  "Crafting Environments of Elegance & Comfort",
+                  style: GoogleFonts.cormorantGaramond(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: LuxuryTheme.primaryDark,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  "Interior Design introduces people to modernism, relaxation and beauty. Our team at Bindu Decor ensures a perfect blend of function and appearance. We have picked up a notoriety of being consistent with its promise and are pleased to state that the majority of our customers will bear declaration to our greatness in administration crosswise over India.",
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    height: 1.6,
+                    color: LuxuryTheme.textMuted,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.about);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: LuxuryTheme.primaryDark,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, AppRoutes.about);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    child: Text(
-                      "Read More",
-                      style: GoogleFonts.cabin(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  child: Text(
+                    "READ MORE",
+                    style: GoogleFonts.cinzel(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: 1.5,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
