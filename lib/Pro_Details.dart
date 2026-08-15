@@ -110,8 +110,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 children: [
                   TextSpan(
                     text: "$label: ",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(text: value ?? "N/A"),
                 ],
               ),
@@ -194,14 +193,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          currentTitle,
-          style: GoogleFonts.cabin(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
+        title: Text(currentTitle, style: GoogleFonts.cormorantGaramond(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16)),
         centerTitle: false,
       ),
       body: SingleChildScrollView(
@@ -306,27 +298,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   const SizedBox(height: 14),
 
                   // Dynamic Title based on current selected image
-                  Text(
-                    currentTitle,
-                    style: GoogleFonts.cabin(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1F2937),
-                    ),
-                  ),
+                  Text(currentTitle, style: GoogleFonts.cormorantGaramond(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFF1F2937))),
                   const SizedBox(height: 14),
                   const Divider(color: Color(0xFFE5E7EB), thickness: 1),
                   const SizedBox(height: 14),
 
                   // Dynamic Description based on current selected image
-                  Text(
-                    "Description",
-                    style: GoogleFonts.cabin(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF276B5A),
-                    ),
-                  ),
+                  Text("Description", style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF276B5A))),
                   const SizedBox(height: 8),
                   Text(
                     currentDescription,
@@ -364,14 +342,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   const SizedBox(height: 16),
 
                   // Image-Specific & Product Specifications
-                  Text(
-                    "Product Specifications",
-                    style: GoogleFonts.cabin(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF1F2937),
-                    ),
-                  ),
+                  Text("Product Specifications", style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF1F2937))),
                   const SizedBox(height: 16),
                   _buildDetailRow(
                     CupertinoIcons.photo,

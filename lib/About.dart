@@ -882,14 +882,6 @@ Widget _lastLeast(BuildContext context) {
     child: Container(
       padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.white,
-            const Color(0xFF0F382C).withOpacity(0.03),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(width: 1.5, color: const Color(0xFFD4AF37).withOpacity(0.5)),
         boxShadow: [
@@ -905,23 +897,9 @@ Widget _lastLeast(BuildContext context) {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                  "Last but",
-                  style: GoogleFonts.playfairDisplay(
-                      fontSize: isDesktop ? 34 : 26,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF0F382C)
-                  )
-              ),
+              Text("Last but", style: GoogleFonts.cormorantGaramond(fontSize: isDesktop ? 34 : 26, fontWeight: FontWeight.bold, color: const Color(0xFF0F382C))),
               const SizedBox(width: 8),
-              Text(
-                  "Not The Least",
-                  style: GoogleFonts.playfairDisplay(
-                      fontSize: isDesktop ? 34 : 26,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF8C6D23)
-                  )
-              )
+              Text("Not The Least", style: GoogleFonts.playfairDisplay(fontSize: isDesktop ? 34 : 26, fontWeight: FontWeight.bold, color: const Color(0xFF8C6D23)))
             ],
           ),
           const SizedBox(height: 8),

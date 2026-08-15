@@ -848,7 +848,9 @@ Widget _contactForm(BuildContext context) {
   }
 
   Future<void> openWhatsApp() async {
-    const String phoneNumber = '91 9586518360';
+    // 1. Phone number MUST contain digits only (no spaces or '+' signs)
+    const String rawPhoneNumber = '919586518360';
+
     final String name = nameController.text.trim();
     final String location = locationController.text.trim();
 
@@ -856,13 +858,23 @@ Widget _contactForm(BuildContext context) {
     if (name.isNotEmpty) message += '\nName: $name';
     if (location.isNotEmpty) message += '\nLocation: $location';
 
-    final Uri whatsappUri = Uri.parse(
-      'https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}',
-    );
+    final String encodedMessage = Uri.encodeComponent(message);
+
+    // 2. Build both HTTPS (Web/Universal) and Native App URI schemes
+    final Uri httpsUri = Uri.parse('https://wa.me/$rawPhoneNumber?text=$encodedMessage');
+    final Uri nativeUri = Uri.parse('whatsapp://send?phone=$rawPhoneNumber&text=$encodedMessage');
 
     try {
-      if (await canLaunchUrl(whatsappUri)) {
-        await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+      // Try opening via native app scheme first
+      if (await canLaunchUrl(nativeUri)) {
+        await launchUrl(nativeUri);
+      }
+      // Fall back to https wa.me link
+      else if (await canLaunchUrl(httpsUri)) {
+        await launchUrl(
+          httpsUri,
+          mode: LaunchMode.externalNonBrowserApplication,
+        );
       } else {
         throw 'Could not launch WhatsApp';
       }
@@ -870,7 +882,7 @@ Widget _contactForm(BuildContext context) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Unable to open WhatsApp.'),
+            content: Text('Unable to open WhatsApp. Please check if WhatsApp is installed.'),
             backgroundColor: Colors.redAccent,
           ),
         );

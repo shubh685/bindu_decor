@@ -74,7 +74,6 @@ class _HomePageState extends State<HomePage> {
     ),
   ];
 
-
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -103,7 +102,7 @@ class _HomePageState extends State<HomePage> {
             SliverToBoxAdapter(
               child: Column(
                 children: [
-                  _mainImage(context),
+                  const MainImageCarousel(),
                   _subTitle(context),
                   const ExploreByCategorySection(),
                   const OurDetails(),
@@ -128,122 +127,258 @@ class _HomePageState extends State<HomePage> {
 }
 
 // ==========================================
-// MAIN IMAGE & SUBTITLE WIDGETS
+// MAIN IMAGE CAROUSEL WIDGET
 // ==========================================
 
-Widget _mainImage(BuildContext context) {
-  final double screenWidth = MediaQuery.of(context).size.width;
+class CarouselImageData {
+  final String imagePath;
+  final Color textColor;
 
-  double imageHeight;
-  double buttonBottomPadding;
-  double buttonFontSize;
-  double buttonHorizontalPadding;
+  const CarouselImageData({
+    required this.imagePath,
+    required this.textColor,
+  });
+}
 
-  if (screenWidth >= 1200) {
-    imageHeight = 540;
-    buttonBottomPadding = 60;
-    buttonFontSize = 14;
-    buttonHorizontalPadding = 32;
-  } else if (screenWidth >= 600) {
-    imageHeight = 420;
-    buttonBottomPadding = 45;
-    buttonFontSize = 13;
-    buttonHorizontalPadding = 24;
-  } else {
-    imageHeight = 320;
-    buttonBottomPadding = 30;
-    buttonFontSize = 12;
-    buttonHorizontalPadding = 20;
+class MainImageCarousel extends StatefulWidget {
+  const MainImageCarousel({super.key});
+
+  @override
+  State<MainImageCarousel> createState() => _MainImageCarouselState();
+}
+
+class _MainImageCarouselState extends State<MainImageCarousel> {
+  late final PageController _pageController;
+  Timer? _timer;
+  int _currentIndex = 0;
+
+  final List<CarouselImageData> _slides = const [
+    CarouselImageData(
+      imagePath: "assets/images/main_img.png",
+      textColor: Colors.white,
+    ),
+    CarouselImageData(
+      imagePath: "assets/images/main_img2.png",
+      textColor: Color(0xFFF4EAD4), // Elegant Warm Ivory
+    ),
+    CarouselImageData(
+      imagePath: "assets/images/main_img3.png",
+      textColor: Color(0xFFE6C687), // Muted Gold Accent
+    ),
+    CarouselImageData(
+      imagePath: "assets/images/main_img4.png",
+      textColor: Color(0xFFFFF8E7), // Soft Champagne
+    ),
+    CarouselImageData(
+      imagePath: "assets/images/main_img5.png",
+      textColor: Color(0xFFD4AF37), // Signature Gold
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _startTimer();
   }
 
-  return SizedBox(
-    width: double.infinity,
-    height: imageHeight,
-    child: Stack(
-      fit: StackFit.expand,
-      children: [
-        Image.asset(
-          "assets/images/main_img.png", fit: BoxFit.cover, alignment: Alignment.center),
-        // Modern Gradient Overlay
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withOpacity(0.15),
-                LuxuryTheme.primaryDark.withOpacity(0.4),
-                LuxuryTheme.primaryDark.withOpacity(0.85),
-              ],
-              stops: const [0.0, 0.6, 1.0],
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if (_pageController.hasClients) {
+        int nextPage = _currentIndex + 1;
+        if (nextPage >= _slides.length) {
+          nextPage = 0;
+        }
+        _pageController.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 800),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+
+    double imageHeight;
+    double buttonBottomPadding;
+    double buttonFontSize;
+    double buttonHorizontalPadding;
+
+    if (screenWidth >= 1200) {
+      imageHeight = 540;
+      buttonBottomPadding = 60;
+      buttonFontSize = 14;
+      buttonHorizontalPadding = 32;
+    } else if (screenWidth >= 600) {
+      imageHeight = 420;
+      buttonBottomPadding = 45;
+      buttonFontSize = 13;
+      buttonHorizontalPadding = 24;
+    } else {
+      imageHeight = 320;
+      buttonBottomPadding = 30;
+      buttonFontSize = 12;
+      buttonHorizontalPadding = 20;
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      height: imageHeight,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background PageView Image Carousel
+          PageView.builder(
+            controller: _pageController,
+            itemCount: _slides.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return Image.asset(
+                _slides[index].imagePath,
+                fit: BoxFit.cover,
+                alignment: Alignment.center,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: LuxuryTheme.primaryDark,
+                  child: const Center(
+                    child: Icon(Icons.image_not_supported, color: Colors.white54, size: 50),
+                  ),
+                ),
+              );
+            },
+          ),
+          // Gradient Overlay
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withOpacity(0.15),
+                  LuxuryTheme.primaryDark.withOpacity(0.4),
+                  LuxuryTheme.primaryDark.withOpacity(0.85),
+                ],
+                stops: const [0.0, 0.6, 1.0],
+              ),
             ),
           ),
-        ),
-        Positioned(
-          left: 24,
-          right: 24,
-          bottom: buttonBottomPadding,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text("Transforming Living Spaces Into Masterpieces", textAlign: TextAlign.center, style: GoogleFonts.cormorantGaramond(fontSize: screenWidth >= 900 ? 46 : (screenWidth >= 600 ? 34 : 24), fontWeight: FontWeight.w700, color: Colors.white, height: 1.1,)),
-              const SizedBox(height: 24),
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Wallpapers()),
-                  ),
-                  borderRadius: BorderRadius.circular(30),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: buttonHorizontalPadding,
-                      vertical: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFD4AF37), Color(0xFFC5A059)],
-                      ),
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFC5A059).withOpacity(0.4),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "EXPLORE COLLECTION",
-                          style: GoogleFonts.cinzel(
-                            fontWeight: FontWeight.w700,
-                            fontSize: buttonFontSize,
-                            color: LuxuryTheme.primaryDark,
-                            letterSpacing: 2.0,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Icon(
-                          Icons.arrow_forward_rounded,
-                          size: 16,
-                          color: LuxuryTheme.primaryDark,
-                        ),
-                      ],
+          // Content Overlay
+          Positioned(
+            left: 24,
+            right: 24,
+            bottom: buttonBottomPadding,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  child: Text(
+                    "Transforming Living Spaces Into Masterpieces",
+                    key: ValueKey<int>(_currentIndex),
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.cormorantGaramond(
+                      fontSize: screenWidth >= 900
+                          ? 46
+                          : (screenWidth >= 600 ? 34 : 24),
+                      fontWeight: FontWeight.w700,
+                      color: _slides[_currentIndex].textColor,
+                      height: 1.1,
                     ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 24),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Wallpapers()),
+                    ),
+                    borderRadius: BorderRadius.circular(30),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: buttonHorizontalPadding,
+                        vertical: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFD4AF37), Color(0xFFC5A059)],
+                        ),
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFC5A059).withOpacity(0.4),
+                            blurRadius: 16,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "EXPLORE COLLECTION",
+                            style: GoogleFonts.cinzel(
+                              fontWeight: FontWeight.w700,
+                              fontSize: buttonFontSize,
+                              color: LuxuryTheme.primaryDark,
+                              letterSpacing: 2.0,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 16,
+                            color: LuxuryTheme.primaryDark,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Indicator Dots
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(_slides.length, (index) {
+                    final bool isActive = _currentIndex == index;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                      height: 6,
+                      width: isActive ? 24 : 6,
+                      decoration: BoxDecoration(
+                        color: isActive ? LuxuryTheme.primaryAccent : Colors.white38,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }
+
+// ==========================================
+// SUBTITLE WIDGET
+// ==========================================
 
 Widget _subTitle(BuildContext context) {
   final double screenWidth = MediaQuery.of(context).size.width;
@@ -522,7 +657,7 @@ class _CategoryCard extends StatelessWidget {
                   errorBuilder: (context, error, stackTrace) => Container(
                     color: const Color(0xFFEBF5F2),
                     child: const Center(
-                      child: Icon(Icons.image_not_supported, color: LuxuryTheme.primaryDark, size: 40)),
+                        child: Icon(Icons.image_not_supported, color: LuxuryTheme.primaryDark, size: 40)),
                   ),
                 ),
               ),
@@ -542,7 +677,6 @@ class _CategoryCard extends StatelessWidget {
                   ),
                 ),
               ),
-              // Category Specific Vibrant Accent Line
               Positioned(
                 top: 0,
                 left: 0,
@@ -575,7 +709,7 @@ class _CategoryCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Text(item.title, style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 0.5))),
+                            child: Text(item.title, style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 0.5))),
                         const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white70, size: 14),
                       ],
                     ),
@@ -1109,12 +1243,12 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("ABOUT BINDU DÉCOR", style: GoogleFonts.cinzel(fontSize: 21, fontWeight: FontWeight.w700,
-                    color: LuxuryTheme.primaryAccent, letterSpacing: 2.0,)),
+                  color: LuxuryTheme.primaryAccent, letterSpacing: 2.0,)),
                 const SizedBox(height: 6),
                 Text(
-                  "Interior Design introduces people to modernism, relaxation and beauty. Our team at Bindu Decor ensures a perfect blend of function and appearance. We have picked up a notoriety of being consistent with its promise and are pleased to state that the majority of our customers will bear declaration to our greatness in administration crosswise over India.",
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13, height: 1.6, color: LuxuryTheme.textMuted)),
+                    "Interior Design introduces people to modernism, relaxation and beauty. Our team at Bindu Decor ensures a perfect blend of function and appearance. We have picked up a notoriety of being consistent with its promise and are pleased to state that the majority of our customers will bear declaration to our greatness in administration crosswise over India.",
+                    style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13, height: 1.6, color: LuxuryTheme.textMuted)),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
