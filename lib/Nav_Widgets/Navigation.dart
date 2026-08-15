@@ -217,7 +217,7 @@ class _NavItem extends StatelessWidget {
               Icon(icon, size: 22, color: Colors.purple.shade800),
               const SizedBox(width: 6),
             ],
-            Text(label, style: GoogleFonts.gloock(fontSize: 20, fontWeight: FontWeight.w400, color: Colors.purple)),
+            Text(label, style: GoogleFonts.unkempt(fontSize: 20, fontWeight: FontWeight.w400, color: Colors.purple)),
           ],
         ),
       ),
@@ -451,6 +451,13 @@ class _BinduFooterState extends State<BinduFooter>
     final Uri emailUri = Uri(scheme: 'mailto', path: email);
     if (await canLaunchUrl(emailUri)) {
       await launchUrl(emailUri);
+    }
+  }
+
+  void _handleNavigation(String route) {
+    if (route.startsWith('http')) return;
+    if (ModalRoute.of(context)?.settings.name != route) {
+      Navigator.pushNamed(context, route);
     }
   }
 
