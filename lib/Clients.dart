@@ -205,31 +205,15 @@ class _ClientLogoListState extends State<_ClientLogoList>
                       borderRadius: BorderRadius.circular(30),
                       border: Border.all(color: const Color(0xFF0F382C).withOpacity(0.15)),
                     ),
-                    child: Text(
-                        "TRUSTED BY INDUSTRY LEADERS",
-                        style: GoogleFonts.spaceGrotesk(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 2.5,
-                            color: const Color(0xFF0F382C)
-                        )
-                    ),
-                  ),
+                    child: Text("TRUSTED BY INDUSTRY LEADERS", style: GoogleFonts.cormorantGaramond(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.5, color: const Color(0xFF0F382C))),
+                 ),
                 ),
                 const SizedBox(height: 14),
 
                 SlideTransition(
                   position: _topToBottomTextAnim,
-                  child: Text(
-                      "Our Esteemed Clients",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.playfairDisplay(
-                          fontSize: screenWidth >= 900 ? 42 : 30,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF0F382C),
-                          letterSpacing: 0.5
-                      )
-                  ),
+                  child: Text("Our Esteemed Clients", textAlign: TextAlign.center,
+                      style: GoogleFonts.cormorantGaramond(fontSize: screenWidth >= 900 ? 42 : 30, fontWeight: FontWeight.bold, color: const Color(0xFF0F382C), letterSpacing: 0.5)),
                 ),
                 const SizedBox(height: 12),
 
@@ -266,11 +250,9 @@ class _ClientLogoListState extends State<_ClientLogoList>
                     child: Text(
                       "Proudly serving corporate offices, luxury residences, and commercial venues across India.",
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.outfit(
+                      style: GoogleFonts.cormorantGaramond(
                         fontSize: 16,
-                        color: const Color(0xFF4A5568),
-                      ),
-                    ),
+                        color: const Color(0xFF4A5568))),
                   ),
                 ),
               ],

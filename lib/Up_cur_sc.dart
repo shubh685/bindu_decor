@@ -158,16 +158,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
           const SizedBox(height: 8),
 
           // Title
-          Text(
-            widget.item.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.cabin(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF222222),
-            ),
-          ),
+          Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cormorantGaramond(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF222222))),
           const SizedBox(height: 2),
 
           // Thumbnails & Quick Inquire Button
@@ -476,14 +467,7 @@ class CurtainsAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "Designer Curtains & Window Drapes",
-            style: GoogleFonts.cabin(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
+          Text("Designer Curtains & Window Drapes", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
@@ -608,14 +592,7 @@ class StretchCeilingAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "Decorative Stretch Ceilings",
-            style: GoogleFonts.cabin(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
+          Text("Decorative Stretch Ceilings", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,

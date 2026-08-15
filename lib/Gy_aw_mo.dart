@@ -159,16 +159,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
           const SizedBox(height: 8),
 
           // Title
-          Text(
-            widget.item.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.cabin(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF222222),
-            ),
-          ),
+          Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cormorantGaramond(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF222222))),
           const SizedBox(height: 2),
 
           // Thumbnails & Quick Inquire Button
@@ -346,7 +337,7 @@ class GymFlooringsAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("High-Performance Gym Flooring", style: GoogleFonts.cabin(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
+          Text("High-Performance Gym Flooring", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
@@ -472,14 +463,7 @@ class AwningsAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "Architectural Outdoor Awnings",
-            style: GoogleFonts.cabin(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
+          Text("Architectural Outdoor Awnings", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
@@ -604,14 +588,7 @@ class MosquitoNetAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "Mosquito & Insect Protection Nets",
-            style: GoogleFonts.cabin(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
+          Text("Mosquito & Insect Protection Nets", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,

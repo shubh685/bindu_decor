@@ -163,16 +163,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
           const SizedBox(height: 8),
 
           // Title
-          Text(
-            widget.item.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.cabin(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF222222),
-            ),
-          ),
+          Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cormorantGaramond(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF222222))),
           const SizedBox(height: 2),
 
           // Thumbnails & Quick Inquire Button
@@ -349,7 +340,7 @@ class WallpaperAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Wallpapers Collection", style: GoogleFonts.cabin(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
+          Text("Wallpapers Collection", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
@@ -474,7 +465,7 @@ class FloorAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Premium Floorings", style: GoogleFonts.cabin(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
+          Text("Premium Floorings", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
@@ -600,7 +591,8 @@ class CarpetAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Luxury Carpets & Rugs", style: GoogleFonts.cabin(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
+          Text("Luxury Carpets & Rugs", style: GoogleFonts.cormorantGaramond
+            (fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,

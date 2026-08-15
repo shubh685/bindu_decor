@@ -186,8 +186,6 @@ Widget _mainImage(BuildContext context) {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("CURATED LUXURY INTERIORS", style: GoogleFonts.cormorantGaramond(fontSize: screenWidth >= 900 ? 18 : 12, fontWeight: FontWeight.w600, letterSpacing: screenWidth >= 900 ? 4.0 : 2.0, color: LuxuryTheme.primaryAccent)),
-              const SizedBox(height: 10),
               Text("Transforming Living Spaces Into Masterpieces", textAlign: TextAlign.center, style: GoogleFonts.cormorantGaramond(fontSize: screenWidth >= 900 ? 46 : (screenWidth >= 600 ? 34 : 24), fontWeight: FontWeight.w700, color: Colors.white, height: 1.1,)),
               const SizedBox(height: 24),
               Material(
@@ -1023,7 +1021,7 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("ABOUT BINDU DÉCOR", style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: LuxuryTheme.primaryAccent, letterSpacing: 2.5)),const SizedBox(height: 8),
+                    Text("ABOUT BINDU DÉCOR", style: GoogleFonts.cormorantGaramond(fontSize: 21, fontWeight: FontWeight.bold, color: LuxuryTheme.primaryAccent, letterSpacing: 2.5)),const SizedBox(height: 8),
                     Text(
                       "Interior Design introduces people to modernism, relaxation and beauty. Our team at Bindu Decor ensures a perfect blend of function and appearance. We have picked up a notoriety of being consistent with its promise and are pleased to state that the majority of our customers will bear declaration to our greatness in administration crosswise over India.",
                       style: GoogleFonts.plusJakartaSans(
@@ -1051,15 +1049,7 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            "READ MORE",
-                            style: GoogleFonts.cinzel(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
+                          Text("READ MORE", style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 1.5,)),
                           const SizedBox(width: 8),
                           const Icon(Icons.arrow_forward_rounded, size: 14),
                         ],
@@ -1118,33 +1108,13 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "ABOUT BINDU DÉCOR",
-                  style: GoogleFonts.cinzel(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: LuxuryTheme.primaryAccent,
-                    letterSpacing: 2.0,
-                  ),
-                ),
+                Text("ABOUT BINDU DÉCOR", style: GoogleFonts.cinzel(fontSize: 21, fontWeight: FontWeight.w700,
+                    color: LuxuryTheme.primaryAccent, letterSpacing: 2.0,)),
                 const SizedBox(height: 6),
-                Text(
-                  "Crafting Environments of Elegance & Comfort",
-                  style: GoogleFonts.cormorantGaramond(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: LuxuryTheme.primaryDark,
-                  ),
-                ),
-                const SizedBox(height: 14),
                 Text(
                   "Interior Design introduces people to modernism, relaxation and beauty. Our team at Bindu Decor ensures a perfect blend of function and appearance. We have picked up a notoriety of being consistent with its promise and are pleased to state that the majority of our customers will bear declaration to our greatness in administration crosswise over India.",
                   style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13,
-                    height: 1.6,
-                    color: LuxuryTheme.textMuted,
-                  ),
-                ),
+                    fontSize: 13, height: 1.6, color: LuxuryTheme.textMuted)),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
@@ -1158,15 +1128,7 @@ class _MoreInfoState extends State<MoreInfo> with SingleTickerProviderStateMixin
                       borderRadius: BorderRadius.circular(25),
                     ),
                   ),
-                  child: Text(
-                    "READ MORE",
-                    style: GoogleFonts.cinzel(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
+                  child: Text("READ MORE", style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 1.5)),
                 ),
               ],
             ),

@@ -159,16 +159,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
           const SizedBox(height: 8),
 
           // Title
-          Text(
-            widget.item.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.cabin(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF222222),
-            ),
-          ),
+          Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cormorantGaramond(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF222222))),
           const SizedBox(height: 2),
 
           // Thumbnails & Quick Inquire Button
@@ -222,14 +213,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
                     children: [
                       const Icon(Icons.touch_app_outlined, size: 12, color: Colors.white),
                       const SizedBox(width: 4),
-                      Text(
-                        "Inquire",
-                        style: GoogleFonts.cabin(
-                          fontSize: 11,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Text("Inquire", style: GoogleFonts.cabin(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),
@@ -345,14 +329,7 @@ class BlindsAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "Premium Window Blinds",
-            style: GoogleFonts.cabin(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
+          Text("Premium Window Blinds", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
@@ -478,14 +455,7 @@ class GlassFilmsAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "Decorative & Safety Glass Films",
-            style: GoogleFonts.cabin(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
+          Text("Decorative & Safety Glass Films", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
@@ -611,14 +581,7 @@ class ArtificialTurfsAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "Premium Artificial Turfs",
-            style: GoogleFonts.cabin(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
+          Text("Premium Artificial Turfs", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
