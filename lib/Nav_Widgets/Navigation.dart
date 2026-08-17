@@ -142,32 +142,11 @@ class BinduNavigationBar extends StatelessWidget implements PreferredSizeWidget 
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
-                          Icons.remove_red_eye_outlined,
-                          size: 11,
-                          color: LuxuryTheme.primaryAccent,
-                        ),
+                        const Icon(Icons.remove_red_eye_outlined, size: 11, color: LuxuryTheme.primaryAccent),
                         const SizedBox(width: 4),
-                        Text(
-                          'CURRENT VIEW: ',
-                          style: GoogleFonts.cinzel(
-                            fontSize: 9.0,
-                            fontWeight: FontWeight.bold,
-                            color: LuxuryTheme.textMuted,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
+                        Text('CURRENT VIEW: ', style: GoogleFonts.cinzel(fontSize: 11.8, fontWeight: FontWeight.bold, color: LuxuryTheme.textMuted, letterSpacing: 1.0,)),
                         Flexible(
-                          child: Text(
-                            currentViewLabel.toUpperCase(),
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.cinzel(
-                              fontSize: 9.0,
-                              fontWeight: FontWeight.w700,
-                              color: LuxuryTheme.primaryDark,
-                              letterSpacing: 1.1,
-                            ),
-                          ),
+                          child: Text(currentViewLabel.toUpperCase(), overflow: TextOverflow.ellipsis, style: GoogleFonts.cinzel(fontSize: 11.8, fontWeight: FontWeight.w700, color: LuxuryTheme.primaryDark, letterSpacing: 1.1)),
                         ),
                       ],
                     ),
