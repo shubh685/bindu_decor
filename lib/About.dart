@@ -897,7 +897,7 @@ Widget _lastLeast(BuildContext context) {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Last but", style: GoogleFonts.cormorantGaramond(fontSize: isDesktop ? 34 : 26, fontWeight: FontWeight.bold, color: const Color(0xFF0F382C))),
+              Text("Last but", style: GoogleFonts.playfairDisplay(fontSize: isDesktop ? 34 : 26, fontWeight: FontWeight.bold, color: const Color(0xFF0F382C))),
               const SizedBox(width: 8),
               Text("Not The Least", style: GoogleFonts.playfairDisplay(fontSize: isDesktop ? 34 : 26, fontWeight: FontWeight.bold, color: const Color(0xFF8C6D23)))
             ],

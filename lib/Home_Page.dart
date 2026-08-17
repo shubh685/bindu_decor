@@ -415,32 +415,35 @@ Widget _subTitle(BuildContext context) {
           ),
         ),
         const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              height: 1,
-              width: 60,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.transparent, LuxuryTheme.primaryAccent.withOpacity(0.8)],
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                height: 1,
+                width: 60,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.transparent, LuxuryTheme.primaryAccent.withOpacity(0.8)],
+                  ),
                 ),
               ),
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Icon(Icons.star_outline_rounded, color: LuxuryTheme.primaryAccent, size: 20),
-            ),
-            Container(
-              height: 1,
-              width: 60,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [LuxuryTheme.primaryAccent.withOpacity(0.8), Colors.transparent],
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Icon(Icons.star_outline_rounded, color: LuxuryTheme.primaryAccent, size: 20),
+              ),
+              Container(
+                height: 1,
+                width: 60,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [LuxuryTheme.primaryAccent.withOpacity(0.8), Colors.transparent],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     ),
