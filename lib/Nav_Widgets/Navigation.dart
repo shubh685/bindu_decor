@@ -51,7 +51,7 @@ class NestedMenuItem {
 // MAIN NAVIGATION BAR
 // ==========================================
 
-class BinduNavigationBar extends StatelessWidget {
+class BinduNavigationBar extends StatelessWidget implements PreferredSizeWidget {
   final List<NavItem> navItems;
   final List<NestedMenuItem> shopItems;
   final VoidCallback? onMenuItemTap;
@@ -63,12 +63,34 @@ class BinduNavigationBar extends StatelessWidget {
     this.onMenuItemTap,
   });
 
+  // Gives Scaffold/AppBar a safe default height to avoid vertical bounding conflicts
+  @override
+  Size get preferredSize => const Size.fromHeight(85.0);
+
+  String _getCurrentViewLabel(String? currentRoute) {
+    if (currentRoute == null || currentRoute.isEmpty) return 'Home';
+    for (var item in navItems) {
+      if (item.route == currentRoute) return item.label;
+    }
+    for (var group in shopItems) {
+      for (var sub in group.subItems) {
+        if (sub.route == currentRoute) return '${group.title} › ${sub.label}';
+      }
+    }
+    return currentRoute.replaceAll('/', '');
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
+    final String? currentRoute = ModalRoute.of(context)?.settings.name;
+    final String currentViewLabel = _getCurrentViewLabel(currentRoute);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+      padding: EdgeInsets.symmetric(
+        horizontal: isDesktop ? 24.0 : 16.0,
+        vertical: 4.0,
+      ),
       decoration: BoxDecoration(
         color: LuxuryTheme.bgCream.withOpacity(0.95),
         boxShadow: [
@@ -83,66 +105,180 @@ class BinduNavigationBar extends StatelessWidget {
         ),
       ),
       child: SafeArea(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildLogo(context),
-            const SizedBox(width: 20),
-            if (isDesktop)
-              _buildDesktopNav(context)
-            else
-              _buildMobileMenuButton(context),
-          ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _buildLogo(context, isDesktop),
+                      const SizedBox(width: 12),
+                      if (isDesktop)
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: _buildDesktopNav(context, currentRoute),
+                          ),
+                        )
+                      else
+                        _buildMobileMenuButton(context),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  // Current View Badge
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: LuxuryTheme.primaryDark.withOpacity(0.06),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.remove_red_eye_outlined,
+                          size: 11,
+                          color: LuxuryTheme.primaryAccent,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'CURRENT VIEW: ',
+                          style: GoogleFonts.cinzel(
+                            fontSize: 9.0,
+                            fontWeight: FontWeight.bold,
+                            color: LuxuryTheme.textMuted,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                        Flexible(
+                          child: Text(
+                            currentViewLabel.toUpperCase(),
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.cinzel(
+                              fontSize: 9.0,
+                              fontWeight: FontWeight.w700,
+                              color: LuxuryTheme.primaryDark,
+                              letterSpacing: 1.1,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildDesktopNav(BuildContext context) {
+  // Responsive Logo Helper
+  Widget _buildLogo(BuildContext context, bool isDesktop) {
+    return SizedBox(
+      height: isDesktop ? 42 : 34,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        },
+        child: Image.asset("assets/images/bindu.png", fit: BoxFit.contain),
+      ),
+    );
+  }
+
+  Widget _buildDesktopNav(BuildContext context, String? currentRoute) {
     List<Widget> navWidgets = [];
 
     for (var item in navItems) {
       if (item.label.toLowerCase() == 'shop') {
-        // Desktop Shop Item with Popup Menu
+        bool isShopActive = shopItems.any(
+              (group) => group.subItems.any((sub) => sub.route == currentRoute),
+        );
+
         navWidgets.add(
           PopupMenuButton<String>(
-            offset: const Offset(0, 52),
+            offset: const Offset(0, 40),
             elevation: 12,
             shadowColor: Colors.black.withOpacity(0.15),
             color: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             tooltip: item.label,
             onSelected: (value) => _handleNavigation(context, value),
             itemBuilder: (BuildContext context) {
               List<PopupMenuEntry<String>> menuEntries = [];
-
               for (var shopGroup in shopItems) {
                 if (shopGroup.subItems.isNotEmpty) {
-                  // Category Header
                   menuEntries.add(
                     PopupMenuItem<String>(
                       enabled: false,
                       child: Text(
                         shopGroup.title.toUpperCase(),
                         style: GoogleFonts.cormorantGaramond(
-                          fontWeight: FontWeight.w700, fontSize: 12.5, letterSpacing: 2.0, color: LuxuryTheme.primaryAccent,)),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12.5,
+                          letterSpacing: 2.0,
+                          color: LuxuryTheme.primaryAccent,
+                        ),
+                      ),
                     ),
                   );
 
-                  // Sub-items with Icons
                   for (var subItem in shopGroup.subItems) {
+                    final bool isSubSelected = subItem.route == currentRoute;
                     menuEntries.add(
                       PopupMenuItem<String>(
                         value: subItem.route,
-                        height: 44,
-                        child: Row(
-                          children: [
-                            if (subItem.icon != null) ...[
-                              Icon(subItem.icon, size: 18, color: LuxuryTheme.primaryDark),
-                              const SizedBox(width: 12),
+                        height: 38,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSubSelected
+                                ? LuxuryTheme.primaryDark.withOpacity(0.1)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            children: [
+                              if (subItem.icon != null) ...[
+                                Icon(
+                                  subItem.icon,
+                                  size: 16,
+                                  color: isSubSelected
+                                      ? LuxuryTheme.primaryAccent
+                                      : LuxuryTheme.primaryDark,
+                                ),
+                                const SizedBox(width: 8),
+                              ],
+                              Text(
+                                subItem.label,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12.5,
+                                  fontWeight: isSubSelected
+                                      ? FontWeight.w800
+                                      : FontWeight.w700,
+                                  color: isSubSelected
+                                      ? LuxuryTheme.primaryDark
+                                      : LuxuryTheme.textDark,
+                                ),
+                              ),
                             ],
-                            Text(subItem.label, style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.w700, color: LuxuryTheme.textDark,)),
-                          ]
+                          ),
                         ),
                       ),
                     );
@@ -153,49 +289,96 @@ class BinduNavigationBar extends StatelessWidget {
               return menuEntries;
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 14.0),
+              padding: const EdgeInsets.symmetric(
+                vertical: 4.0,
+                horizontal: 8.0,
+              ),
               decoration: BoxDecoration(
+                color: isShopActive
+                    ? LuxuryTheme.primaryDark
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isShopActive
+                      ? LuxuryTheme.primaryAccent
+                      : Colors.transparent,
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (item.icon != null) ...[
-                    Icon(item.icon, size: 16, color: LuxuryTheme.primaryDark),
-                    const SizedBox(width: 6),
+                    Icon(
+                      item.icon,
+                      size: 14,
+                      color: isShopActive
+                          ? LuxuryTheme.primaryAccent
+                          : LuxuryTheme.primaryDark,
+                    ),
+                    const SizedBox(width: 4),
                   ],
                   Text(
                     item.label.toUpperCase(),
-                    style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: LuxuryTheme.primaryDark)),
-                  const SizedBox(width: 4),
-                  const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: LuxuryTheme.primaryDark),
+                    style: GoogleFonts.cinzel(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.2,
+                      color: isShopActive
+                          ? Colors.white
+                          : LuxuryTheme.primaryDark,
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    size: 16,
+                    color: isShopActive
+                        ? LuxuryTheme.primaryAccent
+                        : LuxuryTheme.primaryDark,
+                  ),
                 ],
               ),
             ),
           ),
         );
       } else {
+        final bool isSelected = item.route == currentRoute;
         navWidgets.add(
           _NavItem(
             label: item.label,
             icon: item.icon,
+            isSelected: isSelected,
             onTap: () => _handleNavigation(context, item.route),
           ),
         );
       }
-      navWidgets.add(const SizedBox(width: 10));
     }
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: navWidgets,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: navWidgets.map((widget) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 4.0),
+            child: widget,
+          );
+        }).toList(),
+      ),
     );
   }
 
   Widget _buildMobileMenuButton(BuildContext context) {
     return Builder(
       builder: (innerContext) => IconButton(
-        icon: const Icon(Icons.menu_rounded, color: LuxuryTheme.primaryDark, size: 28),
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        icon: const Icon(
+          Icons.menu_rounded,
+          color: LuxuryTheme.primaryDark,
+          size: 26,
+        ),
         onPressed: () {
           Scaffold.of(innerContext).openDrawer();
         },
@@ -203,20 +386,20 @@ class BinduNavigationBar extends StatelessWidget {
     );
   }
 
-  // Replace this method in BinduNavigationBar class
   Future<void> _handleNavigation(BuildContext context, String route) async {
-    await NavigationHandler.handleNavigation(context, route, onTap: onMenuItemTap);
+    await NavigationHandler.handleNavigation(
+      context,
+      route,
+      onTap: onMenuItemTap,
+    );
   }
 }
-
-// Navigation.dart - Add this at the end of the file, before the BinduFooter class
 
 // ==========================================
 // REUSABLE NAVIGATION HANDLER
 // ==========================================
 
 class NavigationHandler {
-  /// Handles navigation for both internal routes and external URLs
   static Future<void> handleNavigation(
       BuildContext context,
       String route, {
@@ -234,7 +417,6 @@ class NavigationHandler {
         debugPrint('Could not launch $url');
       }
     } else {
-      // Check if we're already on the same route to avoid unnecessary navigation
       final String? currentRoute = ModalRoute.of(context)?.settings.name;
       if (currentRoute != route) {
         Navigator.pushNamed(context, route);
@@ -242,7 +424,6 @@ class NavigationHandler {
     }
   }
 
-  /// Creates a navigation callback that can be used with onMenuItemTap
   static VoidCallback createNavigationCallback(
       BuildContext context,
       String route,
@@ -250,6 +431,7 @@ class NavigationHandler {
     return () => handleNavigation(context, route);
   }
 }
+
 // ==========================================
 // NAVIGATION WIDGETS
 // ==========================================
@@ -257,25 +439,54 @@ class NavigationHandler {
 class _NavItem extends StatelessWidget {
   final String label;
   final IconData? icon;
+  final bool isSelected;
   final VoidCallback onTap;
 
-  const _NavItem({required this.label, this.icon, required this.onTap});
+  const _NavItem({
+    required this.label,
+    this.icon,
+    this.isSelected = false,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
-      child: Padding(
+      child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+        decoration: BoxDecoration(
+          color: isSelected ? LuxuryTheme.primaryDark : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? LuxuryTheme.primaryAccent
+                : Colors.transparent,
+          ),
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 16, color: LuxuryTheme.primaryDark),
+              Icon(
+                icon,
+                size: 16,
+                color: isSelected
+                    ? LuxuryTheme.primaryAccent
+                    : LuxuryTheme.primaryDark,
+              ),
               const SizedBox(width: 6),
             ],
-            Text(label.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: LuxuryTheme.primaryDark)),
+            Text(
+              label.toUpperCase(),
+              style: GoogleFonts.cinzel(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.5,
+                color: isSelected ? Colors.white : LuxuryTheme.primaryDark,
+              ),
+            ),
           ],
         ),
       ),
@@ -301,6 +512,8 @@ class BinduMobileDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String? currentRoute = ModalRoute.of(context)?.settings.name;
+
     return Drawer(
       backgroundColor: LuxuryTheme.bgCream,
       child: SafeArea(
@@ -311,14 +524,17 @@ class BinduMobileDrawer extends StatelessWidget {
             const SizedBox(height: 16),
             const Divider(color: Color(0xFFE8E3D9)),
             const SizedBox(height: 8),
-            ..._buildDrawerItems(context),
+            ..._buildDrawerItems(context, currentRoute),
           ],
         ),
       ),
     );
   }
 
-  List<Widget> _buildDrawerItems(BuildContext context) {
+  List<Widget> _buildDrawerItems(
+      BuildContext context,
+      String? currentRoute,
+      ) {
     List<Widget> items = [];
 
     for (var navItem in navItems) {
@@ -332,26 +548,59 @@ class BinduMobileDrawer extends StatelessWidget {
                   : null,
               title: Text(
                 navItem.label.toUpperCase(),
-                style: GoogleFonts.cinzel(fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: LuxuryTheme.primaryDark),
+                style: GoogleFonts.cinzel(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.5,
+                  color: LuxuryTheme.primaryDark,
+                ),
               ),
               children: shopItems.map((category) {
                 return ExpansionTile(
                   tilePadding: const EdgeInsets.only(left: 20),
                   title: Text(
                     category.title.toUpperCase(),
-                    style: GoogleFonts.cormorantGaramond(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: LuxuryTheme.primaryAccent),
+                    style: GoogleFonts.cormorantGaramond(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                      color: LuxuryTheme.primaryAccent,
+                    ),
                   ),
                   children: category.subItems.map((subItem) {
-                    return ListTile(
-                      contentPadding: const EdgeInsets.only(left: 36),
-                      leading: subItem.icon != null
-                          ? Icon(subItem.icon, size: 18, color: LuxuryTheme.primaryDark)
-                          : null,
-                      title: Text(
-                        subItem.label,
-                        style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.w500, color: LuxuryTheme.textDark),
+                    final bool isSubSelected = subItem.route == currentRoute;
+                    return Container(
+                      color: isSubSelected
+                          ? LuxuryTheme.primaryDark.withOpacity(0.08)
+                          : Colors.transparent,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.only(left: 36),
+                        leading: subItem.icon != null
+                            ? Icon(
+                          subItem.icon,
+                          size: 18,
+                          color: isSubSelected
+                              ? LuxuryTheme.primaryAccent
+                              : LuxuryTheme.primaryDark,
+                        )
+                            : null,
+                        title: Text(
+                          subItem.label,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            fontWeight: isSubSelected
+                                ? FontWeight.w800
+                                : FontWeight.w500,
+                            color: isSubSelected
+                                ? LuxuryTheme.primaryDark
+                                : LuxuryTheme.textDark,
+                          ),
+                        ),
+                        onTap: () => _handleNavigation(
+                          context,
+                          subItem.route,
+                        ),
                       ),
-                      onTap: () => _handleNavigation(context, subItem.route),
                     );
                   }).toList(),
                 );
@@ -361,17 +610,36 @@ class BinduMobileDrawer extends StatelessWidget {
         );
         items.add(const SizedBox(height: 4));
       } else {
+        final bool isSelected = navItem.route == currentRoute;
         items.add(
-          ListTile(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            leading: navItem.icon != null
-                ? Icon(navItem.icon, color: LuxuryTheme.primaryDark)
-                : null,
-            title: Text(
-              navItem.label.toUpperCase(),
-              style: GoogleFonts.cinzel(fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: LuxuryTheme.primaryDark),
+          Container(
+            decoration: BoxDecoration(
+              color: isSelected ? LuxuryTheme.primaryDark : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
             ),
-            onTap: () => _handleNavigation(context, navItem.route),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              leading: navItem.icon != null
+                  ? Icon(
+                navItem.icon,
+                color: isSelected
+                    ? LuxuryTheme.primaryAccent
+                    : LuxuryTheme.primaryDark,
+              )
+                  : null,
+              title: Text(
+                navItem.label.toUpperCase(),
+                style: GoogleFonts.cinzel(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.5,
+                  color: isSelected ? Colors.white : LuxuryTheme.primaryDark,
+                ),
+              ),
+              onTap: () => _handleNavigation(context, navItem.route),
+            ),
           ),
         );
         items.add(const SizedBox(height: 4));
@@ -381,9 +649,12 @@ class BinduMobileDrawer extends StatelessWidget {
     return items;
   }
 
-  // Replace this method in BinduMobileDrawer class
   Future<void> _handleNavigation(BuildContext context, String route) async {
-    await NavigationHandler.handleNavigation(context, route, onTap: onItemTap);
+    await NavigationHandler.handleNavigation(
+      context,
+      route,
+      onTap: onItemTap,
+    );
   }
 }
 
@@ -396,7 +667,10 @@ Widget _buildLogo(BuildContext context) {
     height: 65,
     child: InkWell(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
       },
       child: Image.asset("assets/images/bindu.png", fit: BoxFit.contain),
     ),
@@ -589,7 +863,7 @@ class _BinduFooterState extends State<BinduFooter>
             ),
           ),
           const SizedBox(height: 12),
-          Text("BINDU DÉCOR", style: GoogleFonts.cormorantGaramond(color: Colors.white, fontSize: 22, letterSpacing: 3, fontWeight: FontWeight.w700,),),
+          Text("BINDU DÉCOR", style: GoogleFonts.cormorantGaramond(color: Colors.white, fontSize: 22, letterSpacing: 3, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
           Text("Curating Luxury Living Spaces", style: GoogleFonts.plusJakartaSans(color: Colors.white60, fontSize: 12)),
         ],
@@ -604,7 +878,8 @@ class _BinduFooterState extends State<BinduFooter>
       children: [
         Text(
           "CONTACT DETAILS",
-          style: GoogleFonts.cormorantGaramond(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
+          style: GoogleFonts.cormorantGaramond(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0),
+        ),
         const SizedBox(height: 18),
         SlideTransition(
           position: _addressAnim,
@@ -619,7 +894,7 @@ class _BinduFooterState extends State<BinduFooter>
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(address, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: 14, height: 1.5, decorationColor: Colors.white38,)),
+                  child: Text(address, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: 14, height: 1.5, decorationColor: Colors.white38)),
                 ),
               ],
             ),
@@ -639,7 +914,7 @@ class _BinduFooterState extends State<BinduFooter>
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(phone, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: 14,  decorationColor: Colors.white38)),
+                  child: Text(phone, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: 14, decorationColor: Colors.white38)),
                 ),
               ],
             ),
@@ -678,7 +953,7 @@ class _BinduFooterState extends State<BinduFooter>
         children: [
           Text("WORKING HOURS", style: GoogleFonts.cinzel(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
           const SizedBox(height: 18),
-          Text("10:30 AM to 7:00 PM IST | Mon - Sat", style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.85), fontSize: 14, height: 1.5),),
+          Text("10:30 AM to 7:00 PM IST | Mon - Sat", style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.85), fontSize: 14, height: 1.5)),
         ],
       ),
     );
@@ -837,7 +1112,6 @@ Widget _contactForm(BuildContext context) {
   }
 
   Future<void> openWhatsApp() async {
-    // 1. Phone number MUST contain digits only (no spaces or '+' signs)
     const String rawPhoneNumber = '919930098219';
 
     final String name = nameController.text.trim();
@@ -849,17 +1123,13 @@ Widget _contactForm(BuildContext context) {
 
     final String encodedMessage = Uri.encodeComponent(message);
 
-    // 2. Build both HTTPS (Web/Universal) and Native App URI schemes
     final Uri httpsUri = Uri.parse('https://wa.me/$rawPhoneNumber?text=$encodedMessage');
     final Uri nativeUri = Uri.parse('whatsapp://send?phone=$rawPhoneNumber&text=$encodedMessage');
 
     try {
-      // Try opening via native app scheme first
       if (await canLaunchUrl(nativeUri)) {
         await launchUrl(nativeUri);
-      }
-      // Fall back to https wa.me link
-      else if (await canLaunchUrl(httpsUri)) {
+      } else if (await canLaunchUrl(httpsUri)) {
         await launchUrl(
           httpsUri,
           mode: LaunchMode.externalNonBrowserApplication,
@@ -903,7 +1173,6 @@ Widget _contactForm(BuildContext context) {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Dialog Header
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 24),
@@ -934,19 +1203,18 @@ Widget _contactForm(BuildContext context) {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        Text('DESIGN CONSULTATION', style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w700, color: LuxuryTheme.primaryAccent, letterSpacing: 2.0,)),
+                        Text('DESIGN CONSULTATION', style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w700, color: LuxuryTheme.primaryAccent, letterSpacing: 2.0)),
                         const SizedBox(height: 4),
                         Text('Get In Touch With Us', style: GoogleFonts.cormorantGaramond(fontSize: 28, fontWeight: FontWeight.w700, color: Colors.white)),
                         const SizedBox(height: 8),
                         Text(
                           'Tell us your location & preferred style. Our design experts will recommend tailored solutions for you.',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.plusJakartaSans(fontSize: 13, color: Colors.white.withOpacity(0.85), height: 1.4,)),
+                          style: GoogleFonts.plusJakartaSans(fontSize: 13, color: Colors.white.withOpacity(0.85), height: 1.4),
+                        ),
                       ],
                     ),
                   ),
-
-                  // Form Controls
                   Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Form(
@@ -1061,8 +1329,6 @@ Widget _contactForm(BuildContext context) {
                             },
                           ),
                           const SizedBox(height: 24),
-
-                          // Actions Row
                           Row(
                             children: [
                               Expanded(
@@ -1094,7 +1360,8 @@ Widget _contactForm(BuildContext context) {
                                       children: [
                                         Text(
                                           'SEND INQUIRY',
-                                          style: GoogleFonts.cormorantGaramond(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.0, color: Colors.white)),
+                                          style: GoogleFonts.cormorantGaramond(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.0, color: Colors.white),
+                                        ),
                                         const SizedBox(width: 6),
                                         const Icon(Icons.send_rounded, size: 14),
                                       ],
@@ -1103,7 +1370,6 @@ Widget _contactForm(BuildContext context) {
                                 ),
                               ),
                               const SizedBox(width: 10),
-
                               Expanded(
                                 flex: 2,
                                 child: SizedBox(
@@ -1147,16 +1413,11 @@ Widget _contactForm(BuildContext context) {
 }
 
 extension NavigationExtension on BuildContext {
-  /// Navigate to a route or open URL
   Future<void> navigateTo(String route, {VoidCallback? onTap}) {
     return NavigationHandler.handleNavigation(this, route, onTap: onTap);
   }
 
-  /// Check if current route matches the given route
   bool isCurrentRoute(String route) {
-    return ModalRoute
-        .of(this)
-        ?.settings
-        .name == route;
+    return ModalRoute.of(this)?.settings.name == route;
   }
 }
