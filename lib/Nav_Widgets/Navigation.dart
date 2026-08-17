@@ -643,7 +643,7 @@ class BinduMobileDrawer extends StatelessWidget {
 
 Widget _buildLogo(BuildContext context) {
   return SizedBox(
-    height: 65,
+    height: 72,
     child: InkWell(
       onTap: () {
         Navigator.push(
