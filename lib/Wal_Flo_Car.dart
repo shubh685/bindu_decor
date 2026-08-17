@@ -310,7 +310,7 @@ class WallpaperAnimatedSection extends StatelessWidget {
     DecorProductItem(
       title: "Little Curiosity",
       imageUrls: [
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwK7pJ34s4p-K9BxnpIzh4NGKk5MBNzJOVanon8FkS9w&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRV5n7j35abTULzIUHFgQDBLPdA95_BKSWS2j5_kApsAQ&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGri-MxB0WuO36eV9VizgUJV2HOFHUCew1HaktAsB9HQ&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQevlSTzfIrkf6XMPRqB-8yK50GV4MkxbDPQhAjLPZZKw&s=10",
       ],

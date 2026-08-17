@@ -676,20 +676,9 @@ class _BinduFooterState extends State<BinduFooter>
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            "WORKING HOURS",
-            style: GoogleFonts.cinzel(
-              color: LuxuryTheme.primaryAccent,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2.0,
-            ),
-          ),
+          Text("WORKING HOURS", style: GoogleFonts.cinzel(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
           const SizedBox(height: 18),
-          Text(
-            "10:30 AM to 7:00 PM IST | Mon - Sat",
-            style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.85), fontSize: 14, height: 1.5),
-          ),
+          Text("10:30 AM to 7:00 PM IST | Mon - Sat", style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.85), fontSize: 14, height: 1.5),),
         ],
       ),
     );
@@ -849,7 +838,7 @@ Widget _contactForm(BuildContext context) {
 
   Future<void> openWhatsApp() async {
     // 1. Phone number MUST contain digits only (no spaces or '+' signs)
-    const String rawPhoneNumber = '919586518360';
+    const String rawPhoneNumber = '919930098219';
 
     final String name = nameController.text.trim();
     final String location = locationController.text.trim();
@@ -952,12 +941,7 @@ Widget _contactForm(BuildContext context) {
                         Text(
                           'Tell us your location & preferred style. Our design experts will recommend tailored solutions for you.',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 13,
-                            color: Colors.white.withOpacity(0.85),
-                            height: 1.4,
-                          ),
-                        ),
+                          style: GoogleFonts.plusJakartaSans(fontSize: 13, color: Colors.white.withOpacity(0.85), height: 1.4,)),
                       ],
                     ),
                   ),
