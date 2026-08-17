@@ -39,6 +39,7 @@ dependencies:
   visibility_detector: ^0.4.0+2
   http: ^1.2.0
   font_awesome_icon_class: ^0.0.6
+  provider: ^6.1.5+1
 dev_dependencies:
   flutter_test:
     sdk: flutter
