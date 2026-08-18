@@ -69,17 +69,26 @@ class BinduNavigationBar extends StatelessWidget implements PreferredSizeWidget 
 
   String _getCurrentViewLabel(String? currentRoute) {
     if (currentRoute == null || currentRoute.isEmpty) return 'Home';
+
+    // Check defined static nav items first
     for (var item in navItems) {
       if (item.route == currentRoute) return item.label;
     }
+
+    // Check shop category items
     for (var group in shopItems) {
       for (var sub in group.subItems) {
         if (sub.route == currentRoute) return '${group.title} › ${sub.label}';
       }
     }
+
+    // If route is a custom string (e.g. "Projects > Villa Velloze"), return it directly
+    if (currentRoute.contains('>')) {
+      return currentRoute;
+    }
+
     return currentRoute.replaceAll('/', '');
   }
-
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;

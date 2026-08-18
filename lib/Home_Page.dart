@@ -14,6 +14,7 @@ class AppRoutes {
   static const String home = '/';
   static const String about = '/About';
   static const String clients = '/clients';
+  static const String projects = '/projects';
   static const String shop = '/shop';
   static const String reviews = '/reviews';
   static const String wallpapers = '/shop/wallpapers';
@@ -45,6 +46,7 @@ class _HomePageState extends State<HomePage> {
   final List<NavItem> _navItems = const [
     NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
     NavItem(label: "About", route: AppRoutes.about, icon: CupertinoIcons.info_circle),
+    NavItem(label: "Projects", route: AppRoutes.projects, icon: CupertinoIcons.building_2_fill),
     NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.person_alt_circle),
     NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart),
     NavItem(

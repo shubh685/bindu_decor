@@ -13,6 +13,7 @@ import 'Pro_Details.dart';
 final List<NavItem> _globalNavItems = const [
   NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
   NavItem(label: "About", route: AppRoutes.about, icon: CupertinoIcons.info_circle),
+  NavItem(label: "Projects", route: AppRoutes.projects, icon: CupertinoIcons.building_2_fill),
   NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.person_alt_circle),
   NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart),
   NavItem(
@@ -371,8 +372,6 @@ class Awnings extends StatefulWidget {
 }
 
 class _AwningsState extends State<Awnings> {
-
-
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;

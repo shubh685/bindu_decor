@@ -1,6 +1,7 @@
 import 'package:bindu_decor/Clients.dart';
 import 'package:bindu_decor/Gy_aw_mo.dart';
 import 'package:bindu_decor/Home_Page.dart';
+import 'package:bindu_decor/Proj_Page.dart';
 import 'package:bindu_decor/Up_cur_sc.dart';
 import 'package:bindu_decor/Wal_Flo_Car.dart';
 import 'package:bindu_decor/bl_gl_ar.dart';
@@ -40,7 +41,8 @@ class MyApp extends StatelessWidget {
         AppRoutes.mosquitoNets: (context) =>  const MosquitoNets(),
         AppRoutes.upholstery: (context) => const Upholstery(),
         AppRoutes.curtains: (context) => const Curtains(),
-        AppRoutes.stretchCeiling: (context) => const StretchCeiling()
+        AppRoutes.stretchCeiling: (context) => const StretchCeiling(),
+        AppRoutes.projects: (context) => const ProjectsPage()
       },
     );
   }
