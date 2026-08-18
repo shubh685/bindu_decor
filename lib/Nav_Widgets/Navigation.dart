@@ -952,10 +952,7 @@ class _BinduFooterState extends State<BinduFooter>
           // ==========================================
           // SOCIAL MEDIA SECTION
           // ==========================================
-          Text(
-            "FOLLOW US",
-            style: GoogleFonts.cinzel(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0),
-          ),
+          Text("FOLLOW US", style: GoogleFonts.cinzel(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0),),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -996,11 +993,7 @@ class _BinduFooterState extends State<BinduFooter>
             color: Colors.white.withOpacity(0.05),
           ),
           child: Center(
-            child: FaIcon(
-              icon,
-              size: 16,
-              color: Colors.white,
-            ),
+            child: FaIcon(icon, size: 16, color: Colors.white),
           ),
         ),
       ),
