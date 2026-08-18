@@ -923,6 +923,15 @@ class _BinduFooterState extends State<BinduFooter>
     );
   }
 
+  Future<void> _launchSocialUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      debugPrint('Could not launch $url');
+    }
+  }
+
   Widget _buildRightSection() {
     return SlideTransition(
       position: _workingHoursAnim,
@@ -930,14 +939,75 @@ class _BinduFooterState extends State<BinduFooter>
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text("WORKING HOURS", style: GoogleFonts.cinzel(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
+          Text(
+            "WORKING HOURS",
+            style: GoogleFonts.cinzel(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0),
+          ),
           const SizedBox(height: 18),
-          Text("10:30 AM to 7:00 PM IST | Mon - Sat", style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.85), fontSize: 14, height: 1.5)),
+          Text(
+            "10:30 AM to 7:00 PM IST | Mon - Sat",
+            style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.85), fontSize: 14, height: 1.5),
+          ),
+          const SizedBox(height: 24),
+          // ==========================================
+          // SOCIAL MEDIA SECTION
+          // ==========================================
+          Text(
+            "FOLLOW US",
+            style: GoogleFonts.cinzel(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              _buildSocialIconButton(
+                icon: FontAwesomeIcons.facebookF,
+                url: 'https://www.facebook.com/people/Bindu-decorators/100054549485306/',
+              ),
+              const SizedBox(width: 12),
+              _buildSocialIconButton(
+                icon: FontAwesomeIcons.instagram,
+                url: 'https://www.instagram.com/bindudecor/?hl=hi',
+              ),
+              const SizedBox(width: 12),
+              _buildSocialIconButton(
+                icon: FontAwesomeIcons.linkedinIn,
+                url: 'https://in.linkedin.com/company/bindu-decorators',
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
+
+  // Social Media Icon Button Helper
+  Widget _buildSocialIconButton({required IconData icon, required String url}) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _launchSocialUrl(url),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: LuxuryTheme.primaryAccent, width: 1.5),
+            color: Colors.white.withOpacity(0.05),
+          ),
+          child: Center(
+            child: FaIcon(
+              icon,
+              size: 16,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
+
 
 void showContactFormDialog(BuildContext context) {
   showDialog(

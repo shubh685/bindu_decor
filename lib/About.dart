@@ -876,14 +876,28 @@ Widget _imageFallback() {
 Widget _lastLeast(BuildContext context) {
   final double screenWidth = MediaQuery.of(context).size.width;
   final bool isDesktop = screenWidth >= 900;
+  final bool isTablet = screenWidth >= 600 && screenWidth < 900;
+
+  // Responsive typography sizing
+  final double titleFontSize = isDesktop ? 34 : (isTablet ? 30 : 24);
 
   return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+    padding: EdgeInsets.symmetric(
+      horizontal: isDesktop ? 48.0 : (isTablet ? 32.0 : 16.0),
+      vertical: 12.0,
+    ),
     child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        vertical: isDesktop ? 36.0 : 24.0,
+        horizontal: isDesktop ? 32.0 : 16.0,
+      ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(width: 1.5, color: const Color(0xFFD4AF37).withOpacity(0.5)),
+        border: Border.all(
+          width: 1.5,
+          color: const Color(0xFFD4AF37).withOpacity(0.5),
+        ),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF0F382C).withOpacity(0.05),
@@ -893,16 +907,37 @@ Widget _lastLeast(BuildContext context) {
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          // Using Wrap prevents horizontal overflow on smaller screens
+          Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8.0, // horizontal gap between text blocks
+            runSpacing: 4.0, // vertical gap if wrapped to next line
             children: [
-              Text("Last but", style: GoogleFonts.playfairDisplay(fontSize: isDesktop ? 34 : 26, fontWeight: FontWeight.bold, color: const Color(0xFF0F382C))),
-              const SizedBox(width: 8),
-              Text("Not The Least", style: GoogleFonts.playfairDisplay(fontSize: isDesktop ? 34 : 26, fontWeight: FontWeight.bold, color: const Color(0xFF8C6D23)))
+              Text(
+                "Last but",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: titleFontSize,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF0F382C),
+                ),
+              ),
+              Text(
+                "Not The Least",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: titleFontSize,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF8C6D23),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Container(
             height: 3,
             width: 50,
@@ -911,17 +946,17 @@ Widget _lastLeast(BuildContext context) {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
-              "Our team of Supervisors, Technicians and back office ensures the smooth functioning and execution of work thereby ensuring that our projects are completed on time with perfection as per the client’s satisfaction.",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.outfit(
-                  fontSize: 15.5,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xFF4A5568),
-                  height: 1.6
-              )
-          )
+            "Our team of Supervisors, Technicians and back office ensures the smooth functioning and execution of work thereby ensuring that our projects are completed on time with perfection as per the client’s satisfaction.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.outfit(
+              fontSize: isDesktop ? 16.5 : 14.5,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xFF4A5568),
+              height: 1.6,
+            ),
+          ),
         ],
       ),
     ),
