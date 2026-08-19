@@ -175,6 +175,14 @@ class _MainImageCarouselState extends State<MainImageCarousel> {
       imagePath: "assets/images/main_img5.png",
       textColor: Color(0xFFD4AF37), // Signature Gold
     ),
+    CarouselImageData(
+      imagePath: "assets/images/main_img6.png",
+      textColor: Color(0xFFD4AF37), // Signature Gold
+    ),
+    CarouselImageData(
+      imagePath: "assets/images/main_img7.png",
+      textColor: Color(0xFFD4AF37), // Signature Gold
+    ),
   ];
 
   @override
