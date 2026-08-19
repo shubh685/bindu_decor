@@ -1,7 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-// Color Palette Theme inspired by home_page.dart
+// Color Palette Theme
 class LuxuryTheme {
   static const Color primaryDark = Color(0xFF0F2C23); // Dark Emerald Green
   static const Color primaryAccent = Color(0xFFD4AF37); // Signature Gold
@@ -68,8 +69,8 @@ class _AdminAuthState extends State<AdminAuth> {
           });
         } else if (_resetStep == ResetStep.newPassword) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Password successfully reset! Please sign in."),
+            SnackBar(
+              content: Text("Password successfully reset! Please sign in.", style: GoogleFonts.plusJakartaSans()),
               backgroundColor: LuxuryTheme.primaryDark,
             ),
           );
@@ -78,23 +79,23 @@ class _AdminAuthState extends State<AdminAuth> {
       } else if (_authMode == AuthMode.signUp) {
         if (!_agreeTerms) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Please agree to the Terms & Conditions."),
+            SnackBar(
+              content: Text("Please agree to the Terms & Conditions.", style: GoogleFonts.plusJakartaSans()),
               backgroundColor: Colors.redAccent,
             ),
           );
           return;
         }
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Account created successfully!"),
+          SnackBar(
+            content: Text("Account created successfully!", style: GoogleFonts.plusJakartaSans()),
             backgroundColor: LuxuryTheme.primaryDark,
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Signed in successfully!"),
+          SnackBar(
+            content: Text("Signed in successfully!", style: GoogleFonts.plusJakartaSans()),
             backgroundColor: LuxuryTheme.primaryDark,
           ),
         );
@@ -140,33 +141,35 @@ class _AdminAuthState extends State<AdminAuth> {
             // Main Centered Content
             Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Glassmorphism Main Card
+
+                    // Glassmorphism Main Card with Reduced Dimensions
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(20),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                         child: Container(
-                          width: isDesktop ? 850 : 450,
+                          width: isDesktop ? 780 : 410, // Decreased size
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: LuxuryTheme.primaryAccent.withOpacity(0.3),
-                              width: 1.5,
+                              width: 1.2,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 30,
-                                spreadRadius: 5,
+                                color: Colors.black.withOpacity(0.25),
+                                blurRadius: 25,
+                                spreadRadius: 4,
                               ),
                             ],
                           ),
-                          padding: EdgeInsets.all(isDesktop ? 40 : 24),
+                          padding: EdgeInsets.all(isDesktop ? 28 : 20), // Tighter interior padding
                           child: Form(
                             key: _formKey,
                             child: isDesktop
@@ -174,14 +177,14 @@ class _AdminAuthState extends State<AdminAuth> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Expanded(flex: 6, child: _buildFormSection()),
-                                const SizedBox(width: 40),
+                                const SizedBox(width: 28),
                                 Expanded(flex: 5, child: _buildSidePanelSection()),
                               ],
                             )
                                 : Column(
                               children: [
                                 _buildFormSection(),
-                                const SizedBox(height: 32),
+                                const SizedBox(height: 20),
                                 _buildSidePanelSection(),
                               ],
                             ),
@@ -248,14 +251,20 @@ class _AdminAuthState extends State<AdminAuth> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Title
-        Text(title, style: const TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: Colors.white, height: 1.1, letterSpacing: 0.5)),
-        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.center,
+          child: SizedBox(
+              height:75,
+              child: Image.asset("assets/images/bindu.png")),
+        ),
+        // Title with Google Fonts Cinzel
+        Text(title, style: GoogleFonts.cinzel(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white, height: 1.15, letterSpacing: 1.0,)),
+        const SizedBox(height: 6),
 
         // Accent Line
         Container(
-          height: 3,
-          width: 50,
+          height: 2.5,
+          width: 45,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(2),
             gradient: const LinearGradient(
@@ -263,7 +272,7 @@ class _AdminAuthState extends State<AdminAuth> {
             ),
           ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 20),
 
         // Sign Up Fields
         if (_authMode == AuthMode.signUp) ...[
@@ -275,10 +284,10 @@ class _AdminAuthState extends State<AdminAuth> {
               return null;
             },
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
         ],
 
-        // Email Field (Shown during Sign Up, Sign In, or Step 1 of Reset Password)
+        // Email Field
         if (_authMode != AuthMode.resetPassword || _resetStep == ResetStep.enterEmail) ...[
           _buildTextField(
             controller: _emailController,
@@ -291,10 +300,10 @@ class _AdminAuthState extends State<AdminAuth> {
               return null;
             },
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
         ],
 
-        // Password Field (For Sign Up & Sign In)
+        // Password Field
         if (_authMode != AuthMode.resetPassword) ...[
           _buildTextField(
             controller: _passwordController,
@@ -306,10 +315,10 @@ class _AdminAuthState extends State<AdminAuth> {
               return null;
             },
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
         ],
 
-        // Reset Password Step 2: OTP Entry
+        // OTP Field
         if (_authMode == AuthMode.resetPassword && _resetStep == ResetStep.enterOtp) ...[
           _buildTextField(
             controller: _otpController,
@@ -321,10 +330,10 @@ class _AdminAuthState extends State<AdminAuth> {
               return null;
             },
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
         ],
 
-        // Reset Password Step 3: New Password & Confirm Password
+        // Reset Password New Password Fields
         if (_authMode == AuthMode.resetPassword && _resetStep == ResetStep.newPassword) ...[
           _buildTextField(
             controller: _newPasswordController,
@@ -336,7 +345,7 @@ class _AdminAuthState extends State<AdminAuth> {
               return null;
             },
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
           _buildTextField(
             controller: _confirmPasswordController,
             label: "Retype New Password",
@@ -349,7 +358,7 @@ class _AdminAuthState extends State<AdminAuth> {
               return null;
             },
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
         ],
 
         // Options Footer
@@ -357,8 +366,8 @@ class _AdminAuthState extends State<AdminAuth> {
           Row(
             children: [
               SizedBox(
-                height: 24,
-                width: 24,
+                height: 20,
+                width: 20,
                 child: Checkbox(
                   value: _agreeTerms,
                   activeColor: LuxuryTheme.primaryAccent,
@@ -372,10 +381,10 @@ class _AdminAuthState extends State<AdminAuth> {
                 ),
               ),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: Text(
                   "I agree to the Terms & Conditions",
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                  style: GoogleFonts.plusJakartaSans(color: Colors.white70, fontSize: 12),
                 ),
               ),
             ],
@@ -384,27 +393,35 @@ class _AdminAuthState extends State<AdminAuth> {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
               onPressed: () => _switchAuthMode(AuthMode.resetPassword),
-              child: const Text("Forgot Password?", style: TextStyle(color: LuxuryTheme.primaryAccent, fontSize: 13),),
+              child: Text(
+                "Forgot Password?",
+                style: GoogleFonts.plusJakartaSans(color: LuxuryTheme.primaryAccent, fontSize: 12),
+              ),
             ),
           ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 18),
 
         // Action Button
         Container(
           width: double.infinity,
-          height: 48,
+          height: 44,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(22),
             gradient: const LinearGradient(
               colors: [LuxuryTheme.primaryAccent, LuxuryTheme.secondaryAccent],
             ),
             boxShadow: [
               BoxShadow(
-                color: LuxuryTheme.primaryAccent.withOpacity(0.3),
-                blurRadius: 15,
-                offset: const Offset(0, 4),
+                color: LuxuryTheme.primaryAccent.withOpacity(0.25),
+                blurRadius: 12,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
@@ -414,13 +431,21 @@ class _AdminAuthState extends State<AdminAuth> {
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(22),
               ),
             ),
-            child: Text(buttonText, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: LuxuryTheme.primaryDark, letterSpacing: 1.0)),
+            child: Text(
+              buttonText,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: LuxuryTheme.primaryDark,
+                letterSpacing: 0.8,
+              ),
+            ),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 14),
 
         // Mode Switchers
         Center(
@@ -434,7 +459,7 @@ class _AdminAuthState extends State<AdminAuth> {
             },
             child: RichText(
               text: TextSpan(
-                style: const TextStyle(fontSize: 13, color: Colors.white70),
+                style: GoogleFonts.plusJakartaSans(fontSize: 12, color: Colors.white70),
                 children: [
                   TextSpan(
                     text: _authMode == AuthMode.signUp
@@ -443,7 +468,7 @@ class _AdminAuthState extends State<AdminAuth> {
                   ),
                   TextSpan(
                     text: _authMode == AuthMode.signUp ? "Sign In" : "Sign Up",
-                    style: const TextStyle(
+                    style: GoogleFonts.plusJakartaSans(
                       color: LuxuryTheme.primaryAccent,
                       fontWeight: FontWeight.bold,
                     ),
@@ -462,11 +487,10 @@ class _AdminAuthState extends State<AdminAuth> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Mode Switcher Toggle Pill
-        Align(
-          alignment: Alignment.topRight,
+        // Centered Header Tag with Small Logo
+        Center(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.2),
               borderRadius: BorderRadius.circular(20),
@@ -477,7 +501,7 @@ class _AdminAuthState extends State<AdminAuth> {
               children: [
                 Text(
                   _authMode == AuthMode.signUp ? "Welcome back" : "New here?",
-                  style: const TextStyle(color: Colors.white70, fontSize: 13),
+                  style: GoogleFonts.plusJakartaSans(color: Colors.white70, fontSize: 12),
                 ),
                 const SizedBox(width: 8),
                 GestureDetector(
@@ -488,62 +512,70 @@ class _AdminAuthState extends State<AdminAuth> {
                   },
                   child: Image.asset(
                     "assets/images/bindu.png",
-                    width: 22,
-                    height: 22,
+                    width: 20,
+                    height: 20,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.lock, color: LuxuryTheme.primaryAccent, size: 18),
+                    const Icon(Icons.lock, color: LuxuryTheme.primaryAccent, size: 16),
                   ),
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 36),
+        const SizedBox(height: 20),
 
         // Glass Quote Box
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.04),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.white.withOpacity(0.08)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 "“ The spaces have been waiting in silence. One thoughtful detail, and suddenly the whole room remembers how to feel like home. ”",
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 13,
-                  height: 1.5,
+                style: GoogleFonts.cormorantGaramond(
+                  color: Colors.white.withOpacity(0.85),
+                  fontSize: 14,
+                  height: 1.4,
                   fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Image.asset(
                     "assets/images/bindu.png",
-                    width: 18,
-                    height: 18,
+                    width: 16,
+                    height: 16,
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => Container(),
+                    errorBuilder: (context, error, stackTrace) => const SizedBox(),
                   ),
                   const SizedBox(width: 8),
-                  const Text("Bindu Décor Admin Portal", style: TextStyle(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.w600)),
+                  Text(
+                    "Bindu Décor Admin Portal",
+                    style: GoogleFonts.plusJakartaSans(
+                      color: LuxuryTheme.primaryAccent,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ],
               ),
             ],
           ),
         ),
-        const SizedBox(height: 36),
+        const SizedBox(height: 20),
 
         // Security Badge
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.05),
             borderRadius: BorderRadius.circular(20),
@@ -554,14 +586,21 @@ class _AdminAuthState extends State<AdminAuth> {
             children: [
               Image.asset(
                 "assets/images/bindu.png",
-                width: 16,
-                height: 16,
+                width: 14,
+                height: 14,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.security, color: LuxuryTheme.primaryAccent, size: 16),
+                const Icon(Icons.security, color: LuxuryTheme.primaryAccent, size: 14),
               ),
-              const SizedBox(width: 8),
-              const Text("Secure & Encrypted", style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),
+              const SizedBox(width: 6),
+              Text(
+                "Secure & Encrypted",
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white70,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
         ),
@@ -569,7 +608,7 @@ class _AdminAuthState extends State<AdminAuth> {
     );
   }
 
-  // Custom Form TextField Builder with Form Field Validation
+  // Custom Form TextField Builder
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -579,29 +618,36 @@ class _AdminAuthState extends State<AdminAuth> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w500,)),
-        const SizedBox(height: 4),
+        Text(
+          label,
+          style: GoogleFonts.plusJakartaSans(
+            color: Colors.white70,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 2),
         TextFormField(
           controller: controller,
           obscureText: isPassword,
-          style: const TextStyle(color: Colors.white, fontSize: 14),
+          style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 13),
           cursorColor: LuxuryTheme.primaryAccent,
           validator: validator,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             isDense: true,
-            contentPadding: EdgeInsets.symmetric(vertical: 10),
-            enabledBorder: UnderlineInputBorder(
+            contentPadding: const EdgeInsets.symmetric(vertical: 8),
+            enabledBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.white30, width: 1),
             ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: LuxuryTheme.primaryAccent, width: 2),
+            focusedBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: LuxuryTheme.primaryAccent, width: 1.8),
             ),
-            errorStyle: TextStyle(color: Color(0xFFFF6B6B), fontSize: 12),
-            errorBorder: UnderlineInputBorder(
+            errorStyle: GoogleFonts.plusJakartaSans(color: const Color(0xFFFF6B6B), fontSize: 11),
+            errorBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: Color(0xFFFF6B6B), width: 1),
             ),
-            focusedErrorBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFFFF6B6B), width: 2),
+            focusedErrorBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFFFF6B6B), width: 1.8),
             ),
           ),
         ),
