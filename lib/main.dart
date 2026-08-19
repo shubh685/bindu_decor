@@ -1,3 +1,4 @@
+import 'package:bindu_decor/Admin_Auth.dart';
 import 'package:bindu_decor/Clients.dart';
 import 'package:bindu_decor/Gy_aw_mo.dart';
 import 'package:bindu_decor/Home_Page.dart';
@@ -42,7 +43,8 @@ class MyApp extends StatelessWidget {
         AppRoutes.upholstery: (context) => const Upholstery(),
         AppRoutes.curtains: (context) => const Curtains(),
         AppRoutes.stretchCeiling: (context) => const StretchCeiling(),
-        AppRoutes.projects: (context) => const ProjectsPage()
+        AppRoutes.projects: (context) => const ProjectsPage(),
+        AppRoutes.login: (context) => const AdminAuth()
       },
     );
   }

@@ -28,7 +28,8 @@ class AppRoutes {
   static const String mosquitoNets = '/shop/mosquitoNets';
   static const String upholstery = '/shop/upholstery';
   static const String curtains = '/shop/curtains';
-  static const String stretchCeiling = '/shop/stertchCeiling';
+  static const String stretchCeiling = '/shop/stretchCeiling';
+  static const String login = '/admin_auth';
 }
 
 // ==========================================
@@ -47,13 +48,14 @@ class _HomePageState extends State<HomePage> {
     NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
     NavItem(label: "About", route: AppRoutes.about, icon: CupertinoIcons.info_circle),
     NavItem(label: "Projects", route: AppRoutes.projects, icon: CupertinoIcons.building_2_fill),
-    NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.person_alt_circle),
+    NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.group_solid),
     NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart),
     NavItem(
       label: "Reviews",
       icon: Icons.reviews_outlined,
       route: "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
     ),
+    NavItem(label: "Log In", route: AppRoutes.login, icon: Icons.login),
   ];
 
   final List<NestedMenuItem> _shopItems = const [
@@ -156,31 +158,31 @@ class _MainImageCarouselState extends State<MainImageCarousel> {
 
   final List<CarouselImageData> _slides = const [
     CarouselImageData(
-      imagePath: "assets/images/main_img.png",
+      imagePath: "assets/main_images/1.png",
       textColor: Colors.white,
     ),
     CarouselImageData(
-      imagePath: "assets/images/main_img2.png",
+      imagePath: "assets/main_images/2.png",
       textColor: Color(0xFFF4EAD4), // Elegant Warm Ivory
     ),
     CarouselImageData(
-      imagePath: "assets/images/main_img3.png",
+      imagePath: "assets/main_images/3.png",
       textColor: Color(0xFFE6C687), // Muted Gold Accent
     ),
     CarouselImageData(
-      imagePath: "assets/images/main_img4.png",
+      imagePath: "assets/main_images/4.png",
       textColor: Color(0xFFFFF8E7), // Soft Champagne
     ),
     CarouselImageData(
-      imagePath: "assets/images/main_img5.png",
+      imagePath: "assets/main_images/5.png",
       textColor: Color(0xFFD4AF37), // Signature Gold
     ),
     CarouselImageData(
-      imagePath: "assets/images/main_img6.png",
+      imagePath: "assets/main_images/6.png",
       textColor: Color(0xFFD4AF37), // Signature Gold
     ),
     CarouselImageData(
-      imagePath: "assets/images/main_img7.png",
+      imagePath: "assets/main_images/7.png",
       textColor: Color(0xFFD4AF37), // Signature Gold
     ),
   ];
@@ -194,6 +196,9 @@ class _MainImageCarouselState extends State<MainImageCarousel> {
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      // Check if widget is still active in widget tree
+      if (!mounted) return;
+
       if (_pageController.hasClients) {
         int nextPage = _currentIndex + 1;
         if (nextPage >= _slides.length) {
@@ -225,20 +230,20 @@ class _MainImageCarouselState extends State<MainImageCarousel> {
     double buttonHorizontalPadding;
 
     if (screenWidth >= 1200) {
-      imageHeight = 540;
-      buttonBottomPadding = 60;
-      buttonFontSize = 14;
-      buttonHorizontalPadding = 32;
-    } else if (screenWidth >= 600) {
-      imageHeight = 420;
-      buttonBottomPadding = 45;
+      imageHeight = 315; // Wide desktop banner height
+      buttonBottomPadding = 20;
       buttonFontSize = 13;
-      buttonHorizontalPadding = 24;
-    } else {
-      imageHeight = 320;
-      buttonBottomPadding = 30;
-      buttonFontSize = 12;
+      buttonHorizontalPadding = 28;
+    } else if (screenWidth >= 600) {
+      imageHeight = 200; // Tablet banner height
+      buttonBottomPadding = 15;
+      buttonFontSize = 11;
       buttonHorizontalPadding = 20;
+    } else {
+      imageHeight = 160; // Mobile banner height
+      buttonBottomPadding = 12;
+      buttonFontSize = 10;
+      buttonHorizontalPadding = 16;
     }
 
     return SizedBox(
@@ -287,29 +292,35 @@ class _MainImageCarouselState extends State<MainImageCarousel> {
           ),
           // Content Overlay
           Positioned(
-            left: 24,
-            right: 24,
+            left: 16,
+            right: 16,
             bottom: buttonBottomPadding,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Title
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 500),
                   child: Text(
                     "Transforming Living Spaces Into Masterpieces",
                     key: ValueKey<int>(_currentIndex),
                     textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.cormorantGaramond(
                       fontSize: screenWidth >= 900
-                          ? 46
-                          : (screenWidth >= 600 ? 34 : 24),
+                          ? 30
+                          : (screenWidth >= 600 ? 22 : 16),
                       fontWeight: FontWeight.w700,
                       color: _slides[_currentIndex].textColor,
-                      height: 1.1,
+                      height: 1.0,
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+
+                const SizedBox(height: 10), // Reduced spacing above button
+
+                // CTA Button
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -321,7 +332,7 @@ class _MainImageCarouselState extends State<MainImageCarousel> {
                     child: Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: buttonHorizontalPadding,
-                        vertical: 14,
+                        vertical: 8, // Compact vertical padding
                       ),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
@@ -331,8 +342,8 @@ class _MainImageCarouselState extends State<MainImageCarousel> {
                         boxShadow: [
                           BoxShadow(
                             color: const Color(0xFFC5A059).withOpacity(0.4),
-                            blurRadius: 16,
-                            offset: const Offset(0, 6),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
@@ -345,13 +356,13 @@ class _MainImageCarouselState extends State<MainImageCarousel> {
                               fontWeight: FontWeight.w700,
                               fontSize: buttonFontSize,
                               color: LuxuryTheme.primaryDark,
-                              letterSpacing: 2.0,
+                              letterSpacing: 1.5,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          const Icon(
+                          const SizedBox(width: 6),
+                          Icon(
                             Icons.arrow_forward_rounded,
-                            size: 16,
+                            size: buttonFontSize + 2,
                             color: LuxuryTheme.primaryDark,
                           ),
                         ],
@@ -359,7 +370,9 @@ class _MainImageCarouselState extends State<MainImageCarousel> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+
+                const SizedBox(height: 8), // Reduced spacing above dots
+
                 // Indicator Dots
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -367,12 +380,12 @@ class _MainImageCarouselState extends State<MainImageCarousel> {
                     final bool isActive = _currentIndex == index;
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
-                      margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                      height: 6,
-                      width: isActive ? 24 : 6,
+                      margin: const EdgeInsets.symmetric(horizontal: 3.0),
+                      height: 4, // Slimmer dots
+                      width: isActive ? 18 : 4,
                       decoration: BoxDecoration(
                         color: isActive ? LuxuryTheme.primaryAccent : Colors.white38,
-                        borderRadius: BorderRadius.circular(3),
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     );
                   }),
