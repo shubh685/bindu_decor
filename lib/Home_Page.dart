@@ -29,7 +29,6 @@ class AppRoutes {
   static const String upholstery = '/shop/upholstery';
   static const String curtains = '/shop/curtains';
   static const String stretchCeiling = '/shop/stretchCeiling';
-  static const String login = '/admin_auth';
 }
 
 // ==========================================
@@ -55,7 +54,6 @@ class _HomePageState extends State<HomePage> {
       icon: Icons.reviews_outlined,
       route: "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
     ),
-    NavItem(label: "Log In", route: AppRoutes.login, icon: Icons.login),
   ];
 
   final List<NestedMenuItem> _shopItems = const [
