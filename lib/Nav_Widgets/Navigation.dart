@@ -794,31 +794,64 @@ class _BinduFooterState extends State<BinduFooter>
           ),
         ),
         padding: EdgeInsets.symmetric(
-          vertical: 56.0,
-          horizontal: isDesktop ? 64.0 : 24.0,
+          vertical: 24.0,
+          horizontal: isDesktop ? 40.0 : 20.0,
         ),
-        child: isDesktop
-            ? Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
           children: [
-            Expanded(flex: 2, child: _buildLogoSection()),
-            const SizedBox(width: 20),
-            Expanded(
-              flex: 4,
-              child: _buildContactSection(addressText, emailText, phoneText),
+            isDesktop
+                ? Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 2, child: _buildLogoSection()),
+                const SizedBox(width: 16),
+                Expanded(
+                  flex: 4,
+                  child: _buildContactSection(addressText, emailText, phoneText),
+                ),
+                const SizedBox(width: 16),
+                Expanded(flex: 3, child: _buildRightSection()),
+              ],
+            )
+                : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildLogoSection(),
+                const SizedBox(height: 20),
+                _buildContactSection(addressText, emailText, phoneText),
+                const SizedBox(height: 20),
+                _buildRightSection(),
+              ],
             ),
-            const SizedBox(width: 20),
-            Expanded(flex: 3, child: _buildRightSection()),
-          ],
-        )
-            : Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildLogoSection(),
-            const SizedBox(height: 36),
-            _buildContactSection(addressText, emailText, phoneText),
-            const SizedBox(height: 36),
-            _buildRightSection(),
+            const SizedBox(height: 20),
+            Divider(color: Colors.white.withOpacity(0.15), height: 1),
+            const SizedBox(height: 16),
+            // ==========================================
+            // CENTERED COPYRIGHT SECTION
+            // ==========================================
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "© 2026 Bindu Decorators. All rights reserved. ",
+                  style: GoogleFonts.plusJakartaSans(
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 11,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  "| Developed by Grow Socialee",
+                  style: GoogleFonts.plusJakartaSans(
+                    color: LuxuryTheme.primaryAccent,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -833,27 +866,27 @@ class _BinduFooterState extends State<BinduFooter>
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            height: 75,
-            width: 140,
+            height: 55,
+            width: 100,
             child: Image.asset(
               "assets/images/bindu.png",
               errorBuilder: (context, error, stackTrace) => Container(
-                width: 90,
-                height: 90,
+                width: 70,
+                height: 70,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: LuxuryTheme.primaryAccent, width: 2),
                 ),
                 child: const Center(
-                  child: Text("BINDU", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: Text("BINDU", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          Text("BINDU DÉCOR", style: GoogleFonts.cormorantGaramond(color: Colors.white, fontSize: 22, letterSpacing: 3, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 4),
-          Text("Curating Luxury Living Spaces", style: GoogleFonts.plusJakartaSans(color: Colors.white60, fontSize: 12)),
+          const SizedBox(height: 8),
+          Text("BINDU DÉCOR", style: GoogleFonts.cormorantGaramond(color: Colors.white, fontSize: 18, letterSpacing: 2.5, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 2),
+          Text("Curating Luxury Living Spaces", style: GoogleFonts.plusJakartaSans(color: Colors.white60, fontSize: 11)),
         ],
       ),
     );
@@ -866,9 +899,9 @@ class _BinduFooterState extends State<BinduFooter>
       children: [
         Text(
           "CONTACT DETAILS",
-          style: GoogleFonts.cormorantGaramond(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0),
+          style: GoogleFonts.cormorantGaramond(color: LuxuryTheme.primaryAccent, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 10),
         SlideTransition(
           position: _addressAnim,
           child: InkWell(
@@ -877,18 +910,18 @@ class _BinduFooterState extends State<BinduFooter>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Padding(
-                  padding: EdgeInsets.only(top: 2.0),
-                  child: Icon(Icons.location_on_outlined, color: LuxuryTheme.primaryAccent, size: 18),
+                  padding: EdgeInsets.only(top: 1.0),
+                  child: Icon(Icons.location_on_outlined, color: LuxuryTheme.primaryAccent, size: 16),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: Text(address, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: 14, height: 1.5, decorationColor: Colors.white38)),
+                  child: Text(address, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: 12, height: 1.4, decorationColor: Colors.white38)),
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 8),
         SlideTransition(
           position: _phoneAnim,
           child: InkWell(
@@ -897,18 +930,18 @@ class _BinduFooterState extends State<BinduFooter>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Padding(
-                  padding: EdgeInsets.only(top: 2.0),
-                  child: Icon(Icons.phone_outlined, color: LuxuryTheme.primaryAccent, size: 18),
+                  padding: EdgeInsets.only(top: 1.0),
+                  child: Icon(Icons.phone_outlined, color: LuxuryTheme.primaryAccent, size: 16),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: Text(phone, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: 14, decorationColor: Colors.white38)),
+                  child: Text(phone, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: 12, decorationColor: Colors.white38)),
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 8),
         SlideTransition(
           position: _emailAnim,
           child: InkWell(
@@ -917,12 +950,12 @@ class _BinduFooterState extends State<BinduFooter>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Padding(
-                  padding: EdgeInsets.only(top: 2.0),
-                  child: Icon(Icons.email_outlined, color: LuxuryTheme.primaryAccent, size: 18),
+                  padding: EdgeInsets.only(top: 1.0),
+                  child: Icon(Icons.email_outlined, color: LuxuryTheme.primaryAccent, size: 16),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: Text(email, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: 14, decorationColor: Colors.white38)),
+                  child: Text(email, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: 12, decorationColor: Colors.white38)),
                 ),
               ],
             ),
@@ -950,31 +983,28 @@ class _BinduFooterState extends State<BinduFooter>
         children: [
           Text(
             "WORKING HOURS",
-            style: GoogleFonts.cinzel(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0),
+            style: GoogleFonts.cinzel(color: LuxuryTheme.primaryAccent, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 10),
           Text(
             "10:30 AM to 7:00 PM IST | Mon - Sat",
-            style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.85), fontSize: 14, height: 1.5),
+            style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.85), fontSize: 12, height: 1.4),
           ),
-          const SizedBox(height: 24),
-          // ==========================================
-          // SOCIAL MEDIA SECTION
-          // ==========================================
-          Text("FOLLOW US", style: GoogleFonts.cinzel(color: LuxuryTheme.primaryAccent, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.0),),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
+          Text("FOLLOW US", style: GoogleFonts.cinzel(color: LuxuryTheme.primaryAccent, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+          const SizedBox(height: 8),
           Row(
             children: [
               _buildSocialIconButton(
                 icon: FontAwesomeIcons.facebookF,
                 url: 'https://www.facebook.com/people/Bindu-decorators/100054549485306/',
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               _buildSocialIconButton(
                 icon: FontAwesomeIcons.instagram,
                 url: 'https://www.instagram.com/bindudecor/?hl=hi',
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               _buildSocialIconButton(
                 icon: FontAwesomeIcons.linkedinIn,
                 url: 'https://in.linkedin.com/company/bindu-decorators',
@@ -986,23 +1016,22 @@ class _BinduFooterState extends State<BinduFooter>
     );
   }
 
-  // Social Media Icon Button Helper
   Widget _buildSocialIconButton({required IconData icon, required String url}) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () => _launchSocialUrl(url),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
-          width: 38,
-          height: 38,
+          width: 32,
+          height: 32,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: LuxuryTheme.primaryAccent, width: 1.5),
+            border: Border.all(color: LuxuryTheme.primaryAccent, width: 1.2),
             color: Colors.white.withOpacity(0.05),
           ),
           child: Center(
-            child: FaIcon(icon, size: 16, color: Colors.white),
+            child: FaIcon(icon, size: 14, color: Colors.white),
           ),
         ),
       ),
