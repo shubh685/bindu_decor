@@ -18,8 +18,11 @@ class LuxuryTheme {
   static const Color bgCream = Color(0xFFFBF9F5);       // Elegant Soft Cream
   static const Color textDark = Color(0xFF222222);      // Deep Charcoal
   static const Color textMuted = Color(0xFF666666);     // Neutral Subtext
+
 }
 
+// Bindu Decor teal
+ const Color _footerAccent = Color(0xFF2F9E8F);
 // ==========================================
 // NAVIGATION DATA MODELS
 // ==========================================
@@ -650,17 +653,11 @@ class BinduMobileDrawer extends StatelessWidget {
 // ==========================================
 
 Widget _buildLogo(BuildContext context) {
-  return SizedBox(
-    height: 72,
-    child: InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-      },
-      child: Image.asset("assets/images/bindu.png", fit: BoxFit.contain),
-    ),
+  return InkWell(
+    onTap: () {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
+    },
+    child: Image.asset("assets/images/bindu.png", height: 125)
   );
 }
 
@@ -675,8 +672,7 @@ class BinduFooter extends StatefulWidget {
   State<BinduFooter> createState() => _BinduFooterState();
 }
 
-class _BinduFooterState extends State<BinduFooter>
-    with SingleTickerProviderStateMixin {
+class _BinduFooterState extends State<BinduFooter> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   late Animation<Offset> _logoAnim;
@@ -858,27 +854,62 @@ class _BinduFooterState extends State<BinduFooter>
     );
   }
 
+  // ============================================================
+// LOGO SECTION
+// ============================================================
+
   Widget _buildLogoSection() {
     return SlideTransition(
       position: _logoAnim,
+
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
+
         children: [
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 140, maxWidth: 220),
+
+          // ==================================================
+          // WHITE BACKGROUND ONLY FOR LOGO
+          // ==================================================
+
+          Container(
+            padding: const EdgeInsets.all(12),
+
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+            ),
+
             child: Image.asset(
               "assets/images/bindu.png",
+
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Container(
-                width: 90,
-                height: 90,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: LuxuryTheme.primaryAccent, width: 2),
-                ),
-                child: const Icon(Icons.business, color: LuxuryTheme.primaryAccent, size: 40),
-              ),
+
+              errorBuilder: (
+                  context,
+                  error,
+                  stackTrace,
+                  ) {
+                return Container(
+                  width: 90,
+                  height: 90,
+
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+
+                    border: Border.all(
+                      color: _footerAccent,
+                      width: 2,
+                    ),
+                  ),
+
+                  child: Icon(
+                    Icons.business,
+                    color: _footerAccent,
+                    size: 40,
+                  ),
+                );
+              },
             ),
           ),
         ],
