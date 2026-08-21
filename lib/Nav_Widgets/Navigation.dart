@@ -18,11 +18,11 @@ class LuxuryTheme {
   static const Color bgCream = Color(0xFFFBF9F5);       // Elegant Soft Cream
   static const Color textDark = Color(0xFF222222);      // Deep Charcoal
   static const Color textMuted = Color(0xFF666666);     // Neutral Subtext
-
 }
 
 // Bindu Decor teal
- const Color _footerAccent = Color(0xFF2F9E8F);
+const Color _footerAccent = Color(0xFF2F9E8F);
+
 // ==========================================
 // NAVIGATION DATA MODELS
 // ==========================================
@@ -65,32 +65,29 @@ class BinduNavigationBar extends StatelessWidget implements PreferredSizeWidget 
     this.onMenuItemTap,
   });
 
-  // Gives Scaffold/AppBar a safe default height to avoid vertical bounding conflicts
   @override
   Size get preferredSize => const Size.fromHeight(85.0);
 
   String _getCurrentViewLabel(String? currentRoute) {
     if (currentRoute == null || currentRoute.isEmpty) return 'Home';
 
-    // Check defined static nav items first
     for (var item in navItems) {
       if (item.route == currentRoute) return item.label;
     }
 
-    // Check shop category items
     for (var group in shopItems) {
       for (var sub in group.subItems) {
         if (sub.route == currentRoute) return '${group.title} › ${sub.label}';
       }
     }
 
-    // If route is a custom string (e.g. "Projects > Villa Velloze"), return it directly
     if (currentRoute.contains('>')) {
       return currentRoute;
     }
 
     return currentRoute.replaceAll('/', '');
   }
+
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -141,7 +138,6 @@ class BinduNavigationBar extends StatelessWidget implements PreferredSizeWidget 
                     ],
                   ),
                   const SizedBox(height: 4),
-                  // Current View Badge
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
@@ -171,7 +167,6 @@ class BinduNavigationBar extends StatelessWidget implements PreferredSizeWidget 
     );
   }
 
-  // Responsive Logo Helper
   Widget _buildLogo(BuildContext context, bool isDesktop) {
     return SizedBox(
       height: isDesktop ? 42 : 34,
@@ -657,7 +652,7 @@ Widget _buildLogo(BuildContext context) {
     onTap: () {
       Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
     },
-    child: Image.asset("assets/images/bindu.png", height: 125)
+    child: Image.asset("assets/images/bindu.png", height: 125),
   );
 }
 
@@ -846,7 +841,15 @@ class _BinduFooterState extends State<BinduFooter> with SingleTickerProviderStat
                 ),
               ),
               child: Text(
-                "© 2026 Bindu Decorators. All rights reserved. | Powered by Grow Socialee", textAlign: TextAlign.center, style: GoogleFonts.plusJakartaSans(color: Colors.white.withOpacity(0.9), fontSize: isDesktop ? 13 : 11, fontWeight: FontWeight.w400, letterSpacing: 0.3)),
+                "© 2026 Bindu Decorators. All rights reserved. | Powered by Grow Socialee",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: isDesktop ? 13 : 11,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0.3,
+                ),
+              ),
             ),
           ],
         ),
@@ -855,57 +858,46 @@ class _BinduFooterState extends State<BinduFooter> with SingleTickerProviderStat
   }
 
   // ============================================================
-// LOGO SECTION
-// ============================================================
+  // LOGO SECTION (WITH DEDICATED WHITE BACKGROUND COLUMN)
+  // ============================================================
 
   Widget _buildLogoSection() {
     return SlideTransition(
       position: _logoAnim,
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
-
         children: [
-
-          // ==================================================
-          // WHITE BACKGROUND ONLY FOR LOGO
-          // ==================================================
-
           Container(
-            padding: const EdgeInsets.all(12),
-
+            padding: const EdgeInsets.all(12.0),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(8.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-
             child: Image.asset(
               "assets/images/bindu.png",
-
               fit: BoxFit.contain,
-
-              errorBuilder: (
-                  context,
-                  error,
-                  stackTrace,
-                  ) {
+              errorBuilder: (context, error, stackTrace) {
                 return Container(
                   width: 90,
                   height: 90,
-
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-
                     border: Border.all(
-                      color: _footerAccent,
+                      color: LuxuryTheme.primaryAccent,
                       width: 2,
                     ),
                   ),
-
-                  child: Icon(
+                  child: const Icon(
                     Icons.business,
-                    color: _footerAccent,
+                    color: LuxuryTheme.primaryAccent,
                     size: 40,
                   ),
                 );
@@ -1095,7 +1087,6 @@ class _BinduFooterState extends State<BinduFooter> with SingleTickerProviderStat
     );
   }
 }
-
 
 void showContactFormDialog(BuildContext context) {
   showDialog(
