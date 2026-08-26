@@ -14,6 +14,7 @@ final List<NavItem> _globalNavItems = const [
   NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.person_alt_circle),
   NavItem(label: "Projects", route: AppRoutes.projects, icon: CupertinoIcons.building_2_fill),
   NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart),
+  NavItem(label: "Blogs", route: AppRoutes.blogs, icon: Icons.library_add_check_sharp),
   NavItem(
     label: "Reviews",
     icon: Icons.reviews_outlined,

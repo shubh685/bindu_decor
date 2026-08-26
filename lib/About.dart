@@ -48,6 +48,7 @@ class _AboutState extends State<About> {
     NavItem(label: "Projects", route: AppRoutes.projects, icon: CupertinoIcons.building_2_fill),
     NavItem(label: "Clients", route: AppRoutes.clients, icon: CupertinoIcons.group_solid),
     NavItem(label: "Shop", route: AppRoutes.shop, icon: CupertinoIcons.cart),
+    NavItem(label: "Blogs", route: AppRoutes.blogs, icon: Icons.library_add_check_sharp),
     NavItem(
       label: "Reviews",
       icon: Icons.reviews_outlined,

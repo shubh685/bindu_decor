@@ -1,3 +1,4 @@
+import 'package:bindu_decor/Blogs.dart';
 import 'package:bindu_decor/Clients.dart';
 import 'package:bindu_decor/Gy_aw_mo.dart';
 import 'package:bindu_decor/Home_Page.dart';
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.curtains: (context) => const Curtains(),
         AppRoutes.stretchCeiling: (context) => const StretchCeiling(),
         AppRoutes.projects: (context) => const ProjectsPage(),
+        AppRoutes.blogs: (context) => const BlogView()
       },
     );
   }
