@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:visibility_detector/visibility_detector.dart';
 
 import 'Home_Page.dart';
@@ -121,10 +124,14 @@ class _ClientLogoListState extends State<_ClientLogoList>
   late AnimationController _headerController;
   late Animation<Offset> _topToBottomTextAnim;
   bool _headerAnimated = false;
+  late Future<List<ClientItems>> _clientsFuture;
 
   @override
   void initState() {
     super.initState();
+
+    // Fetch dynamic client data from PHP backend API
+    _clientsFuture = fetchClients();
 
     _headerController = AnimationController(
       vsync: this,
@@ -138,6 +145,28 @@ class _ClientLogoListState extends State<_ClientLogoList>
       parent: _headerController,
       curve: Curves.easeOut,
     ));
+  }
+
+  Future<List<ClientItems>> fetchClients() async {
+    // Replace with your actual PHP API Endpoint URL
+    final url = Uri.parse('http://192.168.1.4/bindu_decor/clients.php');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        final List<dynamic> data = jsonResponse['data'] ?? [];
+
+        return data.map((item) {
+          return ClientItems(imgUrl: item['img_url'] ?? '');
+        }).toList();
+      } else {
+        throw Exception('Failed to load dynamic client images.');
+      }
+    } catch (e) {
+      debugPrint('Error fetching clients: $e');
+      return [];
+    }
   }
 
   @override
@@ -158,32 +187,6 @@ class _ClientLogoListState extends State<_ClientLogoList>
     } else {
       crossAxisCount = 2;
     }
-
-    final List<ClientItems> teamMembers = const [
-      ClientItems(imgUrl: "assets/client_logos/img1.png"),
-      ClientItems(imgUrl: "assets/client_logos/img2.png"),
-      ClientItems(imgUrl: "assets/client_logos/img3.png"),
-      ClientItems(imgUrl: "assets/client_logos/img4.png"),
-      ClientItems(imgUrl: "assets/client_logos/img5.png"),
-      ClientItems(imgUrl: "assets/client_logos/img6.png"),
-      ClientItems(imgUrl: "assets/client_logos/img7.png"),
-      ClientItems(imgUrl: "assets/client_logos/img8.png"),
-      ClientItems(imgUrl: "assets/client_logos/img9.png"),
-      ClientItems(imgUrl: "assets/client_logos/img10.png"),
-      ClientItems(imgUrl: "assets/client_logos/img11.png"),
-      ClientItems(imgUrl: "assets/client_logos/img12.png"),
-      ClientItems(imgUrl: "assets/client_logos/img13.png"),
-      ClientItems(imgUrl: "assets/client_logos/img14.png"),
-      ClientItems(imgUrl: "assets/client_logos/img15.png"),
-      ClientItems(imgUrl: "assets/client_logos/img16.png"),
-      ClientItems(imgUrl: "assets/client_logos/img17.png"),
-      ClientItems(imgUrl: "assets/client_logos/img18.png"),
-      ClientItems(imgUrl: "assets/client_logos/img19.png"),
-      ClientItems(imgUrl: "assets/client_logos/img20.png"),
-      ClientItems(imgUrl: "assets/client_logos/img21.png"),
-      ClientItems(imgUrl: "assets/client_logos/img22.png"),
-      ClientItems(imgUrl: "assets/client_logos/img23.png"),
-    ];
 
     return Padding(
       padding: const EdgeInsets.only(top: 40.0, bottom: 60.0),
@@ -210,7 +213,7 @@ class _ClientLogoListState extends State<_ClientLogoList>
                       border: Border.all(color: const Color(0xFF0F382C).withOpacity(0.15)),
                     ),
                     child: Text("TRUSTED BY INDUSTRY LEADERS", style: GoogleFonts.cormorantGaramond(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.5, color: const Color(0xFF0F382C))),
-                 ),
+                  ),
                 ),
                 const SizedBox(height: 14),
 
@@ -252,11 +255,11 @@ class _ClientLogoListState extends State<_ClientLogoList>
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Text(
-                      "Proudly serving corporate offices, luxury residences, and commercial venues across India.",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.cormorantGaramond(
-                        fontSize: 16,
-                        color: const Color(0xFF4A5568))),
+                        "Proudly serving corporate offices, luxury residences, and commercial venues across India.",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.cormorantGaramond(
+                            fontSize: 16,
+                            color: const Color(0xFF4A5568))),
                   ),
                 ),
               ],
@@ -270,21 +273,45 @@ class _ClientLogoListState extends State<_ClientLogoList>
                   ? 80.0
                   : (screenWidth >= 768 ? 36.0 : 16.0),
             ),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: teamMembers.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                crossAxisSpacing: screenWidth >= 768 ? 24 : 14,
-                mainAxisSpacing: screenWidth >= 768 ? 24 : 14,
-                childAspectRatio: 2.1,
-              ),
-              itemBuilder: (context, index) {
-                return _AnimatedClientCard(
-                  key: ValueKey("client_card_$index"),
-                  imgUrl: teamMembers[index].imgUrl,
-                  index: index,
+            child: FutureBuilder<List<ClientItems>>(
+              future: _clientsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0F382C)),
+                    ),
+                  );
+                }
+
+                if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No client logos found.",
+                      style: GoogleFonts.cormorantGaramond(fontSize: 18, color: Colors.grey),
+                    ),
+                  );
+                }
+
+                final teamMembers = snapshot.data!;
+
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: teamMembers.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: screenWidth >= 768 ? 24 : 14,
+                    mainAxisSpacing: screenWidth >= 768 ? 24 : 14,
+                    childAspectRatio: 2.1,
+                  ),
+                  itemBuilder: (context, index) {
+                    return _AnimatedClientCard(
+                      key: ValueKey("client_card_$index"),
+                      imgUrl: teamMembers[index].imgUrl,
+                      index: index,
+                    );
+                  },
                 );
               },
             ),

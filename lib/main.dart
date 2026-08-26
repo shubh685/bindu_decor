@@ -1,4 +1,4 @@
-import 'package:bindu_decor/Blogs.dart';
+import 'package:bindu_decor/Blogs_view.dart';
 import 'package:bindu_decor/Clients.dart';
 import 'package:bindu_decor/Gy_aw_mo.dart';
 import 'package:bindu_decor/Home_Page.dart';
