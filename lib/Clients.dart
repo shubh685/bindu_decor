@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,7 +26,7 @@ class _ClientsState extends State<Clients> {
     NavItem(
       label: "Reviews",
       icon: Icons.reviews_outlined,
-      route: "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
+      route: "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Store4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
     ),
   ];
 
@@ -107,8 +106,10 @@ class _ClientsState extends State<Clients> {
 }
 
 class ClientItems {
+  final int id;
+  final String name;
   final String imgUrl;
-  const ClientItems({required this.imgUrl});
+  const ClientItems({required this.id, required this.name, required this.imgUrl});
 }
 
 class _ClientLogoList extends StatefulWidget {
@@ -126,11 +127,21 @@ class _ClientLogoListState extends State<_ClientLogoList>
   bool _headerAnimated = false;
   late Future<List<ClientItems>> _clientsFuture;
 
+  // Ordered fallback list matching the exact layout of your photo
+  final List<ClientItems> _defaultOrderedClients = const [
+    ClientItems(id: 1, name: "ACME", imgUrl: "assets/images/clients/acme.png"),
+    ClientItems(id: 2, name: "Sai Lee", imgUrl: "assets/images/clients/sailee.png"),
+    ClientItems(id: 3, name: "Kala Niketan", imgUrl: "assets/images/clients/kala_niketan.png"),
+    ClientItems(id: 4, name: "GeeCee Ventures", imgUrl: "assets/images/clients/geecee.png"),
+    ClientItems(id: 5, name: "RITC Developers", imgUrl: "assets/images/clients/ritc.png"),
+    ClientItems(id: 6, name: "Chheda Group", imgUrl: "assets/images/clients/chheda.png"),
+    ClientItems(id: 7, name: "Larsen & Toubro", imgUrl: "assets/images/clients/lt.png"),
+    ClientItems(id: 8, name: "Indian Navy INS Hamla", imgUrl: "assets/images/clients/indian_navy.png"),
+  ];
+
   @override
   void initState() {
     super.initState();
-
-    // Fetch dynamic client data from PHP backend API
     _clientsFuture = fetchClients();
 
     _headerController = AnimationController(
@@ -148,8 +159,7 @@ class _ClientLogoListState extends State<_ClientLogoList>
   }
 
   Future<List<ClientItems>> fetchClients() async {
-    // Replace with your actual PHP API Endpoint URL
-    final url = Uri.parse('http://192.168.1.4/bindu_decor/clients.php');
+    final url = Uri.parse('http://192.168.1.6/bindu_decor/clients.php');
 
     try {
       final response = await http.get(url);
@@ -157,15 +167,25 @@ class _ClientLogoListState extends State<_ClientLogoList>
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         final List<dynamic> data = jsonResponse['data'] ?? [];
 
-        return data.map((item) {
-          return ClientItems(imgUrl: item['img_url'] ?? '');
+        if (data.isEmpty) return _defaultOrderedClients;
+
+        List<ClientItems> fetched = data.map((item) {
+          return ClientItems(
+            id: int.tryParse(item['id']?.toString() ?? '0') ?? 0,
+            name: item['name'] ?? '',
+            imgUrl: item['img_url'] ?? item['image_url'] ?? '',
+          );
         }).toList();
+
+        // Sort by DB ID ascending to guarantee the correct display sequence
+        fetched.sort((a, b) => a.id.compareTo(b.id));
+        return fetched;
       } else {
-        throw Exception('Failed to load dynamic client images.');
+        return _defaultOrderedClients;
       }
     } catch (e) {
       debugPrint('Error fetching clients: $e');
-      return [];
+      return _defaultOrderedClients;
     }
   }
 
@@ -180,12 +200,17 @@ class _ClientLogoListState extends State<_ClientLogoList>
     final double screenWidth = MediaQuery.of(context).size.width;
 
     int crossAxisCount;
-    if (screenWidth >= 1200) {
+    double childAspectRatio;
+
+    if (screenWidth >= 1100) {
       crossAxisCount = 4;
+      childAspectRatio = 2.6;
     } else if (screenWidth >= 768) {
       crossAxisCount = 3;
+      childAspectRatio = 2.3;
     } else {
       crossAxisCount = 2;
+      childAspectRatio = 2.0;
     }
 
     return Padding(
@@ -212,26 +237,36 @@ class _ClientLogoListState extends State<_ClientLogoList>
                       borderRadius: BorderRadius.circular(30),
                       border: Border.all(color: const Color(0xFF0F382C).withOpacity(0.15)),
                     ),
-                    child: Text("TRUSTED BY INDUSTRY LEADERS", style: GoogleFonts.cormorantGaramond(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2.5, color: const Color(0xFF0F382C))),
+                    child: Text(
+                      "TRUSTED BY INDUSTRY LEADERS",
+                      style: GoogleFonts.cormorantGaramond(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2.5,
+                        color: const Color(0xFF0F382C),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 14),
-
                 SlideTransition(
                   position: _topToBottomTextAnim,
-                  child: Text("Our Esteemed Clients", textAlign: TextAlign.center,
-                      style: GoogleFonts.cormorantGaramond(fontSize: screenWidth >= 900 ? 42 : 30, fontWeight: FontWeight.bold, color: const Color(0xFF0F382C), letterSpacing: 0.5)),
+                  child: Text(
+                    "Our Esteemed Clients",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.cormorantGaramond(
+                      fontSize: screenWidth >= 900 ? 42 : 30,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF0F382C),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 12),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      height: 2,
-                      width: 24,
-                      color: const Color(0xFFD4AF37).withOpacity(0.4),
-                    ),
+                    Container(height: 2, width: 24, color: const Color(0xFFD4AF37).withOpacity(0.4)),
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 6),
                       height: 4,
@@ -241,32 +276,28 @@ class _ClientLogoListState extends State<_ClientLogoList>
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                    Container(
-                      height: 2,
-                      width: 24,
-                      color: const Color(0xFFD4AF37).withOpacity(0.4),
-                    ),
+                    Container(height: 2, width: 24, color: const Color(0xFFD4AF37).withOpacity(0.4)),
                   ],
                 ),
                 const SizedBox(height: 16),
-
                 SlideTransition(
                   position: _topToBottomTextAnim,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Text(
-                        "Proudly serving corporate offices, luxury residences, and commercial venues across India.",
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.cormorantGaramond(
-                            fontSize: 16,
-                            color: const Color(0xFF4A5568))),
+                      "Proudly serving corporate offices, luxury residences, and commercial venues across India.",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.cormorantGaramond(
+                        fontSize: 16,
+                        color: const Color(0xFF4A5568),
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 44),
-
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: screenWidth >= 1200
@@ -284,34 +315,24 @@ class _ClientLogoListState extends State<_ClientLogoList>
                   );
                 }
 
-                if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "No client logos found.",
-                      style: GoogleFonts.cormorantGaramond(fontSize: 18, color: Colors.grey),
-                    ),
-                  );
-                }
+                final clientList = (snapshot.hasData && snapshot.data!.isNotEmpty)
+                    ? snapshot.data!
+                    : _defaultOrderedClients;
 
-                final teamMembers = snapshot.data!;
-
-                return GridView.builder(
+                return GridView.count(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: teamMembers.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount,
-                    crossAxisSpacing: screenWidth >= 768 ? 24 : 14,
-                    mainAxisSpacing: screenWidth >= 768 ? 24 : 14,
-                    childAspectRatio: 2.1,
-                  ),
-                  itemBuilder: (context, index) {
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: screenWidth >= 768 ? 24 : 14,
+                  mainAxisSpacing: screenWidth >= 768 ? 24 : 14,
+                  childAspectRatio: childAspectRatio,
+                  children: List.generate(clientList.length, (index) {
                     return _AnimatedClientCard(
-                      key: ValueKey("client_card_$index"),
-                      imgUrl: teamMembers[index].imgUrl,
+                      key: ValueKey("client_card_${clientList[index].id}_$index"),
+                      imgUrl: clientList[index].imgUrl,
                       index: index,
                     );
-                  },
+                  }),
                 );
               },
             ),
@@ -368,7 +389,10 @@ class _AnimatedClientCardState extends State<_AnimatedClientCard>
       onVisibilityChanged: (info) {
         if (info.visibleFraction > 0.1 && !_hasAnimated) {
           _hasAnimated = true;
-          _cardController.forward();
+          // Stagger card entrance animation based on index
+          Future.delayed(Duration(milliseconds: widget.index * 80), () {
+            if (mounted) _cardController.forward();
+          });
         }
       },
       child: SlideTransition(
@@ -382,26 +406,34 @@ class _AnimatedClientCardState extends State<_AnimatedClientCard>
             transform: isHovered
                 ? (Matrix4.identity()..translate(0, -6, 0))
                 : Matrix4.identity(),
-            padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: isHovered ? const Color(0xFFD4AF37) : const Color(0xFF0F382C).withOpacity(0.12),
-                width: isHovered ? 2.0 : 1.5,
+                color: isHovered ? const Color(0xFFD4AF37) : Colors.grey.shade300,
+                width: isHovered ? 1.8 : 1.0,
               ),
               boxShadow: [
                 BoxShadow(
                   color: isHovered
                       ? const Color(0xFF0F382C).withOpacity(0.12)
-                      : const Color(0xFF0F382C).withOpacity(0.04),
-                  blurRadius: isHovered ? 20 : 10,
-                  offset: isHovered ? const Offset(0, 10) : const Offset(0, 4),
+                      : Colors.black.withOpacity(0.02),
+                  blurRadius: isHovered ? 16 : 6,
+                  offset: isHovered ? const Offset(0, 8) : const Offset(0, 2),
                 ),
               ],
             ),
-            child: Center(
-              child: _buildDynamicImage(widget.imgUrl),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(
+                    maxHeight: 70,
+                    maxWidth: 200,
+                  ),
+                  child: _buildDynamicImage(widget.imgUrl),
+                ),
+              ),
             ),
           ),
         ),
@@ -422,6 +454,7 @@ Widget _buildDynamicImage(String imagePath) {
     return Image.network(
       imagePath,
       fit: BoxFit.contain,
+      alignment: Alignment.center,
       errorBuilder: (context, error, stackTrace) => _imageFallback(),
     );
   }
@@ -429,12 +462,14 @@ Widget _buildDynamicImage(String imagePath) {
   return Image.asset(
     imagePath,
     fit: BoxFit.contain,
+    alignment: Alignment.center,
     errorBuilder: (context, error, stackTrace) => _imageFallback(),
   );
 }
 
 Widget _imageFallback() {
   return Container(
+    padding: const EdgeInsets.all(12),
     color: const Color(0xFFFAFAF8),
     child: const Center(
       child: Icon(Icons.business_rounded, size: 36, color: Color(0xFF0F382C)),

@@ -868,22 +868,9 @@ class _BinduFooterState extends State<BinduFooter> with SingleTickerProviderStat
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.all(12.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Image.asset(
-              "assets/images/bindu.png",
-              fit: BoxFit.contain,
+          SizedBox(
+            height: 180, width: 160,
+            child: Image.asset("assets/images/bindu.png", fit: BoxFit.contain, color: Colors.white,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
                   width: 90,
