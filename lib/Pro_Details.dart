@@ -1,8 +1,11 @@
+// Pro_Details.dart
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'Nav_Widgets/Navigation.dart'; // Ensure Navigation.dart contains NavHeader and BinduFooter widgets
+import 'Nav_Widgets/Navigation.dart';
 
 class ImageDetail {
   final String imageUrl;
@@ -14,8 +17,17 @@ class ImageDetail {
     this.title,
     this.description,
   });
+
+  factory ImageDetail.fromJson(Map<String, dynamic> json) {
+    return ImageDetail(
+      imageUrl: (json['imageUrl'] ?? json['image_url'] ?? '') as String,
+      title: json['title'] as String?,
+      description: json['description'] as String?,
+    );
+  }
 }
 
+// Extended model supporting Home Decor product details and specifications
 class DecorProductItem {
   final String title;
   final String category;
@@ -35,24 +47,80 @@ class DecorProductItem {
     this.printType = "High Definition Digital Print / Finish",
   });
 
+  // Robust fromJson to support different API shapes
   factory DecorProductItem.fromJson(Map<String, dynamic> json) {
-    List<String> images = [];
-    if (json['imageUrls'] != null && json['imageUrls'] is List) {
-      images = List<String>.from(json['imageUrls']);
-    } else if (json['image_urls'] != null && json['image_urls'] is List) {
-      images = List<String>.from(json['image_urls']);
+    final String title = json['title']?.toString() ?? json['name']?.toString() ?? '';
+    final String category = json['category']?.toString() ?? json['cat']?.toString() ?? 'HOME DECOR';
+    final String description = json['description']?.toString() ?? json['desc']?.toString() ?? '';
+    final String material = json['material']?.toString() ?? '';
+    final String printType = json['print_type']?.toString() ?? json['printType']?.toString() ?? '';
+
+    // imageDetails can come as list of objects or json-encoded string
+    List<ImageDetail> imageDetails = [];
+    if (json['imageDetails'] != null) {
+      try {
+        if (json['imageDetails'] is List) {
+          imageDetails = (json['imageDetails'] as List).map((e) {
+            if (e is Map<String, dynamic>) return ImageDetail.fromJson(e);
+            return ImageDetail(imageUrl: e?.toString() ?? '');
+          }).toList();
+        } else if (json['imageDetails'] is String) {
+          final decoded = jsonDecodeIfPossible(json['imageDetails']);
+          if (decoded is List) {
+            imageDetails = decoded.map<ImageDetail>((e) {
+              if (e is Map<String, dynamic>) return ImageDetail.fromJson(e);
+              return ImageDetail(imageUrl: e?.toString() ?? '');
+            }).toList();
+          }
+        }
+      } catch (_) {
+        imageDetails = [];
+      }
+    }
+
+    // imageUrls may appear in multiple shapes
+    List<String> imageUrls = [];
+    if (json['imageUrls'] != null) {
+      if (json['imageUrls'] is List) {
+        imageUrls = List<String>.from(json['imageUrls'].map((e) => e?.toString() ?? ''));
+      } else if (json['imageUrls'] is String) {
+        final decoded = jsonDecodeIfPossible(json['imageUrls']);
+        if (decoded is List) {
+          imageUrls = List<String>.from(decoded.map((e) => e?.toString() ?? ''));
+        } else {
+          imageUrls = [json['imageUrls'].toString()];
+        }
+      }
+    } else if (json['images'] != null) {
+      if (json['images'] is List) {
+        imageUrls = List<String>.from(json['images'].map((e) => e?.toString() ?? ''));
+      } else {
+        imageUrls = [json['images'].toString()];
+      }
     } else if (json['image_url'] != null) {
-      images = [json['image_url'].toString()];
+      imageUrls = [json['image_url'].toString()];
+    } else if (imageDetails.isNotEmpty) {
+      imageUrls = imageDetails.map((e) => e.imageUrl).toList();
     }
 
     return DecorProductItem(
-      title: json['title'] ?? '',
-      category: json['category'] ?? 'HOME DECOR',
-      imageUrls: images,
-      description: json['description'] ?? '',
-      material: json['material'] ?? 'Premium Grade Material',
-      printType: json['printType'] ?? json['print_type'] ?? 'High Definition Digital Print / Finish',
+      title: title,
+      category: category,
+      imageDetails: imageDetails.isNotEmpty ? imageDetails : null,
+      imageUrls: imageUrls,
+      description: description,
+      material: material.isNotEmpty ? material : null,
+      printType: printType.isNotEmpty ? printType : null,
     );
+  }
+
+  static dynamic jsonDecodeIfPossible(dynamic value) {
+    try {
+      if (value is String && value.isNotEmpty) {
+        return jsonDecode(value);
+      }
+    } catch (_) {}
+    return null;
   }
 }
 
@@ -117,21 +185,20 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   Widget _buildDetailRow(IconData icon, String label, String? value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
+      padding: const EdgeInsets.only(bottom: 14.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: const Color(0xFF276B5A)),
-          const SizedBox(width: 10),
+          Icon(icon, size: 22, color: const Color(0xFF276B5A)),
+          const SizedBox(width: 12),
           Expanded(
             child: RichText(
               text: TextSpan(
-                style: GoogleFonts.cabin(fontSize: 14, color: Colors.black87),
+                style: GoogleFonts.cabin(fontSize: 15, color: Colors.black87),
                 children: [
                   TextSpan(
-                    text: "$label: ",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                      text: "$label: ",
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(text: value ?? "N/A"),
                 ],
               ),
@@ -178,258 +245,241 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 800;
 
-    // 1. Resolve current selected ImageDetail
+    // 1. Resolve current selected ImageDetail or construct dynamic image fallback
     final ImageDetail? currentImageDetail = (widget.item.imageDetails != null &&
         _selectedImageIndex < widget.item.imageDetails!.length)
         ? widget.item.imageDetails![_selectedImageIndex]
         : null;
 
-    // 2. Resolve image list (prefer imageDetails over imageUrls)
+    // 2. Extract current image URL
+    final String currentImageUrl = currentImageDetail?.imageUrl ??
+        (widget.item.imageUrls.isNotEmpty
+            ? widget.item.imageUrls[_selectedImageIndex]
+            : '');
+
+    // 3. Fallback logic: Use ImageDetail title/description if provided, else rely on product defaults
+    final String currentTitle =
+        currentImageDetail?.title ?? widget.item.title;
+
+    final String currentDescription =
+        currentImageDetail?.description ?? widget.item.description;
+
+    // 4. Derive image list dynamically from either imageDetails or imageUrls
     final List<String> availableImageUrls = widget.item.imageDetails != null &&
         widget.item.imageDetails!.isNotEmpty
         ? widget.item.imageDetails!.map((e) => e.imageUrl).toList()
         : widget.item.imageUrls;
 
-    // 3. Fallback logic for title, image URL, and description
-    final String currentImageUrl = currentImageDetail?.imageUrl ??
-        (availableImageUrls.isNotEmpty ? availableImageUrls[_selectedImageIndex] : '');
-
-    final String currentTitle = currentImageDetail?.title ?? widget.item.title;
-
-    final String currentDescription = currentImageDetail?.description ?? widget.item.description;
+    String categoryDisplay = widget.item.category.toUpperCase();
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0.5,
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          currentTitle,
-          style: GoogleFonts.cormorantGaramond(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
+        title: Text(currentTitle, style: GoogleFonts.cormorantGaramond(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16)),
         centerTitle: false,
       ),
       body: SingleChildScrollView(
-        child: Column(
+        padding: EdgeInsets.symmetric(
+          horizontal: isDesktop ? screenWidth * 0.1 : 16.0,
+          vertical: 16.0,
+        ),
+        child: Flex(
+          direction: isDesktop ? Axis.horizontal : Axis.vertical,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Page Body Content Container
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: isDesktop ? screenWidth * 0.1 : 16.0,
-                vertical: 24.0,
-              ),
-              child: Flex(
-                direction: isDesktop ? Axis.horizontal : Axis.vertical,
-                crossAxisAlignment: CrossAxisAlignment.start,
+            // --- PRODUCT PHOTO GALLERY (LEFT / TOP) ---
+            Flexible(
+              flex: isDesktop ? 1 : 0,
+              child: Column(
                 children: [
-                  // --- LEFT / TOP: MAIN IMAGE & THUMBNAILS ---
-                  Flexible(
-                    flex: isDesktop ? 1 : 0,
-                    child: Column(
-                      children: [
-                        Container(
-                          height: isDesktop ? 420 : 300,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color: const Color(0xFFF5F5F5),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: _buildProductImage(currentImageUrl),
-                          ),
-                        ),
-                        if (availableImageUrls.length > 1) ...[
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            height: 60,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: availableImageUrls.length,
-                              itemBuilder: (context, index) {
-                                final isSelected = index == _selectedImageIndex;
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedImageIndex = index;
-                                    });
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.only(right: 10),
-                                    width: 60,
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: isSelected
-                                            ? const Color(0xFF276B5A)
-                                            : Colors.transparent,
-                                        width: 2.5,
-                                      ),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: _buildProductImage(availableImageUrls[index]),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ],
+                  // Main Image Frame
+                  Container(
+                    height: isDesktop ? 420 : 300,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: const Color(0xFFF5F5F5),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: _buildProductImage(currentImageUrl),
                     ),
                   ),
+                  const SizedBox(height: 12),
 
-                  if (isDesktop) const SizedBox(width: 36) else const SizedBox(height: 24),
-
-                  // --- RIGHT / BOTTOM: PRODUCT DETAILS & SPECS ---
-                  Flexible(
-                    flex: isDesktop ? 1 : 0,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Category Tag
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: getCategoryColor(widget.item.category).withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            widget.item.category.toUpperCase(),
-                            style: GoogleFonts.cabin(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: getCategoryColor(widget.item.category),
-                              letterSpacing: 0.8,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-
-                        // Title
-                        Text(
-                          currentTitle,
-                          style: GoogleFonts.cormorantGaramond(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF1F2937),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        const Divider(color: Color(0xFFE5E7EB), thickness: 1),
-                        const SizedBox(height: 14),
-
-                        // Description Section
-                        Text(
-                          "Description",
-                          style: GoogleFonts.cormorantGaramond(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF276B5A),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          currentDescription,
-                          maxLines: _isExpanded ? null : 4,
-                          overflow: _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-                          style: GoogleFonts.cabin(
-                            fontSize: 15,
-                            color: Colors.black87,
-                            height: 1.5,
-                          ),
-                        ),
-                        if (currentDescription.length > 100)
-                          GestureDetector(
-                            onTap: () => setState(() => _isExpanded = !_isExpanded),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 6.0),
-                              child: Text(
-                                _isExpanded ? "Show Less" : "Show More",
-                                style: GoogleFonts.cabin(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color(0xFF276B5A),
+                  // Dynamic Image Thumbnails Row
+                  if (availableImageUrls.length > 1)
+                    SizedBox(
+                      height: 60,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: availableImageUrls.length,
+                        itemBuilder: (context, index) {
+                          final isSelected = index == _selectedImageIndex;
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedImageIndex = index;
+                              });
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 10),
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: isSelected
+                                      ? const Color(0xFF276B5A)
+                                      : Colors.transparent,
+                                  width: 2.5,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: _buildProductImage(
+                                  availableImageUrls[index],
                                 ),
                               ),
                             ),
-                          ),
-                        const SizedBox(height: 14),
-                        const Divider(color: Color(0xFFE5E7EB), thickness: 1),
-                        const SizedBox(height: 16),
+                          );
+                        },
+                      ),
+                    ),
+                ],
+              ),
+            ),
 
-                        // Specifications
-                        Text(
-                          "Product Specifications",
-                          style: GoogleFonts.cormorantGaramond(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF1F2937),
+            if (isDesktop) const SizedBox(width: 36) else const SizedBox(height: 24),
+
+            // --- DETAILS PANEL (RIGHT / BOTTOM) ---
+            Flexible(
+              flex: isDesktop ? 1 : 0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Category Tag
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: getCategoryColor(widget.item.category)
+                          .withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      categoryDisplay,
+                      style: GoogleFonts.cabin(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: getCategoryColor(widget.item.category),
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Dynamic Title based on current selected image
+                  Text(currentTitle, style: GoogleFonts.cormorantGaramond(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFF1F2937))),
+                  const SizedBox(height: 14),
+                  const Divider(color: Color(0xFFE5E7EB), thickness: 1),
+                  const SizedBox(height: 14),
+
+                  // Dynamic Description based on current selected image
+                  Text("Description", style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF276B5A))),
+                  const SizedBox(height: 8),
+                  Text(
+                    currentDescription,
+                    maxLines: _isExpanded ? null : 4,
+                    overflow: _isExpanded
+                        ? TextOverflow.visible
+                        : TextOverflow.ellipsis,
+                    style: GoogleFonts.cabin(
+                      fontSize: 15,
+                      color: Colors.black87,
+                      height: 1.5,
+                    ),
+                  ),
+                  if (currentDescription.length > 100)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isExpanded = !_isExpanded;
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6.0),
+                        child: Text(
+                          _isExpanded ? "Show Less" : "Show More",
+                          style: GoogleFonts.cabin(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF276B5A),
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        _buildDetailRow(
-                          CupertinoIcons.photo,
-                          "Variant / View",
-                          "Image ${_selectedImageIndex + 1} of ${availableImageUrls.length}",
-                        ),
-                        _buildDetailRow(
-                          CupertinoIcons.layers,
-                          "Material",
-                          widget.item.material,
-                        ),
-                        _buildDetailRow(
-                          CupertinoIcons.printer,
-                          "Print / Finish Type",
-                          widget.item.printType,
-                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 14),
+                  const Divider(color: Color(0xFFE5E7EB), thickness: 1),
+                  const SizedBox(height: 16),
 
-                        const SizedBox(height: 28),
+                  // Image-Specific & Product Specifications
+                  Text("Product Specifications", style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF1F2937))),
+                  const SizedBox(height: 16),
+                  _buildDetailRow(
+                    CupertinoIcons.photo,
+                    "Variant / View",
+                    "Image ${_selectedImageIndex + 1} of ${availableImageUrls.length}",
+                  ),
+                  _buildDetailRow(
+                    CupertinoIcons.layers,
+                    "Material",
+                    widget.item.material,
+                  ),
+                  _buildDetailRow(
+                    CupertinoIcons.printer,
+                    "Print / Finish Type",
+                    widget.item.printType,
+                  ),
 
-                        // Inquiry Action Button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF276B5A),
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            onPressed: () => showContactFormDialog(context),
-                            icon: const Icon(CupertinoIcons.mail_solid, size: 20),
-                            label: Text(
-                              "Inquire For Details",
-                              style: GoogleFonts.cabin(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
+                  const SizedBox(height: 28),
+
+                  // Inquiry Action Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF276B5A),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ],
+                      ),
+                      onPressed: () {
+                        showContactFormDialog(context);
+                      },
+                      icon: const Icon(CupertinoIcons.mail_solid, size: 20),
+                      label: Text(
+                        "Inquire For Details",
+                        style: GoogleFonts.cabin(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-
-            // Navigation/Footer widget embedded at the bottom
-            const BinduFooter(),
           ],
         ),
       ),

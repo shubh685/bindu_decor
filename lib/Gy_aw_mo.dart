@@ -6,6 +6,7 @@ import 'API_Services/View_Api.dart';
 import 'Home_Page.dart';
 import 'Nav_Widgets/Navigation.dart';
 import 'Pro_Details.dart';
+import 'Wal_Flo_Car.dart';
 
 final List<NavItem> _globalNavItems = const [
   NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
@@ -41,166 +42,7 @@ final List<NestedMenuItem> _globalShopItems = const [
   ),
 ];
 
-class ProductGridCard extends StatefulWidget {
-  final DecorProductItem item;
-
-  const ProductGridCard({super.key, required this.item});
-
-  @override
-  State<ProductGridCard> createState() => _ProductGridCardState();
-}
-
-class _ProductGridCardState extends State<ProductGridCard> {
-  int _selectedImageIndex = 0;
-  bool _isFavorite = false;
-
-  void _openDetailDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => ProductDetailPage(
-        item: widget.item,
-        initialImageIndex: _selectedImageIndex,
-      ),
-    );
-  }
-
-  Widget _buildProductImage(String path) {
-    if (path.isEmpty) return _buildPlaceholder();
-    return Image.network(
-      path,
-      fit: BoxFit.cover,
-      width: double.infinity,
-      height: double.infinity,
-      errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-        return Container(
-          color: const Color(0xFFF2F2F2),
-          child: const Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF276B5A)),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildPlaceholder() {
-    return Container(
-      color: const Color(0xFFF2F2F2),
-      child: const Center(
-        child: Icon(CupertinoIcons.photo, color: Colors.grey, size: 32),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final currentImage = widget.item.imageUrls.isNotEmpty
-        ? widget.item.imageUrls[_selectedImageIndex]
-        : '';
-
-    return InkWell(
-      onTap: _openDetailDialog,
-      borderRadius: BorderRadius.circular(8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4.0),
-                  child: Container(
-                    width: double.infinity,
-                    color: const Color(0xFFF5F5F5),
-                    child: _buildProductImage(currentImage),
-                  ),
-                ),
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: GestureDetector(
-                    onTap: () => setState(() => _isFavorite = !_isFavorite),
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.7),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        _isFavorite ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
-                        size: 18,
-                        color: _isFavorite ? Colors.red : Colors.black87,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cormorantGaramond(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF222222))),
-          const SizedBox(height: 2),
-          Row(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: List.generate(widget.item.imageUrls.length, (idx) {
-                      final isSelected = idx == _selectedImageIndex;
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedImageIndex = idx),
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 6),
-                          width: 26,
-                          height: 26,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: isSelected ? Colors.black87 : Colors.transparent,
-                              width: 1.5,
-                            ),
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(1),
-                            child: _buildProductImage(widget.item.imageUrls[idx]),
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: _openDetailDialog,
-                borderRadius: BorderRadius.circular(4),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF276B5A),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.touch_app_outlined, size: 12, color: Colors.white),
-                      const SizedBox(width: 4),
-                      Text("Inquire", style: GoogleFonts.cabin(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
+// ProductGridCard class remains the same...
 
 // 1. GYM FLOORINGS SECTION
 class GymFloorings extends StatefulWidget {
@@ -298,15 +140,48 @@ class _GymFlooringsAnimatedSectionState extends State<GymFlooringsAnimatedSectio
   @override
   void initState() {
     super.initState();
+    _gymItems = List<DecorProductItem>.from(_staticGymItems);
     _fetchCategoryProducts();
   }
 
   Future<void> _fetchCategoryProducts() async {
-    final fetched = await ApiService.fetchProductsByCategory("Gym Floorings");
-    setState(() {
-      _gymItems = fetched.isNotEmpty ? fetched : _staticGymItems;
-      _isLoading = false;
-    });
+    try {
+      final fetched = await ApiService.fetchProductsByCategory("Gym Floorings");
+
+      if (fetched.isEmpty) {
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      final Set<String> seenTitles = <String>{};
+      List<DecorProductItem> merged = [];
+
+      for (final p in fetched) {
+        final key = p.title.toLowerCase();
+        if (!seenTitles.contains(key)) {
+          merged.add(p);
+          seenTitles.add(key);
+        }
+      }
+
+      for (final s in _staticGymItems) {
+        final key = s.title.toLowerCase();
+        if (!seenTitles.contains(key)) {
+          merged.add(s);
+          seenTitles.add(key);
+        }
+      }
+
+      setState(() {
+        _gymItems = merged;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _gymItems = List<DecorProductItem>.from(_staticGymItems);
+      });
+    }
   }
 
   @override
@@ -325,7 +200,10 @@ class _GymFlooringsAnimatedSectionState extends State<GymFlooringsAnimatedSectio
           Text("High-Performance Gym Flooring", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.0),
+            child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
+          )
               : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -442,15 +320,48 @@ class _AwningsAnimatedSectionState extends State<AwningsAnimatedSection> {
   @override
   void initState() {
     super.initState();
+    _awnings = List<DecorProductItem>.from(_staticAwnings);
     _fetchCategoryProducts();
   }
 
   Future<void> _fetchCategoryProducts() async {
-    final fetched = await ApiService.fetchProductsByCategory("Awnings");
-    setState(() {
-      _awnings = fetched.isNotEmpty ? fetched : _staticAwnings;
-      _isLoading = false;
-    });
+    try {
+      final fetched = await ApiService.fetchProductsByCategory("Awnings");
+
+      if (fetched.isEmpty) {
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      final Set<String> seenTitles = <String>{};
+      List<DecorProductItem> merged = [];
+
+      for (final p in fetched) {
+        final key = p.title.toLowerCase();
+        if (!seenTitles.contains(key)) {
+          merged.add(p);
+          seenTitles.add(key);
+        }
+      }
+
+      for (final s in _staticAwnings) {
+        final key = s.title.toLowerCase();
+        if (!seenTitles.contains(key)) {
+          merged.add(s);
+          seenTitles.add(key);
+        }
+      }
+
+      setState(() {
+        _awnings = merged;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _awnings = List<DecorProductItem>.from(_staticAwnings);
+      });
+    }
   }
 
   @override
@@ -469,7 +380,10 @@ class _AwningsAnimatedSectionState extends State<AwningsAnimatedSection> {
           Text("Architectural Outdoor Awnings", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.0),
+            child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
+          )
               : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -586,15 +500,48 @@ class _MosquitoNetAnimatedSectionState extends State<MosquitoNetAnimatedSection>
   @override
   void initState() {
     super.initState();
+    _mosquitoItems = List<DecorProductItem>.from(_staticMosquitoItems);
     _fetchCategoryProducts();
   }
 
   Future<void> _fetchCategoryProducts() async {
-    final fetched = await ApiService.fetchProductsByCategory("Mosquito Nets");
-    setState(() {
-      _mosquitoItems = fetched.isNotEmpty ? fetched : _staticMosquitoItems;
-      _isLoading = false;
-    });
+    try {
+      final fetched = await ApiService.fetchProductsByCategory("Mosquito Nets");
+
+      if (fetched.isEmpty) {
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      final Set<String> seenTitles = <String>{};
+      List<DecorProductItem> merged = [];
+
+      for (final p in fetched) {
+        final key = p.title.toLowerCase();
+        if (!seenTitles.contains(key)) {
+          merged.add(p);
+          seenTitles.add(key);
+        }
+      }
+
+      for (final s in _staticMosquitoItems) {
+        final key = s.title.toLowerCase();
+        if (!seenTitles.contains(key)) {
+          merged.add(s);
+          seenTitles.add(key);
+        }
+      }
+
+      setState(() {
+        _mosquitoItems = merged;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _mosquitoItems = List<DecorProductItem>.from(_staticMosquitoItems);
+      });
+    }
   }
 
   @override
@@ -613,7 +560,10 @@ class _MosquitoNetAnimatedSectionState extends State<MosquitoNetAnimatedSection>
           Text("Mosquito & Insect Protection Nets", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.0),
+            child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
+          )
               : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),

@@ -1,90 +1,74 @@
-// Api_Service.dart
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-
 import '../Pro_Details.dart';
-import '../Proj_Page.dart';
 
 class ApiService {
-  static const String baseUrl = "http://192.168.1.48/bindu_decor";
+  static const String baseUrl = "http://192.168.1.48/bindu_decor/";
 
-  static Future<List<ProjectItem>> fetchProjects() async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/projects.php'));
-      if (response.statusCode == 200) {
-        final decodedData = json.decode(response.body);
-        List<dynamic> data = [];
-
-        if (decodedData is List) {
-          data = decodedData;
-        } else if (decodedData is Map<String, dynamic>) {
-          data = decodedData['data'] ?? decodedData['projects'] ?? [];
-        }
-
-        return data.map((json) {
-          return ProjectItem(
-            title: json['title'] ?? '',
-            subTitle: json['subTitle'] ?? json['subtitle'] ?? '',
-            location: json['location'] ?? '',
-            pricing: json['pricing'] ?? '',
-            bhk: json['bhk'] ?? '',
-            scope: json['scope'] ?? '',
-            propertyType: json['propertyType'] ?? json['property_type'] ?? '',
-            size: json['size'] ?? '',
-            description: json['description'] ?? '',
-            imageUrls: List<String>.from(json['imageUrls'] ?? json['image_urls'] ?? []),
-          );
-        }).toList();
-      } else {
-        throw Exception('Failed to load projects (Status Code: ${response.statusCode})');
-      }
-    } catch (e) {
-      debugPrint('Error fetching projects: $e');
-      return [];
-    }
-  }
-
+  // Fetch products by category
   static Future<List<DecorProductItem>> fetchProductsByCategory(String category) async {
     try {
-      final Uri uri = Uri.parse('$baseUrl/products.php?action=fetch&category=${Uri.encodeComponent(category)}');
-      final response = await http.get(uri);
+      final response = await http.get(
+        Uri.parse("${baseUrl}products.php?category=${Uri.encodeComponent(category)}"),
+      );
 
       if (response.statusCode == 200) {
-        final decodedData = json.decode(response.body);
-        List<dynamic> data = [];
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
-        if (decodedData is List) {
-          data = decodedData;
-        } else if (decodedData is Map<String, dynamic>) {
-          data = decodedData['data'] ?? decodedData['products'] ?? [];
+        if (jsonResponse['status'] == 'success' && jsonResponse['data'] != null) {
+          final List<dynamic> data = jsonResponse['data'];
+          return data.map((item) => DecorProductItem.fromJson(item)).toList();
         }
-
-        return data.map((json) => DecorProductItem.fromJson(json)).toList();
-      } else {
-        debugPrint('Failed to load products for category $category: ${response.statusCode}');
         return [];
       }
+      return [];
     } catch (e) {
-      debugPrint('Error fetching products by category ($category): $e');
+      print('Error fetching products: $e');
       return [];
     }
   }
 
-  static Future<List<String>> fetchDynamicCategories() async {
+  // Fetch all products
+  static Future<List<DecorProductItem>> fetchAllProducts() async {
     try {
-      final Uri uri = Uri.parse('$baseUrl/products.php?action=categories');
-      final response = await http.get(uri);
+      final response = await http.get(
+        Uri.parse("${baseUrl}products.php"),
+      );
 
       if (response.statusCode == 200) {
-        final decodedData = json.decode(response.body);
-        if (decodedData is Map<String, dynamic> && decodedData['categories'] != null) {
-          return List<String>.from(decodedData['categories']);
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+
+        if (jsonResponse['status'] == 'success' && jsonResponse['data'] != null) {
+          final List<dynamic> data = jsonResponse['data'];
+          return data.map((item) => DecorProductItem.fromJson(item)).toList();
         }
+        return [];
       }
       return [];
     } catch (e) {
-      debugPrint('Error fetching dynamic categories: $e');
+      print('Error fetching all products: $e');
+      return [];
+    }
+  }
+
+  // Fetch projects
+  static Future<List<dynamic>> fetchProjects() async {
+    try {
+      final response = await http.get(
+        Uri.parse("${baseUrl}projects.php"),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+
+        if (jsonResponse['status'] == 'success' && jsonResponse['data'] != null) {
+          return jsonResponse['data'];
+        }
+        return [];
+      }
+      return [];
+    } catch (e) {
+      print('Error fetching projects: $e');
       return [];
     }
   }

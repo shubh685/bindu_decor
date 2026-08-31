@@ -267,7 +267,7 @@ class _WallpaperAnimatedSectionState extends State<WallpaperAnimatedSection> {
   bool _isLoading = true;
   List<DecorProductItem> _wallpapers = [];
 
-  // Your static fallback / sample items (shown immediately)
+  // Static fallback / sample items
   final List<DecorProductItem> _staticWallpapers = const [
     DecorProductItem(
       title: "The Song of the Woods",
@@ -304,40 +304,34 @@ class _WallpaperAnimatedSectionState extends State<WallpaperAnimatedSection> {
   @override
   void initState() {
     super.initState();
-    // show static items immediately for fast UI
     _wallpapers = List<DecorProductItem>.from(_staticWallpapers);
     _fetchCategoryProducts();
   }
 
   Future<void> _fetchCategoryProducts() async {
     try {
+      // Use the exact category name from navigation
       final fetched = await ApiService.fetchProductsByCategory("Wallpapers");
 
-      // If no results returned, keep static list (fallback)
       if (fetched.isEmpty) {
-        setState(() {
-          _isLoading = false;
-          // _wallpapers already shows static fallback
-        });
+        setState(() => _isLoading = false);
         return;
       }
 
-      // Merge & deduplicate (by title lowercased). You can change dedupe key to 'id' if available.
+      // Merge API results with static fallback (avoid duplicates)
       final Set<String> seenTitles = <String>{};
       List<DecorProductItem> merged = [];
 
-      // Option A: show API items first (recommended)
       for (final p in fetched) {
-        final key = (p.title ?? '').toLowerCase();
+        final key = p.title.toLowerCase();
         if (!seenTitles.contains(key)) {
           merged.add(p);
           seenTitles.add(key);
         }
       }
 
-      // Append static items that are not present in API results
       for (final s in _staticWallpapers) {
-        final key = (s.title ?? '').toLowerCase();
+        final key = s.title.toLowerCase();
         if (!seenTitles.contains(key)) {
           merged.add(s);
           seenTitles.add(key);
@@ -349,8 +343,6 @@ class _WallpaperAnimatedSectionState extends State<WallpaperAnimatedSection> {
         _isLoading = false;
       });
     } catch (e) {
-      // On error, keep the static fallback and stop loading.
-      // Optionally log the error or show a snackbar.
       setState(() {
         _isLoading = false;
         _wallpapers = List<DecorProductItem>.from(_staticWallpapers);
@@ -380,16 +372,12 @@ class _WallpaperAnimatedSectionState extends State<WallpaperAnimatedSection> {
             ),
           ),
           const SizedBox(height: 16),
-
-          // If you want to show loader while merging, keep this. Otherwise you can hide it
-          // because static items are already visible.
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
-            ),
-
-          GridView.builder(
+          _isLoading
+              ? const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.0),
+            child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
+          )
+              : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _wallpapers.length,
@@ -505,15 +493,48 @@ class _FloorAnimatedSectionState extends State<FloorAnimatedSection> {
   @override
   void initState() {
     super.initState();
+    _floors = List<DecorProductItem>.from(_staticFloors);
     _fetchCategoryProducts();
   }
 
   Future<void> _fetchCategoryProducts() async {
-    final fetched = await ApiService.fetchProductsByCategory("Floorings");
-    setState(() {
-      _floors = fetched.isNotEmpty ? fetched : _staticFloors;
-      _isLoading = false;
-    });
+    try {
+      final fetched = await ApiService.fetchProductsByCategory("Floorings");
+
+      if (fetched.isEmpty) {
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      final Set<String> seenTitles = <String>{};
+      List<DecorProductItem> merged = [];
+
+      for (final p in fetched) {
+        final key = p.title.toLowerCase();
+        if (!seenTitles.contains(key)) {
+          merged.add(p);
+          seenTitles.add(key);
+        }
+      }
+
+      for (final s in _staticFloors) {
+        final key = s.title.toLowerCase();
+        if (!seenTitles.contains(key)) {
+          merged.add(s);
+          seenTitles.add(key);
+        }
+      }
+
+      setState(() {
+        _floors = merged;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _floors = List<DecorProductItem>.from(_staticFloors);
+      });
+    }
   }
 
   @override
@@ -532,7 +553,10 @@ class _FloorAnimatedSectionState extends State<FloorAnimatedSection> {
           Text("Premium Floorings", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.0),
+            child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
+          )
               : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -649,15 +673,48 @@ class _CarpetAnimatedSectionState extends State<CarpetAnimatedSection> {
   @override
   void initState() {
     super.initState();
+    _carpets = List<DecorProductItem>.from(_staticCarpets);
     _fetchCategoryProducts();
   }
 
   Future<void> _fetchCategoryProducts() async {
-    final fetched = await ApiService.fetchProductsByCategory("Carpets");
-    setState(() {
-      _carpets = fetched.isNotEmpty ? fetched : _staticCarpets;
-      _isLoading = false;
-    });
+    try {
+      final fetched = await ApiService.fetchProductsByCategory("Carpets");
+
+      if (fetched.isEmpty) {
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      final Set<String> seenTitles = <String>{};
+      List<DecorProductItem> merged = [];
+
+      for (final p in fetched) {
+        final key = p.title.toLowerCase();
+        if (!seenTitles.contains(key)) {
+          merged.add(p);
+          seenTitles.add(key);
+        }
+      }
+
+      for (final s in _staticCarpets) {
+        final key = s.title.toLowerCase();
+        if (!seenTitles.contains(key)) {
+          merged.add(s);
+          seenTitles.add(key);
+        }
+      }
+
+      setState(() {
+        _carpets = merged;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _carpets = List<DecorProductItem>.from(_staticCarpets);
+      });
+    }
   }
 
   @override
@@ -676,7 +733,10 @@ class _CarpetAnimatedSectionState extends State<CarpetAnimatedSection> {
           Text("Luxury Carpets & Rugs", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.0),
+            child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
+          )
               : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
