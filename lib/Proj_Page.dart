@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'API_Services/View_Api.dart';
 import 'Home_Page.dart';
 import 'Nav_Widgets/Navigation.dart';
 
@@ -19,7 +20,7 @@ final List<NavItem> _globalNavItems = const [
     label: "Reviews",
     icon: Icons.reviews_outlined,
     route:
-    "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTZaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
+    "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTZaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3StoreAEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
   ),
 ];
 
@@ -44,13 +45,12 @@ final List<NestedMenuItem> _globalShopItems = const [
 ];
 
 // ==========================================
-// SELF-CONTAINED PROJECT MODEL
+// SELF-CONTAINED PROJECT MODEL (Tags removed)
 // ==========================================
 class ProjectItem {
   final String title;
   final String subTitle;
   final String location;
-  final List<String> tags;
   final String pricing;
   final String bhk;
   final String scope;
@@ -63,7 +63,6 @@ class ProjectItem {
     required this.title,
     required this.subTitle,
     required this.location,
-    required this.tags,
     required this.pricing,
     required this.bhk,
     required this.scope,
@@ -85,13 +84,12 @@ class ProjectsPage extends StatefulWidget {
 }
 
 class _ProjectsPageState extends State<ProjectsPage> {
-  // Converted single _project to a List of ProjectItem models
-  final List<ProjectItem> _projects = const [
+  // Static project list retained as initial/fallback state
+  List<ProjectItem> _projects = const [
     ProjectItem(
       title: "Modern Apartment Design in Mumbai With Stylish Living Room",
       subTitle: "Villa Velloze",
       location: "Villa Velloze, Mumbai",
-      tags: ["Modern", "Convenience Max"],
       pricing: "10 - 15 Lakhs",
       bhk: "3-BHK",
       scope: "Living Room, Dining",
@@ -108,60 +106,93 @@ class _ProjectsPageState extends State<ProjectsPage> {
       ],
     ),
     ProjectItem(
-        title: "Contemporary 3BHK Interior Design in Noida with Full Home Detailing",
-        subTitle: "Ivy Country",
-        location: 'Sector-75, Noida',
-        tags: ["Contemporary", "Convenience Max"],
-        pricing: "20-25 lakkhs",
-        bhk: "3-BHK",
-        scope: "Full Home, Kitchen, Living Room, 3 Bedrooms",
-        propertyType:"Apartment",
-        size: "2000 to 3500 sq ft",
-        description: "Here’s a Noida 3BHK designed for style-conscious families who want comfort, sophistication, and practical design. The full-home interiors showcase calming neutrals, bold blue accent units, and organic-inspired feature walls. Living and dining zones are bright and spacious, lit by elegant fixtures and natural sunlight streaming through large windows. Bedrooms make the most of modular wardrobes, combining ample storage with clean geometry and integrated study nooks. Every touch, from clever display shelves to seamless built-ins, promotes both beauty and usability for homes sized 2000–3500 sq ft and finished within a 20–25 lakh bracket.",
-        imageUrls:[
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/2711582-1755860801-qfgLL/mbr-1-1755861347-Pf0mv.jpg",
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/2711582-1755860801-qfgLL/mbr-2-1755861347-JGxR0.jpg",
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/2711582-1755860801-qfgLL/mbr-3-1755861345-a1LjP.jpg",
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/2711582-1755860801-qfgLL/mbr-4-1755861344-75OL8.jpg",
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/2711582-1755860801-qfgLL/mbr-5-1755861343-vMWgn.jpg"
-        ]),
+      title: "Contemporary 3BHK Interior Design in Noida with Full Home Detailing",
+      subTitle: "Ivy Country",
+      location: 'Sector-75, Noida',
+      pricing: "20-25 lakkhs",
+      bhk: "3-BHK",
+      scope: "Full Home, Kitchen, Living Room, 3 Bedrooms",
+      propertyType: "Apartment",
+      size: "2000 to 3500 sq ft",
+      description: "Here’s a Noida 3BHK designed for style-conscious families who want comfort, sophistication, and practical design. The full-home interiors showcase calming neutrals, bold blue accent units, and organic-inspired feature walls. Living and dining zones are bright and spacious, lit by elegant fixtures and natural sunlight streaming through large windows. Bedrooms make the most of modular wardrobes, combining ample storage with clean geometry and integrated study nooks. Every touch, from clever display shelves to seamless built-ins, promotes both beauty and usability for homes sized 2000–3500 sq ft and finished within a 20–25 lakh bracket.",
+      imageUrls: [
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/2711582-1755860801-qfgLL/mbr-1-1755861347-Pf0mv.jpg",
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/2711582-1755860801-qfgLL/mbr-2-1755861347-JGxR0.jpg",
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/2711582-1755860801-qfgLL/mbr-3-1755861345-a1LjP.jpg",
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/2711582-1755860801-qfgLL/mbr-4-1755861344-75OL8.jpg",
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/2711582-1755860801-qfgLL/mbr-5-1755861343-vMWgn.jpg"
+      ],
+    ),
     ProjectItem(
-        title: "Modern 3BHK Interior Design in Gurugram With L-Shaped Layout",
-        subTitle: "Bestech Park View Spa Next",
-        location: 'Sector-67, Gurugram',
-        tags: ["Modern", "Convenience Max", "L-Shaped"],
-        pricing: "25-30 lakkhs",
-        bhk: "3-BHK",
-        scope: "Kitchen, Living Room, Dining Room, 2 Bedrooms",
-        propertyType:"Apartment",
-        size: "1000 to 2500 sq ft",
-        description: "What’s refreshing about this 3BHK modern style interior design in Gurugram is the way each room has its own personality. The kitchen grabs attention with its bold red-and-white cabinetry, paired with sleek counters for easy cooking. In contrast, the master bedroom exudes calmness with muted beige walls, soft lighting, and cozy layered bedding. The kids’ room, meanwhile, is colourful and playful with bright yellows, patterned walls, and cheerful storage. Even the foyer and dining area storage units feel polished with glossy neutrals. Designed at a budget of 25–30 Lakhs, this home beautifully balances convenience with vibrant modern charm.",
-        imageUrls:[
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/hometour-1754897714-JYTjF/2233908-1754897784-l1rAi/mbr-1-1754897800-kBfpQ.jpg",
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/hometour-1754897714-JYTjF/2233908-1754897784-l1rAi/mbr-2-1754897800-dDQEg.jpg",
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/hometour-1754897714-JYTjF/2233908-1754897784-l1rAi/mbr-3-1754897799-jlNWH.jpg",
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/hometour-1754897714-JYTjF/2233908-1754897784-l1rAi/kbr-1-1754897798-iDSo5.jpg",
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/hometour-1754897714-JYTjF/2233908-1754897784-l1rAi/ki-1-1754897805-we9I5.jpg"
-        ]),
+      title: "Modern 3BHK Interior Design in Gurugram With L-Shaped Layout",
+      subTitle: "Bestech Park View Spa Next",
+      location: 'Sector-67, Gurugram',
+      pricing: "25-30 lakkhs",
+      bhk: "3-BHK",
+      scope: "Kitchen, Living Room, Dining Room, 2 Bedrooms",
+      propertyType: "Apartment",
+      size: "1000 to 2500 sq ft",
+      description: "What’s refreshing about this 3BHK modern style interior design in Gurugram is the way each room has its own personality. The kitchen grabs attention with its bold red-and-white cabinetry, paired with sleek counters for easy cooking. In contrast, the master bedroom exudes calmness with muted beige walls, soft lighting, and cozy layered bedding. The kids’ room, meanwhile, is colourful and playful with bright yellows, patterned walls, and cheerful storage. Even the foyer and dining area storage units feel polished with glossy neutrals. Designed at a budget of 25–30 Lakhs, this home beautifully balances convenience with vibrant modern charm.",
+      imageUrls: [
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/hometour-1754897714-JYTjF/2233908-1754897784-l1rAi/mbr-1-1754897800-kBfpQ.jpg",
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/hometour-1754897714-JYTjF/2233908-1754897784-l1rAi/mbr-2-1754897800-dDQEg.jpg",
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/hometour-1754897714-JYTjF/2233908-1754897784-l1rAi/mbr-3-1754897799-jlNWH.jpg",
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/hometour-1754897714-JYTjF/2233908-1754897784-l1rAi/kbr-1-1754897798-iDSo5.jpg",
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/hometour-1754897714-JYTjF/2233908-1754897784-l1rAi/ki-1-1754897805-we9I5.jpg"
+      ],
+    ),
     ProjectItem(
-        title: "Contemporary 3BHK Interior Design in Greater Noida with Swing Wardrobes",
-        subTitle: "Nirala Estate",
-        location: 'Tech Zone IV, Patwari, Greater Noida, UP',
-        tags: ["Contemporary", "Convenience Max", "Parallel"],
-        pricing: "20-25 lakkhs",
-        bhk: "3-BHK",
-        scope: "Kitchen, Living Room, Dining Room, 3 Bedrooms",
-        propertyType:"Apartment",
-        size: "1000 to 2500 sq ft",
-        description: "A bright and breezy contemporary home, this 3BHK apartment in Greater Noida is tailored for comfort and visual warmth. The kitchen layout maximises movement with its parallel format and white-toned cabinetry, making it a delight to cook in. The dining room is framed with mirrored wall panels and golden trims, enhancing the light flow. Bedrooms feature different design stories—green accent walls and floral themes in the guest space, pastel playfulness in the kids’ room, and rich woodwork in the master bedroom. Paired with clever swing wardrobe storage and a neutral colour palette, this 20–25 lakh home nails practicality and charm.",
-        imageUrls:[
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/nirala-estate-1736923285-pfuE8/lr-ne-1736923415-OheGP.jpg",
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/nirala-estate-1736923285-pfuE8/tv-ne-1736923405-HJaX1.jpg",
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/nirala-estate-1736923285-pfuE8/dr-ne1-1736923406-wOLgx.jpg",
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/nirala-estate-1736923285-pfuE8/ki-ne-1736923404-BTl1B.jpg",
-          "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/nirala-estate-1736923285-pfuE8/br-ne2-1736923411-vUxaU.jpg"
-        ]),
+      title: "Contemporary 3BHK Interior Design in Greater Noida with Swing Wardrobes",
+      subTitle: "Nirala Estate",
+      location: 'Tech Zone IV, Patwari, Greater Noida, UP',
+      pricing: "20-25 lakkhs",
+      bhk: "3-BHK",
+      scope: "Kitchen, Living Room, Dining Room, 3 Bedrooms",
+      propertyType: "Apartment",
+      size: "1000 to 2500 sq ft",
+      description: "A bright and breezy contemporary home, this 3BHK apartment in Greater Noida is tailored for comfort and visual warmth. The kitchen layout maximises movement with its parallel format and white-toned cabinetry, making it a delight to cook in. The dining room is framed with mirrored wall panels and golden trims, enhancing the light flow. Bedrooms feature different design stories—green accent walls and floral themes in the guest space, pastel playfulness in the kids’ room, and rich woodwork in the master bedroom. Paired with clever swing wardrobe storage and a neutral colour palette, this 20–25 lakh home nails practicality and charm.",
+      imageUrls: [
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/nirala-estate-1736923285-pfuE8/lr-ne-1736923415-OheGP.jpg",
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/nirala-estate-1736923285-pfuE8/tv-ne-1736923405-HJaX1.jpg",
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/nirala-estate-1736923285-pfuE8/dr-ne1-1736923406-wOLgx.jpg",
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/nirala-estate-1736923285-pfuE8/ki-ne-1736923404-BTl1B.jpg",
+        "https://images.livspace-cdn.com/w:2048/plain/https://d3gq2merok8n5r.cloudfront.net/abhinav/2properties-1733457217-X1TuH/photoshoots-1735452784-CzJzx/delhi-1735818163-51LCH/nirala-estate-1736923285-pfuE8/br-ne2-1736923411-vUxaU.jpg"
+      ],
+    ),
   ];
+
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProjects();
+  }
+
+  Future<void> _loadProjects() async {
+    try {
+      // Keep a reference to your original static list
+      final List<ProjectItem> staticProjects = List.from(_projects);
+
+      final fetchedProjects = await ApiService.fetchProjects();
+
+      setState(() {
+        if (fetchedProjects.isNotEmpty) {
+          // Option 1: Combine API projects with Static projects (API first)
+          _projects = [...fetchedProjects, ...staticProjects];
+        } else {
+          // Fallback to static items if API returns empty list
+          _projects = staticProjects;
+        }
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint("Error loading projects: $e");
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -205,28 +236,34 @@ class _ProjectsPageState extends State<ProjectsPage> {
               ),
             ),
 
-            // Displays Dynamic Grid of Project Cards
-            // Displays Dynamic Grid of Project Cards (3 columns on Desktop)
-            SliverPadding(
-              padding: EdgeInsets.symmetric(
-                horizontal: isDesktop ? 60.0 : 20.0,
-                vertical: 10.0,
-              ),
-              sliver: SliverGrid(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: isDesktop ? 3 : 1, // Set crossAxisCount to 3 for Desktop
-                  mainAxisSpacing: 24,
-                  crossAxisSpacing: 24,
-                  mainAxisExtent: 480,
+            // Loader or Dynamic Grid of Project Cards
+            if (_isLoading)
+              const SliverFillRemaining(
+                child: Center(
+                  child: CircularProgressIndicator(color: Color(0xFFC5A059)),
                 ),
-                delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                    return _ProjectCard(item: _projects[index]);
-                  },
-                  childCount: _projects.length,
+              )
+            else
+              SliverPadding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isDesktop ? 60.0 : 20.0,
+                  vertical: 10.0,
+                ),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: isDesktop ? 3 : 1,
+                    mainAxisSpacing: 24,
+                    crossAxisSpacing: 24,
+                    mainAxisExtent: 480,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                      return _ProjectCard(item: _projects[index]);
+                    },
+                    childCount: _projects.length,
+                  ),
                 ),
               ),
-            ),
 
             const SliverFillRemaining(
               hasScrollBody: false,
@@ -518,31 +555,6 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
                       const SizedBox(height: 8),
 
                       Text(widget.project.subTitle, style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w500, color: const Color(0xFF222222))),
-                      const SizedBox(height: 12),
-
-                      // TAGS
-                      Wrap(
-                        spacing: 10,
-                        runSpacing: 8,
-                        children: widget.project.tags.map((tag) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE8F3EE),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              tag,
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: const Color(0xFF388E3C),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
                       const SizedBox(height: 24),
 
                       // LOCATION & GET STARTED BUTTON

@@ -159,7 +159,7 @@ class _ClientLogoListState extends State<_ClientLogoList>
   }
 
   Future<List<ClientItems>> fetchClients() async {
-    final url = Uri.parse('http://192.168.1.6/bindu_decor/clients.php');
+    final url = Uri.parse('http://192.168.1.48/bindu_decor/clients.php');
 
     try {
       final response = await http.get(url);

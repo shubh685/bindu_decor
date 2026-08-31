@@ -109,8 +109,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 style: GoogleFonts.cabin(fontSize: 15, color: Colors.black87),
                 children: [
                   TextSpan(
-                    text: "$label: ",
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                      text: "$label: ",
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(text: value ?? "N/A"),
                 ],
               ),
