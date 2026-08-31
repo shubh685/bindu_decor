@@ -1,14 +1,11 @@
-import 'package:bindu_decor/Nav_Widgets/Navigation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'API_Services/View_Api.dart';
 import 'Home_Page.dart';
+import 'Nav_Widgets/Navigation.dart';
 import 'Pro_Details.dart';
-
-// ============================================================================
-// GLOBAL NAVIGATION CONFIGURATIONS
-// ============================================================================
 
 final List<NavItem> _globalNavItems = const [
   NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
@@ -20,8 +17,7 @@ final List<NavItem> _globalNavItems = const [
   NavItem(
     label: "Reviews",
     icon: Icons.reviews_outlined,
-    route:
-    "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
+    route: "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z",
   ),
 ];
 
@@ -44,11 +40,6 @@ final List<NestedMenuItem> _globalShopItems = const [
     ],
   ),
 ];
-
-
-// ============================================================================
-// COMMON PRODUCT GRID CARD WIDGET
-// ============================================================================
 
 class ProductGridCard extends StatefulWidget {
   final DecorProductItem item;
@@ -74,10 +65,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
   }
 
   Widget _buildProductImage(String path) {
-    if (path.isEmpty) {
-      return _buildPlaceholder();
-    }
-
+    if (path.isEmpty) return _buildPlaceholder();
     return Image.network(
       path,
       fit: BoxFit.cover,
@@ -120,7 +108,6 @@ class _ProductGridCardState extends State<ProductGridCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Main Image Display Area with InkWell / Tap Gesture
           Expanded(
             child: Stack(
               children: [
@@ -136,11 +123,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
                   top: 10,
                   right: 10,
                   child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isFavorite = !_isFavorite;
-                      });
-                    },
+                    onTap: () => setState(() => _isFavorite = !_isFavorite),
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
@@ -159,12 +142,8 @@ class _ProductGridCardState extends State<ProductGridCard> {
             ),
           ),
           const SizedBox(height: 8),
-
-          // Title
           Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cormorantGaramond(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF222222))),
           const SizedBox(height: 2),
-
-          // Thumbnails & Quick Inquire Button
           Row(
             children: [
               Expanded(
@@ -174,11 +153,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
                     children: List.generate(widget.item.imageUrls.length, (idx) {
                       final isSelected = idx == _selectedImageIndex;
                       return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedImageIndex = idx;
-                          });
-                        },
+                        onTap: () => setState(() => _selectedImageIndex = idx),
                         child: Container(
                           margin: const EdgeInsets.only(right: 6),
                           width: 26,
@@ -200,7 +175,6 @@ class _ProductGridCardState extends State<ProductGridCard> {
                   ),
                 ),
               ),
-
               InkWell(
                 onTap: _openDetailDialog,
                 borderRadius: BorderRadius.circular(4),
@@ -215,14 +189,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
                     children: [
                       const Icon(Icons.touch_app_outlined, size: 12, color: Colors.white),
                       const SizedBox(width: 4),
-                      Text(
-                        "Inquire",
-                        style: GoogleFonts.cabin(
-                          fontSize: 11,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Text("Inquire", style: GoogleFonts.cabin(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),
@@ -235,10 +202,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
   }
 }
 
-// =============================================================================
 // 1. GYM FLOORINGS SECTION
-// =============================================================================
-
 class GymFloorings extends StatefulWidget {
   const GymFloorings({super.key});
 
@@ -247,8 +211,6 @@ class GymFloorings extends StatefulWidget {
 }
 
 class _GymFlooringsState extends State<GymFloorings> {
-
-
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -274,16 +236,12 @@ class _GymFlooringsState extends State<GymFloorings> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            const SliverToBoxAdapter(
-              child: GymFlooringsAnimatedSection(),
-            ),
+            const SliverToBoxAdapter(child: GymFlooringsAnimatedSection()),
             const SliverFillRemaining(
               hasScrollBody: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  BinduFooter(),
-                ],
+                children: [BinduFooter()],
               ),
             ),
           ],
@@ -293,12 +251,21 @@ class _GymFlooringsState extends State<GymFloorings> {
   }
 }
 
-class GymFlooringsAnimatedSection extends StatelessWidget {
+class GymFlooringsAnimatedSection extends StatefulWidget {
   const GymFlooringsAnimatedSection({super.key});
 
-  final List<DecorProductItem> _gymItems = const [
+  @override
+  State<GymFlooringsAnimatedSection> createState() => _GymFlooringsAnimatedSectionState();
+}
+
+class _GymFlooringsAnimatedSectionState extends State<GymFlooringsAnimatedSection> {
+  bool _isLoading = true;
+  List<DecorProductItem> _gymItems = [];
+
+  final List<DecorProductItem> _staticGymItems = const [
     DecorProductItem(
       title: "Rubberized Dumbbell Mat",
+      category: "Gym Floorings",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVcTkp0U8ES6Hei7zEh3S0jwWGyMwd5Thsf4wadnAi3g&s=104",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRS10N8ZTA7_3qNf6mZCWB-9TGKXxBRCubB7adA9GNU2A&s=10",
@@ -308,6 +275,7 @@ class GymFlooringsAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Commercial Athletic Flooring",
+      category: "Gym Floorings",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaCbSVrTPbAR2DJSxsa4-Xn1lrekqR-NOXzuLxIvH9zw&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTThvKenYZJGOYpP3uffH32jGWQ8UdeImhwB4UYd_O0fw&s=10",
@@ -317,6 +285,7 @@ class GymFlooringsAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Interlocking Rubber Tiles",
+      category: "Gym Floorings",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrxH6rjFPbdrnrhsB1k7lrI-wv3NHVUP_eGPOYg8qsHw&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKQSbku_xphzghkuLu3Tyeo3_lsbT_K3-MzUNLglpSLA&s=10",
@@ -325,6 +294,20 @@ class GymFlooringsAnimatedSection extends StatelessWidget {
       description: "Durable puzzle-edge rubber tiles providing superior grip, impact absorption, and noise reduction.",
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategoryProducts();
+  }
+
+  Future<void> _fetchCategoryProducts() async {
+    final fetched = await ApiService.fetchProductsByCategory("Gym Floorings");
+    setState(() {
+      _gymItems = fetched.isNotEmpty ? fetched : _staticGymItems;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -341,7 +324,9 @@ class GymFlooringsAnimatedSection extends StatelessWidget {
         children: [
           Text("High-Performance Gym Flooring", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
-          GridView.builder(
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _gymItems.length,
@@ -361,10 +346,7 @@ class GymFlooringsAnimatedSection extends StatelessWidget {
   }
 }
 
-// =============================================================================
 // 2. AWNINGS SECTION
-// =============================================================================
-
 class Awnings extends StatefulWidget {
   const Awnings({super.key});
 
@@ -398,16 +380,12 @@ class _AwningsState extends State<Awnings> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            const SliverToBoxAdapter(
-              child: AwningsAnimatedSection(),
-            ),
+            const SliverToBoxAdapter(child: AwningsAnimatedSection()),
             const SliverFillRemaining(
               hasScrollBody: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  BinduFooter(),
-                ],
+                children: [BinduFooter()],
               ),
             ),
           ],
@@ -417,12 +395,21 @@ class _AwningsState extends State<Awnings> {
   }
 }
 
-class AwningsAnimatedSection extends StatelessWidget {
+class AwningsAnimatedSection extends StatefulWidget {
   const AwningsAnimatedSection({super.key});
 
-  final List<DecorProductItem> _awnings = const [
+  @override
+  State<AwningsAnimatedSection> createState() => _AwningsAnimatedSectionState();
+}
+
+class _AwningsAnimatedSectionState extends State<AwningsAnimatedSection> {
+  bool _isLoading = true;
+  List<DecorProductItem> _awnings = [];
+
+  final List<DecorProductItem> _staticAwnings = const [
     DecorProductItem(
       title: "Rooftop Louver Pergola",
+      category: "Awnings",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdDt6ILehmhc-ZCIOi1hD78y3JZoE7Yj4zdMwhT-ND3Q&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlD_6REnRXeWBvonaZWyoHbyx0RmKrgp-DLcbNN-csLA&s=10",
@@ -432,6 +419,7 @@ class AwningsAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Balcony Patio Awning",
+      category: "Awnings",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRV7mniXaDirbUcNs56VwuHdklwplbUDCwM8SrpqFvAQ&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRV7mniXaDirbUcNs56VwuHdklwplbUDCwM8SrpqFvAQ&s=10",
@@ -441,6 +429,7 @@ class AwningsAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Retractable Balcony Shade",
+      category: "Awnings",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlaFMSD-L2QJEFsEwYiHy2ELigF61ZLH3mbdd_QC7dAA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTL8guIzHtBvbI1rbRDngXo7mcbDCkmnXxhrFGU4dWrjA&s=10",
@@ -449,6 +438,20 @@ class AwningsAnimatedSection extends StatelessWidget {
       description: "Heavy-duty motorized black folding arm awning offering instant sun & rain protection.",
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategoryProducts();
+  }
+
+  Future<void> _fetchCategoryProducts() async {
+    final fetched = await ApiService.fetchProductsByCategory("Awnings");
+    setState(() {
+      _awnings = fetched.isNotEmpty ? fetched : _staticAwnings;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -465,7 +468,9 @@ class AwningsAnimatedSection extends StatelessWidget {
         children: [
           Text("Architectural Outdoor Awnings", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
-          GridView.builder(
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _awnings.length,
@@ -485,10 +490,7 @@ class AwningsAnimatedSection extends StatelessWidget {
   }
 }
 
-// =============================================================================
 // 3. MOSQUITO NET SECTION
-// =============================================================================
-
 class MosquitoNets extends StatefulWidget {
   const MosquitoNets({super.key});
 
@@ -497,7 +499,6 @@ class MosquitoNets extends StatefulWidget {
 }
 
 class _MosquitoNetsState extends State<MosquitoNets> {
-
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -523,16 +524,12 @@ class _MosquitoNetsState extends State<MosquitoNets> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            const SliverToBoxAdapter(
-              child: MosquitoNetAnimatedSection(),
-            ),
+            const SliverToBoxAdapter(child: MosquitoNetAnimatedSection()),
             const SliverFillRemaining(
               hasScrollBody: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  BinduFooter(),
-                ],
+                children: [BinduFooter()],
               ),
             ),
           ],
@@ -542,12 +539,21 @@ class _MosquitoNetsState extends State<MosquitoNets> {
   }
 }
 
-class MosquitoNetAnimatedSection extends StatelessWidget {
+class MosquitoNetAnimatedSection extends StatefulWidget {
   const MosquitoNetAnimatedSection({super.key});
 
-  final List<DecorProductItem> _mosquitoItems = const [
+  @override
+  State<MosquitoNetAnimatedSection> createState() => _MosquitoNetAnimatedSectionState();
+}
+
+class _MosquitoNetAnimatedSectionState extends State<MosquitoNetAnimatedSection> {
+  bool _isLoading = true;
+  List<DecorProductItem> _mosquitoItems = [];
+
+  final List<DecorProductItem> _staticMosquitoItems = const [
     DecorProductItem(
       title: "Outdoor Lawn Dome Net",
+      category: "Mosquito Nets",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5F888CmSGKGOPmplz4Or_pWEbllerd6HoJx-UyviISg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT51KEf8gAfu26Q4O2rEtE2itBi3Owpa_Ul8OPW1w8j4g&s",
@@ -557,6 +563,7 @@ class MosquitoNetAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Gazebo Mesh Screen Enclosure",
+      category: "Mosquito Nets",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnVTuJPjEmS3_ruYlgPxf-WIoDHfYpvIMBErVBYZkNrg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4Yzd5jgKJ10TatrdZp9nKarb_U0YKtjxuv-UIgsAAFg&s=10",
@@ -566,6 +573,7 @@ class MosquitoNetAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Pleated Window Mesh Screen",
+      category: "Mosquito Nets",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGhE0J-vBCgyoqhDadqgVw2bewchQflkE8l_j1CXUsJg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuWsXBFfjvH9po3PP8y8b3HVtwbHJqioyTRIo1AyuzeA&s",
@@ -574,6 +582,20 @@ class MosquitoNetAnimatedSection extends StatelessWidget {
       description: "Retractable accordion-style mosquito net for smooth sliding windows and balcony doors.",
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategoryProducts();
+  }
+
+  Future<void> _fetchCategoryProducts() async {
+    final fetched = await ApiService.fetchProductsByCategory("Mosquito Nets");
+    setState(() {
+      _mosquitoItems = fetched.isNotEmpty ? fetched : _staticMosquitoItems;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -590,7 +612,9 @@ class MosquitoNetAnimatedSection extends StatelessWidget {
         children: [
           Text("Mosquito & Insect Protection Nets", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
-          GridView.builder(
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _mosquitoItems.length,

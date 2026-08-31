@@ -1,14 +1,11 @@
-import 'package:bindu_decor/Nav_Widgets/Navigation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'Home_Page.dart';
+import 'Nav_Widgets/Navigation.dart';
 import 'Pro_Details.dart';
-
-// ============================================================================
-// GLOBAL NAVIGATION CONFIGURATIONS
-// ============================================================================
+import 'API_Services/View_Api.dart';
 
 final List<NavItem> _globalNavItems = const [
   NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
@@ -20,8 +17,7 @@ final List<NavItem> _globalNavItems = const [
   NavItem(
     label: "Reviews",
     icon: Icons.reviews_outlined,
-    route:
-    "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
+    route: "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z",
   ),
 ];
 
@@ -44,10 +40,6 @@ final List<NestedMenuItem> _globalShopItems = const [
     ],
   ),
 ];
-
-// ============================================================================
-// COMMON PRODUCT GRID CARD WIDGET
-// ============================================================================
 
 class ProductGridCard extends StatefulWidget {
   final DecorProductItem item;
@@ -73,10 +65,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
   }
 
   Widget _buildProductImage(String path) {
-    if (path.isEmpty) {
-      return _buildPlaceholder();
-    }
-
+    if (path.isEmpty) return _buildPlaceholder();
     return Image.network(
       path,
       fit: BoxFit.cover,
@@ -119,7 +108,6 @@ class _ProductGridCardState extends State<ProductGridCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Main Image Display Area with InkWell / Tap Gesture
           Expanded(
             child: Stack(
               children: [
@@ -135,11 +123,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
                   top: 10,
                   right: 10,
                   child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isFavorite = !_isFavorite;
-                      });
-                    },
+                    onTap: () => setState(() => _isFavorite = !_isFavorite),
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
@@ -158,12 +142,8 @@ class _ProductGridCardState extends State<ProductGridCard> {
             ),
           ),
           const SizedBox(height: 8),
-
-          // Title
           Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cormorantGaramond(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF222222))),
           const SizedBox(height: 2),
-
-          // Thumbnails & Quick Inquire Button
           Row(
             children: [
               Expanded(
@@ -173,11 +153,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
                     children: List.generate(widget.item.imageUrls.length, (idx) {
                       final isSelected = idx == _selectedImageIndex;
                       return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedImageIndex = idx;
-                          });
-                        },
+                        onTap: () => setState(() => _selectedImageIndex = idx),
                         child: Container(
                           margin: const EdgeInsets.only(right: 6),
                           width: 26,
@@ -199,7 +175,6 @@ class _ProductGridCardState extends State<ProductGridCard> {
                   ),
                 ),
               ),
-
               InkWell(
                 onTap: _openDetailDialog,
                 borderRadius: BorderRadius.circular(4),
@@ -214,14 +189,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
                     children: [
                       const Icon(Icons.touch_app_outlined, size: 12, color: Colors.white),
                       const SizedBox(width: 4),
-                      Text(
-                        "Inquire",
-                        style: GoogleFonts.cabin(
-                          fontSize: 11,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Text("Inquire", style: GoogleFonts.cabin(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),
@@ -234,10 +202,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
   }
 }
 
-// =============================================================================
 // 1. UPHOLSTERY SECTION
-// =============================================================================
-
 class Upholstery extends StatefulWidget {
   const Upholstery({super.key});
 
@@ -246,7 +211,6 @@ class Upholstery extends StatefulWidget {
 }
 
 class _UpholsteryState extends State<Upholstery> {
-
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -272,16 +236,12 @@ class _UpholsteryState extends State<Upholstery> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            const SliverToBoxAdapter(
-              child: UpholsteryAnimatedSection(),
-            ),
+            const SliverToBoxAdapter(child: UpholsteryAnimatedSection()),
             const SliverFillRemaining(
               hasScrollBody: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  BinduFooter(),
-                ],
+                children: [BinduFooter()],
               ),
             ),
           ],
@@ -291,12 +251,21 @@ class _UpholsteryState extends State<Upholstery> {
   }
 }
 
-class UpholsteryAnimatedSection extends StatelessWidget {
+class UpholsteryAnimatedSection extends StatefulWidget {
   const UpholsteryAnimatedSection({super.key});
 
-  final List<DecorProductItem> _upholsteryItems = const [
+  @override
+  State<UpholsteryAnimatedSection> createState() => _UpholsteryAnimatedSectionState();
+}
+
+class _UpholsteryAnimatedSectionState extends State<UpholsteryAnimatedSection> {
+  bool _isLoading = true;
+  List<DecorProductItem> _upholsteryItems = [];
+
+  final List<DecorProductItem> _staticUpholsteryItems = const [
     DecorProductItem(
       title: "Modular Curved Lounge Sofa",
+      category: "Upholstery",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkRhQssdHo3-JIMolcjjqkDzYGPBwkZGtfeVvxP1f4ng&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9xpJbTRV0CF8opUBVj4T4-wr6RczL1eFiq1y2T00qyg&s",
@@ -306,6 +275,7 @@ class UpholsteryAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Floral Printed Sofa",
+      category: "Upholstery",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsrdBEmz6tUd8qMklwgczwA3nenU3kBnpIbw2P4c9JLw&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxt-qePejPp7S892nn5fYThdDM8ymS_w1tUwryI8ws3w&s=10",
@@ -315,6 +285,7 @@ class UpholsteryAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Dual-Tone Leatherette Sofa",
+      category: "Upholstery",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM5tNTTTWRARJmmYn4V6WJ9rG9Bi6xePOxs-ARGKYLCQ&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHFd8HQjzUx6SQTkzeQ0a4q6NtheUv9uOIorYPp1unsw&s",
@@ -323,6 +294,20 @@ class UpholsteryAnimatedSection extends StatelessWidget {
       description: "Contemporary tan orange and cream leatherette padded sofa with sleek metal leg support.",
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategoryProducts();
+  }
+
+  Future<void> _fetchCategoryProducts() async {
+    final fetched = await ApiService.fetchProductsByCategory("Upholstery");
+    setState(() {
+      _upholsteryItems = fetched.isNotEmpty ? fetched : _staticUpholsteryItems;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -337,16 +322,11 @@ class UpholsteryAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "Luxury Upholstery Fabrics & Sofas",
-            style: GoogleFonts.cabin(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
+          Text("Luxury Upholstery Fabrics & Sofas", style: GoogleFonts.cabin(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
-          GridView.builder(
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _upholsteryItems.length,
@@ -366,10 +346,7 @@ class UpholsteryAnimatedSection extends StatelessWidget {
   }
 }
 
-// =============================================================================
 // 2. CURTAINS SECTION
-// =============================================================================
-
 class Curtains extends StatefulWidget {
   const Curtains({super.key});
 
@@ -378,7 +355,6 @@ class Curtains extends StatefulWidget {
 }
 
 class _CurtainsState extends State<Curtains> {
-
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -404,16 +380,12 @@ class _CurtainsState extends State<Curtains> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            const SliverToBoxAdapter(
-              child: CurtainsAnimatedSection(),
-            ),
+            const SliverToBoxAdapter(child: CurtainsAnimatedSection()),
             const SliverFillRemaining(
               hasScrollBody: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  BinduFooter(),
-                ],
+                children: [BinduFooter()],
               ),
             ),
           ],
@@ -423,12 +395,21 @@ class _CurtainsState extends State<Curtains> {
   }
 }
 
-class CurtainsAnimatedSection extends StatelessWidget {
+class CurtainsAnimatedSection extends StatefulWidget {
   const CurtainsAnimatedSection({super.key});
 
-  final List<DecorProductItem> _curtainItems = const [
+  @override
+  State<CurtainsAnimatedSection> createState() => _CurtainsAnimatedSectionState();
+}
+
+class _CurtainsAnimatedSectionState extends State<CurtainsAnimatedSection> {
+  bool _isLoading = true;
+  List<DecorProductItem> _curtainItems = [];
+
+  final List<DecorProductItem> _staticCurtainItems = const [
     DecorProductItem(
       title: "Boho Palm Print & Navy Drapes",
+      category: "Curtains",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSTPR_ATqgSAd4j0jqrSkBV7QPLDBe0nVO0twMhFfMtA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSb562mQjYbWcicnMLAEuZdWwTgE0DEQh32_SrnKNxDDg&s",
@@ -438,6 +419,7 @@ class CurtainsAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Yellow Wildflower Floral Drapes",
+      category: "Curtains",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpDTGGEt4ZMcIHTjRk7O-2ItFwf0nEXFF4V6J1atV_Lw&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMmAkaaFiFkf_xHWwDarlvv8Oi0VpRW3tGqSNEvxC9lA&s=10",
@@ -447,6 +429,7 @@ class CurtainsAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Royal Blue & Gold Layered Drapes",
+      category: "Curtains",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf5xEKHnMqzCP59cosJBE_UavvQHrJOA2nz1KDlqx33g&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbtEWamz6HLoRmkHsFaiXFsS2zyfvg-PJaEp-Zelp1wQ&s",
@@ -455,6 +438,20 @@ class CurtainsAnimatedSection extends StatelessWidget {
       description: "Luxury dual-color royal blue and mustard curtains with tied-back blackout layers over soft sheer fabric.",
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategoryProducts();
+  }
+
+  Future<void> _fetchCategoryProducts() async {
+    final fetched = await ApiService.fetchProductsByCategory("Curtains");
+    setState(() {
+      _curtainItems = fetched.isNotEmpty ? fetched : _staticCurtainItems;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -471,7 +468,9 @@ class CurtainsAnimatedSection extends StatelessWidget {
         children: [
           Text("Designer Curtains & Window Drapes", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
-          GridView.builder(
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _curtainItems.length,
@@ -491,10 +490,7 @@ class CurtainsAnimatedSection extends StatelessWidget {
   }
 }
 
-// =============================================================================
 // 3. STRETCH CEILING SECTION
-// =============================================================================
-
 class StretchCeiling extends StatefulWidget {
   const StretchCeiling({super.key});
 
@@ -503,7 +499,6 @@ class StretchCeiling extends StatefulWidget {
 }
 
 class _StretchCeilingState extends State<StretchCeiling> {
-
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -529,16 +524,12 @@ class _StretchCeilingState extends State<StretchCeiling> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            const SliverToBoxAdapter(
-              child: StretchCeilingAnimatedSection(),
-            ),
+            const SliverToBoxAdapter(child: StretchCeilingAnimatedSection()),
             const SliverFillRemaining(
               hasScrollBody: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  BinduFooter(),
-                ],
+                children: [BinduFooter()],
               ),
             ),
           ],
@@ -548,12 +539,21 @@ class _StretchCeilingState extends State<StretchCeiling> {
   }
 }
 
-class StretchCeilingAnimatedSection extends StatelessWidget {
+class StretchCeilingAnimatedSection extends StatefulWidget {
   const StretchCeilingAnimatedSection({super.key});
 
-  final List<DecorProductItem> _stretchCeilingItems = const [
+  @override
+  State<StretchCeilingAnimatedSection> createState() => _StretchCeilingAnimatedSectionState();
+}
+
+class _StretchCeilingAnimatedSectionState extends State<StretchCeilingAnimatedSection> {
+  bool _isLoading = true;
+  List<DecorProductItem> _stretchCeilingItems = [];
+
+  final List<DecorProductItem> _staticStretchCeilingItems = const [
     DecorProductItem(
       title: "Glossy Mirror Stretch Ceiling",
+      category: "Stretch Ceiling",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDLDPB52KffAPZmuAPuVztlL2jconnP8GXBWCD42hakA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTe_G75vtiXEGL4jyAGPr0ON4xLF6p94YXCqnqBT21kLg&s=10",
@@ -563,6 +563,7 @@ class StretchCeilingAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Multi-Tiered Wooden Stretch Ceiling",
+      category: "Stretch Ceiling",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeUctTmuvuv1HtPNyobLOWywyWBRucDCPYqjrJXw2OLA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5zk4uU55L1uOvbnS4IKNoaV12ek1LhhUWrSB7mxxLHg&s=10",
@@ -572,6 +573,7 @@ class StretchCeilingAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Sky Print Backlit Stretch Ceiling",
+      category: "Stretch Ceiling",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVD6rqC8QjlcD7n4L8Hewldk2ayd2ZaOpgaiL1GL1ajA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNwNawkBbFVrH6CKOtc1FKIHroTxdDkaYEchvemfHk3Q&s=10",
@@ -580,6 +582,20 @@ class StretchCeilingAnimatedSection extends StatelessWidget {
       description: "Illuminated sky and snow forest print stretch ceiling panel bringing a natural outdoor feel indoors.",
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategoryProducts();
+  }
+
+  Future<void> _fetchCategoryProducts() async {
+    final fetched = await ApiService.fetchProductsByCategory("Stretch Ceiling");
+    setState(() {
+      _stretchCeilingItems = fetched.isNotEmpty ? fetched : _staticStretchCeilingItems;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -596,7 +612,9 @@ class StretchCeilingAnimatedSection extends StatelessWidget {
         children: [
           Text("Decorative Stretch Ceilings", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
-          GridView.builder(
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _stretchCeilingItems.length,

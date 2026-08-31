@@ -2,13 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'API_Services/View_Api.dart';
 import 'Home_Page.dart';
 import 'Nav_Widgets/Navigation.dart';
 import 'Pro_Details.dart';
-
-// ============================================================================
-// GLOBAL NAVIGATION CONFIGURATIONS (Unified for all screens)
-// ============================================================================
 
 final List<NavItem> _globalNavItems = const [
   NavItem(label: "Home", route: AppRoutes.home, icon: Icons.home),
@@ -20,8 +17,7 @@ final List<NavItem> _globalNavItems = const [
   NavItem(
     label: "Reviews",
     icon: Icons.reviews_outlined,
-    route:
-    "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z/data=!3m1!5s0x3be7b0d85f0d5563:0xbcc67135cad97d47!4m12!1m2!2m1!1sB-2+Mandpeshwar+Ind+premises+Opp+MCF+Gymkhana+Road+Borivali+west+mumbai-400092!3m8!1s0x3be7b11fee8a918b:0xedf1f8374494f993!8m2!3d19.2351656!4d72.8532524!9m1!1b1!15sCk5CLTIgTWFuZHBlc2h3YXIgSW5kIHByZW1pc2VzIE9wcCBNQ0YgR3lta2hhbmEgUm9hZCBCb3JpdmFsaSB3ZXN0IG11bWJhaS00MDAwOTJaUCJOYiAyIG1hbmRwZXNod2FyIGluZCBwcmVtaXNlcyBvcHAgbWNmIGd5bWtoYW5hIHJvYWQgYm9yaXZhbGkgd2VzdCBtdW1iYWkgNDAwMDkykgEPd2FsbHBhcGVyX3N0b3Jl4AEA!16s%2Fg%2F1v_slq8m?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
+    route: "https://www.google.com/maps/place/Bindu+Decorators/@19.2351656,72.8487463,17z",
   ),
 ];
 
@@ -44,15 +40,6 @@ final List<NestedMenuItem> _globalShopItems = const [
     ],
   ),
 ];
-
-// ============================================================================
-// DATA MODELS
-// ============================================================================
-
-
-// ============================================================================
-// COMMON PRODUCT CARD WIDGET
-// ============================================================================
 
 class ProductGridCard extends StatefulWidget {
   final DecorProductItem item;
@@ -78,10 +65,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
   }
 
   Widget _buildProductImage(String path) {
-    if (path.isEmpty) {
-      return _buildPlaceholder();
-    }
-
+    if (path.isEmpty) return _buildPlaceholder();
     return Image.network(
       path,
       fit: BoxFit.cover,
@@ -124,7 +108,6 @@ class _ProductGridCardState extends State<ProductGridCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Main Image Display Area with InkWell / Tap Gesture
           Expanded(
             child: Stack(
               children: [
@@ -140,11 +123,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
                   top: 10,
                   right: 10,
                   child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isFavorite = !_isFavorite;
-                      });
-                    },
+                    onTap: () => setState(() => _isFavorite = !_isFavorite),
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
@@ -163,12 +142,13 @@ class _ProductGridCardState extends State<ProductGridCard> {
             ),
           ),
           const SizedBox(height: 8),
-
-          // Title
-          Text(widget.item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.cormorantGaramond(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF222222))),
+          Text(
+            widget.item.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.cormorantGaramond(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF222222)),
+          ),
           const SizedBox(height: 2),
-
-          // Thumbnails & Quick Inquire Button
           Row(
             children: [
               Expanded(
@@ -178,11 +158,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
                     children: List.generate(widget.item.imageUrls.length, (idx) {
                       final isSelected = idx == _selectedImageIndex;
                       return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedImageIndex = idx;
-                          });
-                        },
+                        onTap: () => setState(() => _selectedImageIndex = idx),
                         child: Container(
                           margin: const EdgeInsets.only(right: 6),
                           width: 26,
@@ -204,7 +180,6 @@ class _ProductGridCardState extends State<ProductGridCard> {
                   ),
                 ),
               ),
-
               InkWell(
                 onTap: _openDetailDialog,
                 borderRadius: BorderRadius.circular(4),
@@ -219,14 +194,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
                     children: [
                       const Icon(Icons.touch_app_outlined, size: 12, color: Colors.white),
                       const SizedBox(width: 4),
-                      Text(
-                        "Inquire",
-                        style: GoogleFonts.cabin(
-                          fontSize: 11,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Text("Inquire", style: GoogleFonts.cabin(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),
@@ -239,10 +207,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
   }
 }
 
-// ============================================================================
 // 1. WALLPAPERS SCREEN
-// ============================================================================
-
 class Wallpapers extends StatefulWidget {
   const Wallpapers({super.key});
 
@@ -251,7 +216,6 @@ class Wallpapers extends StatefulWidget {
 }
 
 class _WallpapersState extends State<Wallpapers> {
-
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -277,16 +241,12 @@ class _WallpapersState extends State<Wallpapers> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            const SliverToBoxAdapter(
-              child: WallpaperAnimatedSection(),
-            ),
+            const SliverToBoxAdapter(child: WallpaperAnimatedSection()),
             const SliverFillRemaining(
               hasScrollBody: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  BinduFooter(),
-                ],
+                children: [BinduFooter()],
               ),
             ),
           ],
@@ -296,12 +256,22 @@ class _WallpapersState extends State<Wallpapers> {
   }
 }
 
-class WallpaperAnimatedSection extends StatelessWidget {
+class WallpaperAnimatedSection extends StatefulWidget {
   const WallpaperAnimatedSection({super.key});
 
-  final List<DecorProductItem> _wallpapers = const [
+  @override
+  State<WallpaperAnimatedSection> createState() => _WallpaperAnimatedSectionState();
+}
+
+class _WallpaperAnimatedSectionState extends State<WallpaperAnimatedSection> {
+  bool _isLoading = true;
+  List<DecorProductItem> _wallpapers = [];
+
+  // Your static fallback / sample items (shown immediately)
+  final List<DecorProductItem> _staticWallpapers = const [
     DecorProductItem(
       title: "The Song of the Woods",
+      category: "Wallpapers",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZsUShEzxBw8UMG1bXP4OA76w62MddirmLsxpQSEJ-7A&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZ2x1v1wN0yDrpf-diMv0zswg_wRcWWxK2zqwQP-60Ew&s=10",
@@ -311,6 +281,7 @@ class WallpaperAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Little Curiosity",
+      category: "Wallpapers",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRV5n7j35abTULzIUHFgQDBLPdA95_BKSWS2j5_kApsAQ&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGri-MxB0WuO36eV9VizgUJV2HOFHUCew1HaktAsB9HQ&s",
@@ -320,6 +291,7 @@ class WallpaperAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Secrets Of The Stars",
+      category: "Wallpapers",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQgY8za7EGgk_vFJo9j0N9DeB-GPbU3FJBFaXh0MB44Q&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRylL2JMFEAJ8_mTdLUcXWcG9api2dJIprGaF0F4B10Dg&s=10",
@@ -328,6 +300,63 @@ class WallpaperAnimatedSection extends StatelessWidget {
       description: "Night sky over traditional royal architectural landscape.",
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // show static items immediately for fast UI
+    _wallpapers = List<DecorProductItem>.from(_staticWallpapers);
+    _fetchCategoryProducts();
+  }
+
+  Future<void> _fetchCategoryProducts() async {
+    try {
+      final fetched = await ApiService.fetchProductsByCategory("Wallpapers");
+
+      // If no results returned, keep static list (fallback)
+      if (fetched.isEmpty) {
+        setState(() {
+          _isLoading = false;
+          // _wallpapers already shows static fallback
+        });
+        return;
+      }
+
+      // Merge & deduplicate (by title lowercased). You can change dedupe key to 'id' if available.
+      final Set<String> seenTitles = <String>{};
+      List<DecorProductItem> merged = [];
+
+      // Option A: show API items first (recommended)
+      for (final p in fetched) {
+        final key = (p.title ?? '').toLowerCase();
+        if (!seenTitles.contains(key)) {
+          merged.add(p);
+          seenTitles.add(key);
+        }
+      }
+
+      // Append static items that are not present in API results
+      for (final s in _staticWallpapers) {
+        final key = (s.title ?? '').toLowerCase();
+        if (!seenTitles.contains(key)) {
+          merged.add(s);
+          seenTitles.add(key);
+        }
+      }
+
+      setState(() {
+        _wallpapers = merged;
+        _isLoading = false;
+      });
+    } catch (e) {
+      // On error, keep the static fallback and stop loading.
+      // Optionally log the error or show a snackbar.
+      setState(() {
+        _isLoading = false;
+        _wallpapers = List<DecorProductItem>.from(_staticWallpapers);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -342,8 +371,24 @@ class WallpaperAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Wallpapers Collection", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
+          Text(
+            "Wallpapers Collection",
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF276B5A),
+            ),
+          ),
           const SizedBox(height: 16),
+
+          // If you want to show loader while merging, keep this. Otherwise you can hide it
+          // because static items are already visible.
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.0),
+              child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
+            ),
+
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -364,10 +409,7 @@ class WallpaperAnimatedSection extends StatelessWidget {
   }
 }
 
-// ============================================================================
 // 2. FLOORINGS SCREEN
-// ============================================================================
-
 class Floorings extends StatefulWidget {
   const Floorings({super.key});
 
@@ -376,7 +418,6 @@ class Floorings extends StatefulWidget {
 }
 
 class _FlooringsState extends State<Floorings> {
-
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -402,16 +443,12 @@ class _FlooringsState extends State<Floorings> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            const SliverToBoxAdapter(
-              child: FloorAnimatedSection(),
-            ),
+            const SliverToBoxAdapter(child: FloorAnimatedSection()),
             const SliverFillRemaining(
               hasScrollBody: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  BinduFooter(),
-                ],
+                children: [BinduFooter()],
               ),
             ),
           ],
@@ -421,12 +458,21 @@ class _FlooringsState extends State<Floorings> {
   }
 }
 
-class FloorAnimatedSection extends StatelessWidget {
+class FloorAnimatedSection extends StatefulWidget {
   const FloorAnimatedSection({super.key});
 
-  final List<DecorProductItem> _floors = const [
+  @override
+  State<FloorAnimatedSection> createState() => _FloorAnimatedSectionState();
+}
+
+class _FloorAnimatedSectionState extends State<FloorAnimatedSection> {
+  bool _isLoading = true;
+  List<DecorProductItem> _floors = [];
+
+  final List<DecorProductItem> _staticFloors = const [
     DecorProductItem(
       title: "Royal Gold Oak Plank",
+      category: "Floorings",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7EN-yCRT7ltma9w_m17wK3nXBqZAkOtv7iINgSi40rQ&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTihL0RCXs3WhhNEGjIqJIE0ZIdWKf2e6Sey7zJX4GYBw&s=10",
@@ -436,6 +482,7 @@ class FloorAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Dark Vintage Hardwood",
+      category: "Floorings",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBdbAUfRC2j0DfJsq0oN0NQimXZwHJW4QCCJpz4NBf7g&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaM9GO9jZJSLdWoDHbkG1Bd6nofQZZfJHy9RbuOs87EQ&s=10",
@@ -445,6 +492,7 @@ class FloorAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Italian Carrara Marble Tile",
+      category: "Floorings",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPRnh8pDemscGO5PY7m2v50tR4Qat9_U_phc1IaLgHhg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKqJebUVEo3MY1BcGeaEjEWf2HFFQq_P3C265T2NQsZw&s=10",
@@ -453,6 +501,20 @@ class FloorAnimatedSection extends StatelessWidget {
       description: "Polished Italian white marble finish tile for luxury spaces.",
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategoryProducts();
+  }
+
+  Future<void> _fetchCategoryProducts() async {
+    final fetched = await ApiService.fetchProductsByCategory("Floorings");
+    setState(() {
+      _floors = fetched.isNotEmpty ? fetched : _staticFloors;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -469,7 +531,9 @@ class FloorAnimatedSection extends StatelessWidget {
         children: [
           Text("Premium Floorings", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
-          GridView.builder(
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _floors.length,
@@ -489,10 +553,7 @@ class FloorAnimatedSection extends StatelessWidget {
   }
 }
 
-// ============================================================================
 // 3. CARPETS SCREEN
-// ============================================================================
-
 class Carpets extends StatefulWidget {
   const Carpets({super.key});
 
@@ -501,8 +562,6 @@ class Carpets extends StatefulWidget {
 }
 
 class _CarpetsState extends State<Carpets> {
-
-
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -528,16 +587,12 @@ class _CarpetsState extends State<Carpets> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            const SliverToBoxAdapter(
-              child: CarpetAnimatedSection(),
-            ),
+            const SliverToBoxAdapter(child: CarpetAnimatedSection()),
             const SliverFillRemaining(
               hasScrollBody: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  BinduFooter(),
-                ],
+                children: [BinduFooter()],
               ),
             ),
           ],
@@ -547,12 +602,21 @@ class _CarpetsState extends State<Carpets> {
   }
 }
 
-class CarpetAnimatedSection extends StatelessWidget {
+class CarpetAnimatedSection extends StatefulWidget {
   const CarpetAnimatedSection({super.key});
 
-  final List<DecorProductItem> _carpets = const [
+  @override
+  State<CarpetAnimatedSection> createState() => _CarpetAnimatedSectionState();
+}
+
+class _CarpetAnimatedSectionState extends State<CarpetAnimatedSection> {
+  bool _isLoading = true;
+  List<DecorProductItem> _carpets = [];
+
+  final List<DecorProductItem> _staticCarpets = const [
     DecorProductItem(
       title: "Royal Hand-Tufted Plush",
+      category: "Carpets",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPa2GEOtq7-vDQGS-jV9Z8OODV8QRiTTEWQBFgTqS_qA&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_viVUCAkCR3qYrA8EOcXC8Uy9IKH-SqQ7t7BZ_OtnSQ&s=10",
@@ -562,6 +626,7 @@ class CarpetAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Modern Vintage Persian Rug",
+      category: "Carpets",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTuRERD2mMB77rJbolW6_1rEiEOy66BrinmP1x_qCXGA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmpiH2bQ5C2R6uBGTejBHcToqbvKbHxuiIeN_VijXY0w&s",
@@ -571,6 +636,7 @@ class CarpetAnimatedSection extends StatelessWidget {
     ),
     DecorProductItem(
       title: "Abstract Gold & Teal Rug",
+      category: "Carpets",
       imageUrls: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgSZ8zcz5vT0vXzDsIZD7uWhL1bF_wDUP6YZ5fVEXdCA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQo0nYlMpW9BvxFFNbWWW-PImQuEGeyYwYiPJgyCp5dYQ&s=10",
@@ -579,6 +645,20 @@ class CarpetAnimatedSection extends StatelessWidget {
       description: "Artistic contemporary statement rug for living spaces.",
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategoryProducts();
+  }
+
+  Future<void> _fetchCategoryProducts() async {
+    final fetched = await ApiService.fetchProductsByCategory("Carpets");
+    setState(() {
+      _carpets = fetched.isNotEmpty ? fetched : _staticCarpets;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -593,10 +673,11 @@ class CarpetAnimatedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Luxury Carpets & Rugs", style: GoogleFonts.cormorantGaramond
-            (fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
+          Text("Luxury Carpets & Rugs", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
-          GridView.builder(
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _carpets.length,
