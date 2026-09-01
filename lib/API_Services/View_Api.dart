@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../Pro_Details.dart';
 
 class ApiService {
-  static const String baseUrl = "http://192.168.1.48/bindu_decor/";
+  static const String baseUrl = "https://yellow-woodpecker-430323.hostingersite.com/bindu_web/";
 
   // Fetch projects
   static Future<List<dynamic>> fetchProjects() async {

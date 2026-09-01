@@ -8,7 +8,7 @@ import 'package:bindu_decor/Nav_Widgets/Navigation.dart';
 import 'Home_Page.dart';
 
 // Base API Server URL definition for path formatting
-const String kBaseServerUrl = "http://192.168.1.48/bindu_decor/";
+const String kBaseServerUrl = "https://yellow-woodpecker-430323.hostingersite.com/bindu_web/";
 
 // Helper to handle absolute HTTP URLs and local server uploads directory paths
 String _resolveImageUrl(String path) {
