@@ -42,9 +42,9 @@ final List<NestedMenuItem> _globalShopItems = const [
   ),
 ];
 
-// ProductGridCard class remains the same...
-
+// ============================================================
 // 1. GYM FLOORINGS SECTION
+// ============================================================
 class GymFloorings extends StatefulWidget {
   const GymFloorings({super.key});
 
@@ -104,11 +104,12 @@ class _GymFlooringsAnimatedSectionState extends State<GymFlooringsAnimatedSectio
   bool _isLoading = true;
   List<DecorProductItem> _gymItems = [];
 
-  final List<DecorProductItem> _staticGymItems = const [
+  // Static fallback items (used when API returns empty)
+  final List<DecorProductItem> _staticGymItems = [
     DecorProductItem(
       title: "Rubberized Dumbbell Mat",
       category: "Gym Floorings",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVcTkp0U8ES6Hei7zEh3S0jwWGyMwd5Thsf4wadnAi3g&s=104",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRS10N8ZTA7_3qNf6mZCWB-9TGKXxBRCubB7adA9GNU2A&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHqpeSi5HboaNeSC7gvyOf_Bz9H9anSI9lYrEid_o_qA&s=10",
@@ -118,7 +119,7 @@ class _GymFlooringsAnimatedSectionState extends State<GymFlooringsAnimatedSectio
     DecorProductItem(
       title: "Commercial Athletic Flooring",
       category: "Gym Floorings",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaCbSVrTPbAR2DJSxsa4-Xn1lrekqR-NOXzuLxIvH9zw&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTThvKenYZJGOYpP3uffH32jGWQ8UdeImhwB4UYd_O0fw&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLz9umVq0WDQSGmpPFiKDayDA_NB_T1d0Tf20detA95g&s=10",
@@ -128,7 +129,7 @@ class _GymFlooringsAnimatedSectionState extends State<GymFlooringsAnimatedSectio
     DecorProductItem(
       title: "Interlocking Rubber Tiles",
       category: "Gym Floorings",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrxH6rjFPbdrnrhsB1k7lrI-wv3NHVUP_eGPOYg8qsHw&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKQSbku_xphzghkuLu3Tyeo3_lsbT_K3-MzUNLglpSLA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMwhBAnGMDk4Erft7wg4C6CcJcsMFkkRVFtj94HfkE2g&s=10",
@@ -147,17 +148,13 @@ class _GymFlooringsAnimatedSectionState extends State<GymFlooringsAnimatedSectio
   Future<void> _fetchCategoryProducts() async {
     try {
       final fetched = await ApiService.fetchProductsByCategory("Gym Floorings");
-
-      if (fetched.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
+      print('Gym Floorings API fetched: ${fetched.length} items');
 
       final Set<String> seenTitles = <String>{};
       List<DecorProductItem> merged = [];
 
       for (final p in fetched) {
-        final key = p.title.toLowerCase();
+        final key = p.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(p);
           seenTitles.add(key);
@@ -165,7 +162,7 @@ class _GymFlooringsAnimatedSectionState extends State<GymFlooringsAnimatedSectio
       }
 
       for (final s in _staticGymItems) {
-        final key = s.title.toLowerCase();
+        final key = s.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(s);
           seenTitles.add(key);
@@ -173,10 +170,11 @@ class _GymFlooringsAnimatedSectionState extends State<GymFlooringsAnimatedSectio
       }
 
       setState(() {
-        _gymItems = merged;
+        _gymItems = merged.isEmpty ? List<DecorProductItem>.from(_staticGymItems) : merged;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching Gym Floorings: $e');
       setState(() {
         _isLoading = false;
         _gymItems = List<DecorProductItem>.from(_staticGymItems);
@@ -204,6 +202,13 @@ class _GymFlooringsAnimatedSectionState extends State<GymFlooringsAnimatedSectio
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
           )
+              : _gymItems.isEmpty
+              ? const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: Text('No products available in this category.'),
+            ),
+          )
               : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -224,7 +229,9 @@ class _GymFlooringsAnimatedSectionState extends State<GymFlooringsAnimatedSectio
   }
 }
 
+// ============================================================
 // 2. AWNINGS SECTION
+// ============================================================
 class Awnings extends StatefulWidget {
   const Awnings({super.key});
 
@@ -284,11 +291,11 @@ class _AwningsAnimatedSectionState extends State<AwningsAnimatedSection> {
   bool _isLoading = true;
   List<DecorProductItem> _awnings = [];
 
-  final List<DecorProductItem> _staticAwnings = const [
+  final List<DecorProductItem> _staticAwnings = [
     DecorProductItem(
       title: "Rooftop Louver Pergola",
       category: "Awnings",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdDt6ILehmhc-ZCIOi1hD78y3JZoE7Yj4zdMwhT-ND3Q&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlD_6REnRXeWBvonaZWyoHbyx0RmKrgp-DLcbNN-csLA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0TN4NE8OX94Lr1ogCq3sSLJWV8JIux8q_CWwV-QhBPg&s=10",
@@ -298,7 +305,7 @@ class _AwningsAnimatedSectionState extends State<AwningsAnimatedSection> {
     DecorProductItem(
       title: "Balcony Patio Awning",
       category: "Awnings",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRV7mniXaDirbUcNs56VwuHdklwplbUDCwM8SrpqFvAQ&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRV7mniXaDirbUcNs56VwuHdklwplbUDCwM8SrpqFvAQ&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKAya6vmEyDOF6LRuqy__if6E6zeW4GZB7Bi7cxGgtKw&s=10",
@@ -308,7 +315,7 @@ class _AwningsAnimatedSectionState extends State<AwningsAnimatedSection> {
     DecorProductItem(
       title: "Retractable Balcony Shade",
       category: "Awnings",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlaFMSD-L2QJEFsEwYiHy2ELigF61ZLH3mbdd_QC7dAA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTL8guIzHtBvbI1rbRDngXo7mcbDCkmnXxhrFGU4dWrjA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTttSBuUKWF0pr2sC0-NUzqNt9ji8FYmEBQQ5O8MeT43w&s",
@@ -327,17 +334,13 @@ class _AwningsAnimatedSectionState extends State<AwningsAnimatedSection> {
   Future<void> _fetchCategoryProducts() async {
     try {
       final fetched = await ApiService.fetchProductsByCategory("Awnings");
-
-      if (fetched.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
+      print('Awnings API fetched: ${fetched.length} items');
 
       final Set<String> seenTitles = <String>{};
       List<DecorProductItem> merged = [];
 
       for (final p in fetched) {
-        final key = p.title.toLowerCase();
+        final key = p.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(p);
           seenTitles.add(key);
@@ -345,7 +348,7 @@ class _AwningsAnimatedSectionState extends State<AwningsAnimatedSection> {
       }
 
       for (final s in _staticAwnings) {
-        final key = s.title.toLowerCase();
+        final key = s.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(s);
           seenTitles.add(key);
@@ -353,10 +356,11 @@ class _AwningsAnimatedSectionState extends State<AwningsAnimatedSection> {
       }
 
       setState(() {
-        _awnings = merged;
+        _awnings = merged.isEmpty ? List<DecorProductItem>.from(_staticAwnings) : merged;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching Awnings: $e');
       setState(() {
         _isLoading = false;
         _awnings = List<DecorProductItem>.from(_staticAwnings);
@@ -384,6 +388,13 @@ class _AwningsAnimatedSectionState extends State<AwningsAnimatedSection> {
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
           )
+              : _awnings.isEmpty
+              ? const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: Text('No products available in this category.'),
+            ),
+          )
               : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -404,7 +415,9 @@ class _AwningsAnimatedSectionState extends State<AwningsAnimatedSection> {
   }
 }
 
-// 3. MOSQUITO NET SECTION
+// ============================================================
+// 3. MOSQUITO NETS SECTION
+// ============================================================
 class MosquitoNets extends StatefulWidget {
   const MosquitoNets({super.key});
 
@@ -464,11 +477,11 @@ class _MosquitoNetAnimatedSectionState extends State<MosquitoNetAnimatedSection>
   bool _isLoading = true;
   List<DecorProductItem> _mosquitoItems = [];
 
-  final List<DecorProductItem> _staticMosquitoItems = const [
+  final List<DecorProductItem> _staticMosquitoItems = [
     DecorProductItem(
       title: "Outdoor Lawn Dome Net",
       category: "Mosquito Nets",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5F888CmSGKGOPmplz4Or_pWEbllerd6HoJx-UyviISg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT51KEf8gAfu26Q4O2rEtE2itBi3Owpa_Ul8OPW1w8j4g&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5I6N6BfKP09fhmde4S0mjICrUfVShcJTXOqwE-H6z0A&s=10",
@@ -478,7 +491,7 @@ class _MosquitoNetAnimatedSectionState extends State<MosquitoNetAnimatedSection>
     DecorProductItem(
       title: "Gazebo Mesh Screen Enclosure",
       category: "Mosquito Nets",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnVTuJPjEmS3_ruYlgPxf-WIoDHfYpvIMBErVBYZkNrg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4Yzd5jgKJ10TatrdZp9nKarb_U0YKtjxuv-UIgsAAFg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJDazpdej3cWSvvHSlS5B3t7SJ3bRX81TlnDZIRVGqlg&s=10",
@@ -488,7 +501,7 @@ class _MosquitoNetAnimatedSectionState extends State<MosquitoNetAnimatedSection>
     DecorProductItem(
       title: "Pleated Window Mesh Screen",
       category: "Mosquito Nets",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGhE0J-vBCgyoqhDadqgVw2bewchQflkE8l_j1CXUsJg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuWsXBFfjvH9po3PP8y8b3HVtwbHJqioyTRIo1AyuzeA&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZoY9DePKcyxOZfWeb7Ovd4l9vm8Ix05dsGpRrJnAyUw&s=10",
@@ -507,17 +520,13 @@ class _MosquitoNetAnimatedSectionState extends State<MosquitoNetAnimatedSection>
   Future<void> _fetchCategoryProducts() async {
     try {
       final fetched = await ApiService.fetchProductsByCategory("Mosquito Nets");
-
-      if (fetched.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
+      print('Mosquito Nets API fetched: ${fetched.length} items');
 
       final Set<String> seenTitles = <String>{};
       List<DecorProductItem> merged = [];
 
       for (final p in fetched) {
-        final key = p.title.toLowerCase();
+        final key = p.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(p);
           seenTitles.add(key);
@@ -525,7 +534,7 @@ class _MosquitoNetAnimatedSectionState extends State<MosquitoNetAnimatedSection>
       }
 
       for (final s in _staticMosquitoItems) {
-        final key = s.title.toLowerCase();
+        final key = s.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(s);
           seenTitles.add(key);
@@ -533,10 +542,11 @@ class _MosquitoNetAnimatedSectionState extends State<MosquitoNetAnimatedSection>
       }
 
       setState(() {
-        _mosquitoItems = merged;
+        _mosquitoItems = merged.isEmpty ? List<DecorProductItem>.from(_staticMosquitoItems) : merged;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching Mosquito Nets: $e');
       setState(() {
         _isLoading = false;
         _mosquitoItems = List<DecorProductItem>.from(_staticMosquitoItems);
@@ -563,6 +573,13 @@ class _MosquitoNetAnimatedSectionState extends State<MosquitoNetAnimatedSection>
               ? const Padding(
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
+          )
+              : _mosquitoItems.isEmpty
+              ? const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: Text('No products available in this category.'),
+            ),
           )
               : GridView.builder(
             shrinkWrap: true,

@@ -29,6 +29,7 @@ class ImageDetail {
 
 // Extended model supporting Home Decor product details and specifications
 class DecorProductItem {
+  final String id;
   final String title;
   final String category;
   final List<ImageDetail>? imageDetails;
@@ -37,7 +38,8 @@ class DecorProductItem {
   final String? material;
   final String? printType;
 
-  const DecorProductItem({
+  DecorProductItem({
+    this.id = '',
     required this.title,
     this.category = "HOME DECOR",
     this.imageDetails,
@@ -49,6 +51,7 @@ class DecorProductItem {
 
   // Robust fromJson to support different API shapes
   factory DecorProductItem.fromJson(Map<String, dynamic> json) {
+    final String id = json['id']?.toString() ?? '';
     final String title = json['title']?.toString() ?? json['name']?.toString() ?? '';
     final String category = json['category']?.toString() ?? json['cat']?.toString() ?? 'HOME DECOR';
     final String description = json['description']?.toString() ?? json['desc']?.toString() ?? '';
@@ -97,6 +100,21 @@ class DecorProductItem {
       } else {
         imageUrls = [json['images'].toString()];
       }
+    } else if (json['image_urls'] != null) {
+      if (json['image_urls'] is List) {
+        imageUrls = List<String>.from(json['image_urls'].map((e) => e?.toString() ?? ''));
+      } else if (json['image_urls'] is String) {
+        try {
+          final decoded = jsonDecode(json['image_urls']);
+          if (decoded is List) {
+            imageUrls = List<String>.from(decoded.map((e) => e?.toString() ?? ''));
+          } else {
+            imageUrls = [json['image_urls']];
+          }
+        } catch (_) {
+          imageUrls = [json['image_urls']];
+        }
+      }
     } else if (json['image_url'] != null) {
       imageUrls = [json['image_url'].toString()];
     } else if (imageDetails.isNotEmpty) {
@@ -104,6 +122,7 @@ class DecorProductItem {
     }
 
     return DecorProductItem(
+      id: id,
       title: title,
       category: category,
       imageDetails: imageDetails.isNotEmpty ? imageDetails : null,
@@ -141,6 +160,7 @@ class ProductDetailPage extends StatefulWidget {
 class _ProductDetailPageState extends State<ProductDetailPage> {
   late int _selectedImageIndex;
   bool _isExpanded = false;
+  bool _isFavorite = false;
 
   @override
   void initState() {
@@ -197,8 +217,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 style: GoogleFonts.cabin(fontSize: 15, color: Colors.black87),
                 children: [
                   TextSpan(
-                      text: "$label: ",
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                    text: "$label: ",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   TextSpan(text: value ?? "N/A"),
                 ],
               ),
@@ -233,7 +254,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         return Colors.grey.shade700;
       case 'CURTAINS':
         return Colors.cyan.shade500;
-      case 'STRETCH CEILINGS':
+      case 'STRETCH CEILING':
         return Colors.lime.shade700;
       default:
         return const Color(0xFF276B5A);
@@ -281,7 +302,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(currentTitle, style: GoogleFonts.cormorantGaramond(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text(
+          currentTitle,
+          style: GoogleFonts.cormorantGaramond(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         centerTitle: false,
       ),
       body: SingleChildScrollView(
@@ -386,13 +416,27 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   const SizedBox(height: 14),
 
                   // Dynamic Title based on current selected image
-                  Text(currentTitle, style: GoogleFonts.cormorantGaramond(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFF1F2937))),
+                  Text(
+                    currentTitle,
+                    style: GoogleFonts.cormorantGaramond(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF1F2937),
+                    ),
+                  ),
                   const SizedBox(height: 14),
                   const Divider(color: Color(0xFFE5E7EB), thickness: 1),
                   const SizedBox(height: 14),
 
                   // Dynamic Description based on current selected image
-                  Text("Description", style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF276B5A))),
+                  Text(
+                    "Description",
+                    style: GoogleFonts.cormorantGaramond(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF276B5A),
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     currentDescription,
@@ -430,7 +474,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   const SizedBox(height: 16),
 
                   // Image-Specific & Product Specifications
-                  Text("Product Specifications", style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF1F2937))),
+                  Text(
+                    "Product Specifications",
+                    style: GoogleFonts.cormorantGaramond(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF1F2937),
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   _buildDetailRow(
                     CupertinoIcons.photo,
@@ -447,6 +498,17 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     "Print / Finish Type",
                     widget.item.printType,
                   ),
+                  _buildDetailRow(
+                    CupertinoIcons.tag,
+                    "Category",
+                    widget.item.category,
+                  ),
+                  if (widget.item.id.isNotEmpty)
+                    _buildDetailRow(
+                      CupertinoIcons.info,
+                      "Product ID",
+                      widget.item.id,
+                    ),
 
                   const SizedBox(height: 28),
 

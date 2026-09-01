@@ -42,9 +42,9 @@ final List<NestedMenuItem> _globalShopItems = const [
   ),
 ];
 
-// ProductGridCard class remains the same as in Wal_Flo_Car.dart...
-
+// ============================================================
 // 1. BLINDS SECTION
+// ============================================================
 class Blinds extends StatefulWidget {
   const Blinds({super.key});
 
@@ -104,11 +104,11 @@ class _BlindsAnimatedSectionState extends State<BlindsAnimatedSection> {
   bool _isLoading = true;
   List<DecorProductItem> _blinds = [];
 
-  final List<DecorProductItem> _staticBlinds = const [
+  final List<DecorProductItem> _staticBlinds = [
     DecorProductItem(
       title: "Modern Wooden Roller Blinds",
       category: "Blinds",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL-v-AASWB8__k6UF3FSvo6yDbfMZYTVFkWPr3iyZ5_g&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4Pc6ToN_DEvhUyQBKYXaYzq24yQFWWEb_cfJv85dvXg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShmMFK9REEOt5OHBeesimNvShdgzNxDELdPa3UlNx9Jg&s=10",
@@ -118,7 +118,7 @@ class _BlindsAnimatedSectionState extends State<BlindsAnimatedSection> {
     DecorProductItem(
       title: "Motorized Zebra Shades",
       category: "Blinds",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4KAdQo4yQNWahr6N_0GzhhXazPw0ad8K47iJDfKWr2Q&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPaIX0R3v8brk-xVKMeRikwlNxv7bj3DfDddg-UreMfg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTwI2TGooJGANSB_eQiReW3NSs-N7iAOs2hiVVUjX0fg&s=10",
@@ -128,7 +128,7 @@ class _BlindsAnimatedSectionState extends State<BlindsAnimatedSection> {
     DecorProductItem(
       title: "Roman Fabric Window Blinds",
       category: "Blinds",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZh1_VnC8N3cCzt8Gd7XQoOR0QD5LlkWqgDAJkZHLmmA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnNeeqXE_rlKkFGSUXpvmXKDhlamiEmqepfQzv7uEAXQ&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSqswW3cgOCNLbzrYdOIQCaVVYIWVne40XouM_DMUcZg&s=10",
@@ -147,17 +147,13 @@ class _BlindsAnimatedSectionState extends State<BlindsAnimatedSection> {
   Future<void> _fetchCategoryProducts() async {
     try {
       final fetched = await ApiService.fetchProductsByCategory("Blinds");
-
-      if (fetched.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
+      print('Blinds API fetched: ${fetched.length} items');
 
       final Set<String> seenTitles = <String>{};
       List<DecorProductItem> merged = [];
 
       for (final p in fetched) {
-        final key = p.title.toLowerCase();
+        final key = p.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(p);
           seenTitles.add(key);
@@ -165,7 +161,7 @@ class _BlindsAnimatedSectionState extends State<BlindsAnimatedSection> {
       }
 
       for (final s in _staticBlinds) {
-        final key = s.title.toLowerCase();
+        final key = s.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(s);
           seenTitles.add(key);
@@ -173,10 +169,11 @@ class _BlindsAnimatedSectionState extends State<BlindsAnimatedSection> {
       }
 
       setState(() {
-        _blinds = merged;
+        _blinds = merged.isEmpty ? List<DecorProductItem>.from(_staticBlinds) : merged;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching Blinds: $e');
       setState(() {
         _isLoading = false;
         _blinds = List<DecorProductItem>.from(_staticBlinds);
@@ -204,6 +201,13 @@ class _BlindsAnimatedSectionState extends State<BlindsAnimatedSection> {
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
           )
+              : _blinds.isEmpty
+              ? const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: Text('No products available in this category.'),
+            ),
+          )
               : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -224,7 +228,9 @@ class _BlindsAnimatedSectionState extends State<BlindsAnimatedSection> {
   }
 }
 
+// ============================================================
 // 2. GLASS FILMS SECTION
+// ============================================================
 class GlassFilms extends StatefulWidget {
   const GlassFilms({super.key});
 
@@ -284,11 +290,11 @@ class _GlassFilmsAnimatedSectionState extends State<GlassFilmsAnimatedSection> {
   bool _isLoading = true;
   List<DecorProductItem> _glassFilms = [];
 
-  final List<DecorProductItem> _staticGlassFilms = const [
+  final List<DecorProductItem> _staticGlassFilms = [
     DecorProductItem(
       title: "Frosted Privacy Glass Film",
       category: "Glass Films",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS5zFLRhjS9bxpN_W8yjHldqg9joye5Se1QW6cfdiSTg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmzDETgaFUSPzqCx5tSFMiLQLMAgtOhjaR1UNASB1FOg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPAVnhQIuchRPWi4e8Vsvw2QnVwBE8mg-67BoARJ6Hog&s",
@@ -298,7 +304,7 @@ class _GlassFilmsAnimatedSectionState extends State<GlassFilmsAnimatedSection> {
     DecorProductItem(
       title: "Geometric Patterned Film",
       category: "Glass Films",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXRZC7xpWuTK1qrmwMhfh8Z26x_uGljRpjJRCPC84v9Q&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBcdEkYb5azFMFjjOJK91lklZdGKgfyhIMdfuqRhtiIA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIq7t9egM5zlMezxBvibP6it1Ykje5j88Y904AA8Qd_g&s=10",
@@ -308,7 +314,7 @@ class _GlassFilmsAnimatedSectionState extends State<GlassFilmsAnimatedSection> {
     DecorProductItem(
       title: "Solar Heat Control Sun Film",
       category: "Glass Films",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPCYJF8zNWJY7NBiXcwci4MZCz16e23kEtKNOxWwmSbQ&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHcm81hOYwFfB758rp2YpjzPUycII2xDDO5p9LOGfCoA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZ4Zbdp91p8wTeC-r6JACk0TbbnIjmIjG0ZKBShKuwEg&s",
@@ -327,17 +333,13 @@ class _GlassFilmsAnimatedSectionState extends State<GlassFilmsAnimatedSection> {
   Future<void> _fetchCategoryProducts() async {
     try {
       final fetched = await ApiService.fetchProductsByCategory("Glass Films");
-
-      if (fetched.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
+      print('Glass Films API fetched: ${fetched.length} items');
 
       final Set<String> seenTitles = <String>{};
       List<DecorProductItem> merged = [];
 
       for (final p in fetched) {
-        final key = p.title.toLowerCase();
+        final key = p.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(p);
           seenTitles.add(key);
@@ -345,7 +347,7 @@ class _GlassFilmsAnimatedSectionState extends State<GlassFilmsAnimatedSection> {
       }
 
       for (final s in _staticGlassFilms) {
-        final key = s.title.toLowerCase();
+        final key = s.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(s);
           seenTitles.add(key);
@@ -353,10 +355,11 @@ class _GlassFilmsAnimatedSectionState extends State<GlassFilmsAnimatedSection> {
       }
 
       setState(() {
-        _glassFilms = merged;
+        _glassFilms = merged.isEmpty ? List<DecorProductItem>.from(_staticGlassFilms) : merged;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching Glass Films: $e');
       setState(() {
         _isLoading = false;
         _glassFilms = List<DecorProductItem>.from(_staticGlassFilms);
@@ -384,6 +387,13 @@ class _GlassFilmsAnimatedSectionState extends State<GlassFilmsAnimatedSection> {
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
           )
+              : _glassFilms.isEmpty
+              ? const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: Text('No products available in this category.'),
+            ),
+          )
               : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -404,7 +414,9 @@ class _GlassFilmsAnimatedSectionState extends State<GlassFilmsAnimatedSection> {
   }
 }
 
+// ============================================================
 // 3. ARTIFICIAL TURFS SECTION
+// ============================================================
 class ArtificialTurfs extends StatefulWidget {
   const ArtificialTurfs({super.key});
 
@@ -464,11 +476,11 @@ class _ArtificialTurfsAnimatedSectionState extends State<ArtificialTurfsAnimated
   bool _isLoading = true;
   List<DecorProductItem> _turfs = [];
 
-  final List<DecorProductItem> _staticTurfs = const [
+  final List<DecorProductItem> _staticTurfs = [
     DecorProductItem(
       title: "Lush Green Balcony Grass",
       category: "Artificial Turfs",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_K67g_nBZEKDDJP0xJKRrcFtvjSnTI1t9UHSuTECN4A&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFqAXWYwJdjpxXF1H6s2r-zGd9kZ82akiroKW9Yc3RQA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRUk-ng3-DGQKQL9eHke4ze6CGk5wVGscO7a9sBCtjdQ&s=10",
@@ -478,7 +490,7 @@ class _ArtificialTurfsAnimatedSectionState extends State<ArtificialTurfsAnimated
     DecorProductItem(
       title: "High-Density Landscape Turf",
       category: "Artificial Turfs",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3T8qsfIxm7yDq5Poiz0CPXlZTbutHFmbV8zrfb_1L3A&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxnShjA6E52AnAS2wbE0cGt349Zf7jYAi0_GEDnVeJKw&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwj8Y1dQWDFC1mTeywt0EJX_uDFOhf6UfrKLb4QVeNKw&s=10",
@@ -488,7 +500,7 @@ class _ArtificialTurfsAnimatedSectionState extends State<ArtificialTurfsAnimated
     DecorProductItem(
       title: "Sports & Play Area Turf",
       category: "Artificial Turfs",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRNewt7mQGQo7Dz11IwUUuruBQubrowazxEPIsrJOQhA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmM0s5e1nH_jjcrGRRhc3_9NU_a7JtwM4Mnj3Yk_audA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe2hOE1UwqU_xHWlQD6BAk-mvWjQnKDJ-AG7Emdtk5qg&s",
@@ -507,17 +519,13 @@ class _ArtificialTurfsAnimatedSectionState extends State<ArtificialTurfsAnimated
   Future<void> _fetchCategoryProducts() async {
     try {
       final fetched = await ApiService.fetchProductsByCategory("Artificial Turfs");
-
-      if (fetched.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
+      print('Artificial Turfs API fetched: ${fetched.length} items');
 
       final Set<String> seenTitles = <String>{};
       List<DecorProductItem> merged = [];
 
       for (final p in fetched) {
-        final key = p.title.toLowerCase();
+        final key = p.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(p);
           seenTitles.add(key);
@@ -525,7 +533,7 @@ class _ArtificialTurfsAnimatedSectionState extends State<ArtificialTurfsAnimated
       }
 
       for (final s in _staticTurfs) {
-        final key = s.title.toLowerCase();
+        final key = s.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(s);
           seenTitles.add(key);
@@ -533,10 +541,11 @@ class _ArtificialTurfsAnimatedSectionState extends State<ArtificialTurfsAnimated
       }
 
       setState(() {
-        _turfs = merged;
+        _turfs = merged.isEmpty ? List<DecorProductItem>.from(_staticTurfs) : merged;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching Artificial Turfs: $e');
       setState(() {
         _isLoading = false;
         _turfs = List<DecorProductItem>.from(_staticTurfs);
@@ -563,6 +572,13 @@ class _ArtificialTurfsAnimatedSectionState extends State<ArtificialTurfsAnimated
               ? const Padding(
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
+          )
+              : _turfs.isEmpty
+              ? const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: Text('No products available in this category.'),
+            ),
           )
               : GridView.builder(
             shrinkWrap: true,

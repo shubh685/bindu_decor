@@ -1,3 +1,6 @@
+// Modified to fetch categories from products.php and merge them into the "Products & Services" group.
+// All existing static items and behaviour preserved; only runtime merging added.
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:bindu_decor/Home_Page.dart';
@@ -8,6 +11,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+
+// Added imports
+import 'package:bindu_decor/API_Services/View_Api.dart';
+
+import 'Pro_Category.dart';
 
 // ==========================================
 // LUXURY BRANDING COLOR PALETTE
@@ -53,7 +61,7 @@ class NestedMenuItem {
 // MAIN NAVIGATION BAR
 // ==========================================
 
-class BinduNavigationBar extends StatelessWidget implements PreferredSizeWidget {
+class BinduNavigationBar extends StatefulWidget implements PreferredSizeWidget {
   final List<NavItem> navItems;
   final List<NestedMenuItem> shopItems;
   final VoidCallback? onMenuItemTap;
@@ -68,14 +76,58 @@ class BinduNavigationBar extends StatelessWidget implements PreferredSizeWidget 
   @override
   Size get preferredSize => const Size.fromHeight(85.0);
 
+  @override
+  State<BinduNavigationBar> createState() => _BinduNavigationBarState();
+}
+
+class _BinduNavigationBarState extends State<BinduNavigationBar> {
+  List<String> _apiCategories = [];
+  bool _loadingCategories = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    setState(() {
+      _loadingCategories = true;
+    });
+    try {
+      final fetched = await ApiService.fetchCategories();
+      // ApiService.fetchCategories returns List<String>
+      final normalized = fetched.map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+      final unique = <String>{};
+      final merged = <String>[];
+      for (final c in normalized) {
+        final lower = c.toLowerCase();
+        if (!unique.contains(lower)) {
+          unique.add(lower);
+          merged.add(c);
+        }
+      }
+      setState(() {
+        _apiCategories = merged;
+        _loadingCategories = false;
+      });
+    } catch (e) {
+      // keep failure silent, fallback to static only
+      setState(() {
+        _apiCategories = [];
+        _loadingCategories = false;
+      });
+    }
+  }
+
   String _getCurrentViewLabel(String? currentRoute) {
     if (currentRoute == null || currentRoute.isEmpty) return 'Home';
 
-    for (var item in navItems) {
+    for (var item in widget.navItems) {
       if (item.route == currentRoute) return item.label;
     }
 
-    for (var group in shopItems) {
+    for (var group in widget.shopItems) {
       for (var sub in group.subItems) {
         if (sub.route == currentRoute) return '${group.title} › ${sub.label}';
       }
@@ -185,9 +237,9 @@ class BinduNavigationBar extends StatelessWidget implements PreferredSizeWidget 
   Widget _buildDesktopNav(BuildContext context, String? currentRoute) {
     List<Widget> navWidgets = [];
 
-    for (var item in navItems) {
+    for (var item in widget.navItems) {
       if (item.label.toLowerCase() == 'shop') {
-        bool isShopActive = shopItems.any(
+        bool isShopActive = widget.shopItems.any(
               (group) => group.subItems.any((sub) => sub.route == currentRoute),
         );
 
@@ -201,10 +253,13 @@ class BinduNavigationBar extends StatelessWidget implements PreferredSizeWidget 
               borderRadius: BorderRadius.circular(12),
             ),
             tooltip: item.label,
-            onSelected: (value) => _handleNavigation(context, value),
+            onSelected: (value) => _onMenuSelected(value),
             itemBuilder: (BuildContext context) {
               List<PopupMenuEntry<String>> menuEntries = [];
-              for (var shopGroup in shopItems) {
+
+              // --- STATIC ITEMS SECTION ---
+              // Iterate through all shop groups (only one: "Products & Services")
+              for (var shopGroup in widget.shopItems) {
                 if (shopGroup.subItems.isNotEmpty) {
                   menuEntries.add(
                     PopupMenuItem<String>(
@@ -221,6 +276,7 @@ class BinduNavigationBar extends StatelessWidget implements PreferredSizeWidget 
                     ),
                   );
 
+                  // Add all static sub-items
                   for (var subItem in shopGroup.subItems) {
                     final bool isSubSelected = subItem.route == currentRoute;
                     menuEntries.add(
@@ -268,6 +324,71 @@ class BinduNavigationBar extends StatelessWidget implements PreferredSizeWidget 
                       ),
                     );
                   }
+
+                  // --- API CATEGORIES (append below "Stretch Ceiling") ---
+                  if (_apiCategories.isNotEmpty) {
+                    // Add a divider before API categories
+                    menuEntries.add(const PopupMenuDivider());
+
+                    // Add a small header for dynamic categories
+                    menuEntries.add(
+                      PopupMenuItem<String>(
+                        enabled: false,
+                        child: Text(
+                          'MORE CATEGORIES',
+                          style: GoogleFonts.cormorantGaramond(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 11,
+                            letterSpacing: 1.5,
+                            color: LuxuryTheme.primaryAccent.withOpacity(0.7),
+                          ),
+                        ),
+                      ),
+                    );
+
+                    // Add all API categories
+                    for (var apiCat in _apiCategories) {
+                      // Skip if this category already exists in static items (case-insensitive)
+                      final bool existsInStatic = shopGroup.subItems.any(
+                              (staticItem) => staticItem.label.toLowerCase() == apiCat.toLowerCase()
+                      );
+
+                      if (!existsInStatic) {
+                        menuEntries.add(
+                          PopupMenuItem<String>(
+                            value: 'CATEGORY::$apiCat',
+                            height: 38,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              child: Row(
+                                children: [
+                                  const SizedBox(width: 2),
+                                  Flexible(
+                                    child: Text(
+                                      apiCat,
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: LuxuryTheme.textDark,
+                                      ),
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 12,
+                                    color: LuxuryTheme.primaryAccent.withOpacity(0.5),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                  }
+
+                  // Add final divider
                   menuEntries.add(const PopupMenuDivider());
                 }
               }
@@ -372,11 +493,36 @@ class BinduNavigationBar extends StatelessWidget implements PreferredSizeWidget 
   }
 
   Future<void> _handleNavigation(BuildContext context, String route) async {
+    if (route.startsWith('CATEGORY::')) {
+      final String category = route.substring('CATEGORY::'.length);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ProductCategoryPage(category: category)),
+      );
+      return;
+    }
+
     await NavigationHandler.handleNavigation(
       context,
       route,
-      onTap: onMenuItemTap,
+      onTap: widget.onMenuItemTap,
     );
+  }
+
+  Future<void> _onMenuSelected(String value) async {
+    if (value.startsWith('CATEGORY::')) {
+      final String cat = value.substring('CATEGORY::'.length);
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ProductCategoryPage(category: cat)),
+      );
+      return;
+    }
+
+    // Fallback to normal route navigation
+    if (!mounted) return;
+    _handleNavigation(context, value);
   }
 }
 
@@ -483,7 +629,7 @@ class _NavItem extends StatelessWidget {
 // MOBILE DRAWER
 // ==========================================
 
-class BinduMobileDrawer extends StatelessWidget {
+class BinduMobileDrawer extends StatefulWidget {
   final List<NavItem> navItems;
   final List<NestedMenuItem> shopItems;
   final VoidCallback? onItemTap;
@@ -494,6 +640,48 @@ class BinduMobileDrawer extends StatelessWidget {
     required this.shopItems,
     this.onItemTap,
   });
+
+  @override
+  State<BinduMobileDrawer> createState() => _BinduMobileDrawerState();
+}
+
+class _BinduMobileDrawerState extends State<BinduMobileDrawer> {
+  List<String> _apiCategories = [];
+  bool _loadingCategories = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategories();
+  }
+
+  Future<void> _fetchCategories() async {
+    setState(() {
+      _loadingCategories = true;
+    });
+    try {
+      final fetched = await ApiService.fetchCategories();
+      final normalized = fetched.map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+      final unique = <String>{};
+      final merged = <String>[];
+      for (final c in normalized) {
+        final lower = c.toLowerCase();
+        if (!unique.contains(lower)) {
+          unique.add(lower);
+          merged.add(c);
+        }
+      }
+      setState(() {
+        _apiCategories = merged;
+        _loadingCategories = false;
+      });
+    } catch (e) {
+      setState(() {
+        _apiCategories = [];
+        _loadingCategories = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -522,7 +710,7 @@ class BinduMobileDrawer extends StatelessWidget {
       ) {
     List<Widget> items = [];
 
-    for (var navItem in navItems) {
+    for (var navItem in widget.navItems) {
       if (navItem.label.toLowerCase() == 'shop') {
         items.add(
           Theme(
@@ -540,9 +728,10 @@ class BinduMobileDrawer extends StatelessWidget {
                   color: LuxuryTheme.primaryDark,
                 ),
               ),
-              children: shopItems.map((category) {
+              children: widget.shopItems.map((category) {
                 return ExpansionTile(
                   tilePadding: const EdgeInsets.only(left: 20),
+                  initiallyExpanded: true,
                   title: Text(
                     category.title.toUpperCase(),
                     style: GoogleFonts.cormorantGaramond(
@@ -552,42 +741,96 @@ class BinduMobileDrawer extends StatelessWidget {
                       color: LuxuryTheme.primaryAccent,
                     ),
                   ),
-                  children: category.subItems.map((subItem) {
-                    final bool isSubSelected = subItem.route == currentRoute;
-                    return Container(
-                      color: isSubSelected
-                          ? LuxuryTheme.primaryDark.withOpacity(0.08)
-                          : Colors.transparent,
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.only(left: 36),
-                        leading: subItem.icon != null
-                            ? Icon(
-                          subItem.icon,
-                          size: 18,
-                          color: isSubSelected
-                              ? LuxuryTheme.primaryAccent
-                              : LuxuryTheme.primaryDark,
-                        )
-                            : null,
-                        title: Text(
-                          subItem.label,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 13,
-                            fontWeight: isSubSelected
-                                ? FontWeight.w800
-                                : FontWeight.w500,
+                  children: [
+                    // --- STATIC SUB-ITEMS ---
+                    ...category.subItems.map((subItem) {
+                      final bool isSubSelected = subItem.route == currentRoute;
+                      return Container(
+                        color: isSubSelected
+                            ? LuxuryTheme.primaryDark.withOpacity(0.08)
+                            : Colors.transparent,
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.only(left: 36),
+                          leading: subItem.icon != null
+                              ? Icon(
+                            subItem.icon,
+                            size: 18,
                             color: isSubSelected
-                                ? LuxuryTheme.primaryDark
-                                : LuxuryTheme.textDark,
+                                ? LuxuryTheme.primaryAccent
+                                : LuxuryTheme.primaryDark,
+                          )
+                              : null,
+                          title: Text(
+                            subItem.label,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13,
+                              fontWeight: isSubSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w500,
+                              color: isSubSelected
+                                  ? LuxuryTheme.primaryDark
+                                  : LuxuryTheme.textDark,
+                            ),
+                          ),
+                          onTap: () => _handleNavigation(context, subItem.route),
+                        ),
+                      );
+                    }).toList(),
+
+                    // --- API CATEGORIES (append below static items) ---
+                    if (_apiCategories.isNotEmpty) ...[
+                      const Padding(
+                        padding: EdgeInsets.only(left: 36, top: 8, bottom: 4),
+                        child: Divider(color: Color(0xFFE8E3D9)),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 36, top: 4, bottom: 4),
+                        child: Text(
+                          'MORE CATEGORIES',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFC5A059),
+                            letterSpacing: 1.2,
                           ),
                         ),
-                        onTap: () => _handleNavigation(
-                          context,
-                          subItem.route,
-                        ),
                       ),
-                    );
-                  }).toList(),
+                      ..._apiCategories.map((cat) {
+                        // Skip if this category already exists in static items
+                        final bool existsInStatic = category.subItems.any(
+                                (staticItem) => staticItem.label.toLowerCase() == cat.toLowerCase()
+                        );
+
+                        if (existsInStatic) return const SizedBox.shrink();
+
+                        return Container(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.only(left: 48),
+                            title: Text(
+                              cat,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: LuxuryTheme.textDark,
+                              ),
+                            ),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: LuxuryTheme.primaryAccent.withOpacity(0.5),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => ProductCategoryPage(category: cat)),
+                              );
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ],
                 );
               }).toList(),
             ),
@@ -635,10 +878,19 @@ class BinduMobileDrawer extends StatelessWidget {
   }
 
   Future<void> _handleNavigation(BuildContext context, String route) async {
+    if (route.startsWith('CATEGORY::')) {
+      final String category = route.substring('CATEGORY::'.length);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ProductCategoryPage(category: category)),
+      );
+      return;
+    }
+
     await NavigationHandler.handleNavigation(
       context,
       route,
-      onTap: onItemTap,
+      onTap: widget.onItemTap,
     );
   }
 }
@@ -667,6 +919,7 @@ class BinduFooter extends StatefulWidget {
   State<BinduFooter> createState() => _BinduFooterState();
 }
 
+// (Footer code unchanged from your original file)
 class _BinduFooterState extends State<BinduFooter> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 

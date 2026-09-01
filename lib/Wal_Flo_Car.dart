@@ -41,6 +41,9 @@ final List<NestedMenuItem> _globalShopItems = const [
   ),
 ];
 
+// ============================================================
+// PRODUCT GRID CARD (Shared across all category screens)
+// ============================================================
 class ProductGridCard extends StatefulWidget {
   final DecorProductItem item;
 
@@ -54,12 +57,14 @@ class _ProductGridCardState extends State<ProductGridCard> {
   int _selectedImageIndex = 0;
   bool _isFavorite = false;
 
-  void _openDetailDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => ProductDetailPage(
-        item: widget.item,
-        initialImageIndex: _selectedImageIndex,
+  void _openDetailPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProductDetailPage(
+          item: widget.item,
+          initialImageIndex: _selectedImageIndex,
+        ),
       ),
     );
   }
@@ -103,7 +108,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
         : '';
 
     return InkWell(
-      onTap: _openDetailDialog,
+      onTap: _openDetailPage,
       borderRadius: BorderRadius.circular(8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +186,7 @@ class _ProductGridCardState extends State<ProductGridCard> {
                 ),
               ),
               InkWell(
-                onTap: _openDetailDialog,
+                onTap: _openDetailPage,
                 borderRadius: BorderRadius.circular(4),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -207,7 +212,9 @@ class _ProductGridCardState extends State<ProductGridCard> {
   }
 }
 
-// 1. WALLPAPERS SCREEN
+// ============================================================
+// 1. WALLPAPERS SECTION
+// ============================================================
 class Wallpapers extends StatefulWidget {
   const Wallpapers({super.key});
 
@@ -267,12 +274,12 @@ class _WallpaperAnimatedSectionState extends State<WallpaperAnimatedSection> {
   bool _isLoading = true;
   List<DecorProductItem> _wallpapers = [];
 
-  // Static fallback / sample items
-  final List<DecorProductItem> _staticWallpapers = const [
+  // Static fallback items (used when API returns empty)
+  final List<DecorProductItem> _staticWallpapers = [
     DecorProductItem(
       title: "The Song of the Woods",
       category: "Wallpapers",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZsUShEzxBw8UMG1bXP4OA76w62MddirmLsxpQSEJ-7A&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZ2x1v1wN0yDrpf-diMv0zswg_wRcWWxK2zqwQP-60Ew&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9NlR5jBTk4tJv49uFzm9isBBATYtsciHzVCW67hStCQ&s=10",
@@ -282,7 +289,7 @@ class _WallpaperAnimatedSectionState extends State<WallpaperAnimatedSection> {
     DecorProductItem(
       title: "Little Curiosity",
       category: "Wallpapers",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRV5n7j35abTULzIUHFgQDBLPdA95_BKSWS2j5_kApsAQ&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGri-MxB0WuO36eV9VizgUJV2HOFHUCew1HaktAsB9HQ&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQevlSTzfIrkf6XMPRqB-8yK50GV4MkxbDPQhAjLPZZKw&s=10",
@@ -292,7 +299,7 @@ class _WallpaperAnimatedSectionState extends State<WallpaperAnimatedSection> {
     DecorProductItem(
       title: "Secrets Of The Stars",
       category: "Wallpapers",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQgY8za7EGgk_vFJo9j0N9DeB-GPbU3FJBFaXh0MB44Q&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRylL2JMFEAJ8_mTdLUcXWcG9api2dJIprGaF0F4B10Dg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAFMQ-EhhhtEZNEercVE3y7gEOROge81aLSjhf5yQitQ&s=10",
@@ -310,28 +317,24 @@ class _WallpaperAnimatedSectionState extends State<WallpaperAnimatedSection> {
 
   Future<void> _fetchCategoryProducts() async {
     try {
-      // Use the exact category name from navigation
       final fetched = await ApiService.fetchProductsByCategory("Wallpapers");
+      print('Wallpapers API fetched: ${fetched.length} items');
 
-      if (fetched.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
-
-      // Merge API results with static fallback (avoid duplicates)
       final Set<String> seenTitles = <String>{};
       List<DecorProductItem> merged = [];
 
+      // Add API items first
       for (final p in fetched) {
-        final key = p.title.toLowerCase();
+        final key = p.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(p);
           seenTitles.add(key);
         }
       }
 
+      // Add static items that aren't already in the list
       for (final s in _staticWallpapers) {
-        final key = s.title.toLowerCase();
+        final key = s.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(s);
           seenTitles.add(key);
@@ -339,10 +342,11 @@ class _WallpaperAnimatedSectionState extends State<WallpaperAnimatedSection> {
       }
 
       setState(() {
-        _wallpapers = merged;
+        _wallpapers = merged.isEmpty ? List<DecorProductItem>.from(_staticWallpapers) : merged;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching Wallpapers: $e');
       setState(() {
         _isLoading = false;
         _wallpapers = List<DecorProductItem>.from(_staticWallpapers);
@@ -363,19 +367,19 @@ class _WallpaperAnimatedSectionState extends State<WallpaperAnimatedSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "Wallpapers Collection",
-            style: GoogleFonts.cormorantGaramond(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF276B5A),
-            ),
-          ),
+          Text("Wallpapers Collection", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           _isLoading
               ? const Padding(
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
+          )
+              : _wallpapers.isEmpty
+              ? const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: Text('No products available in this category.'),
+            ),
           )
               : GridView.builder(
             shrinkWrap: true,
@@ -397,7 +401,9 @@ class _WallpaperAnimatedSectionState extends State<WallpaperAnimatedSection> {
   }
 }
 
-// 2. FLOORINGS SCREEN
+// ============================================================
+// 2. FLOORINGS SECTION
+// ============================================================
 class Floorings extends StatefulWidget {
   const Floorings({super.key});
 
@@ -457,11 +463,12 @@ class _FloorAnimatedSectionState extends State<FloorAnimatedSection> {
   bool _isLoading = true;
   List<DecorProductItem> _floors = [];
 
-  final List<DecorProductItem> _staticFloors = const [
+  // Static fallback items (used when API returns empty)
+  final List<DecorProductItem> _staticFloors = [
     DecorProductItem(
       title: "Royal Gold Oak Plank",
       category: "Floorings",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7EN-yCRT7ltma9w_m17wK3nXBqZAkOtv7iINgSi40rQ&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTihL0RCXs3WhhNEGjIqJIE0ZIdWKf2e6Sey7zJX4GYBw&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyIy6VYGVGXLF_gukV-dIAZ3She3Ty-mqPGH1jw8chTQ&s=10",
@@ -471,7 +478,7 @@ class _FloorAnimatedSectionState extends State<FloorAnimatedSection> {
     DecorProductItem(
       title: "Dark Vintage Hardwood",
       category: "Floorings",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBdbAUfRC2j0DfJsq0oN0NQimXZwHJW4QCCJpz4NBf7g&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaM9GO9jZJSLdWoDHbkG1Bd6nofQZZfJHy9RbuOs87EQ&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeNPHYvLU9WYWRoDEKO1ACulwuk63UKZGAbid78yByRw&s=10",
@@ -481,7 +488,7 @@ class _FloorAnimatedSectionState extends State<FloorAnimatedSection> {
     DecorProductItem(
       title: "Italian Carrara Marble Tile",
       category: "Floorings",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPRnh8pDemscGO5PY7m2v50tR4Qat9_U_phc1IaLgHhg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKqJebUVEo3MY1BcGeaEjEWf2HFFQq_P3C265T2NQsZw&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNEro14_--ktIWuwyp80puiGGbzAGYfqMKCsNyx7_Www&s=10",
@@ -500,17 +507,13 @@ class _FloorAnimatedSectionState extends State<FloorAnimatedSection> {
   Future<void> _fetchCategoryProducts() async {
     try {
       final fetched = await ApiService.fetchProductsByCategory("Floorings");
-
-      if (fetched.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
+      print('Floorings API fetched: ${fetched.length} items');
 
       final Set<String> seenTitles = <String>{};
       List<DecorProductItem> merged = [];
 
       for (final p in fetched) {
-        final key = p.title.toLowerCase();
+        final key = p.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(p);
           seenTitles.add(key);
@@ -518,7 +521,7 @@ class _FloorAnimatedSectionState extends State<FloorAnimatedSection> {
       }
 
       for (final s in _staticFloors) {
-        final key = s.title.toLowerCase();
+        final key = s.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(s);
           seenTitles.add(key);
@@ -526,10 +529,11 @@ class _FloorAnimatedSectionState extends State<FloorAnimatedSection> {
       }
 
       setState(() {
-        _floors = merged;
+        _floors = merged.isEmpty ? List<DecorProductItem>.from(_staticFloors) : merged;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching Floorings: $e');
       setState(() {
         _isLoading = false;
         _floors = List<DecorProductItem>.from(_staticFloors);
@@ -557,6 +561,13 @@ class _FloorAnimatedSectionState extends State<FloorAnimatedSection> {
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
           )
+              : _floors.isEmpty
+              ? const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: Text('No products available in this category.'),
+            ),
+          )
               : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -577,7 +588,9 @@ class _FloorAnimatedSectionState extends State<FloorAnimatedSection> {
   }
 }
 
-// 3. CARPETS SCREEN
+// ============================================================
+// 3. CARPETS SECTION
+// ============================================================
 class Carpets extends StatefulWidget {
   const Carpets({super.key});
 
@@ -637,11 +650,12 @@ class _CarpetAnimatedSectionState extends State<CarpetAnimatedSection> {
   bool _isLoading = true;
   List<DecorProductItem> _carpets = [];
 
-  final List<DecorProductItem> _staticCarpets = const [
+  // Static fallback items (used when API returns empty)
+  final List<DecorProductItem> _staticCarpets = [
     DecorProductItem(
       title: "Royal Hand-Tufted Plush",
       category: "Carpets",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPa2GEOtq7-vDQGS-jV9Z8OODV8QRiTTEWQBFgTqS_qA&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_viVUCAkCR3qYrA8EOcXC8Uy9IKH-SqQ7t7BZ_OtnSQ&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzYjZFew7XRn6ceO1GJjtcSXmcMQp_WFPp7kN9QvakgQ&s=10",
@@ -651,7 +665,7 @@ class _CarpetAnimatedSectionState extends State<CarpetAnimatedSection> {
     DecorProductItem(
       title: "Modern Vintage Persian Rug",
       category: "Carpets",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTuRERD2mMB77rJbolW6_1rEiEOy66BrinmP1x_qCXGA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmpiH2bQ5C2R6uBGTejBHcToqbvKbHxuiIeN_VijXY0w&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrJ5a9CQckdA1DTUcY0qgxlzzXXvz_fhFaTEeE9dHTqg&s=10",
@@ -661,7 +675,7 @@ class _CarpetAnimatedSectionState extends State<CarpetAnimatedSection> {
     DecorProductItem(
       title: "Abstract Gold & Teal Rug",
       category: "Carpets",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgSZ8zcz5vT0vXzDsIZD7uWhL1bF_wDUP6YZ5fVEXdCA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQo0nYlMpW9BvxFFNbWWW-PImQuEGeyYwYiPJgyCp5dYQ&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIBNifFvWKH-ogGlLibh7VdWaM6ifHr1qhtNnGtdcQzg&s",
@@ -680,17 +694,13 @@ class _CarpetAnimatedSectionState extends State<CarpetAnimatedSection> {
   Future<void> _fetchCategoryProducts() async {
     try {
       final fetched = await ApiService.fetchProductsByCategory("Carpets");
-
-      if (fetched.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
+      print('Carpets API fetched: ${fetched.length} items');
 
       final Set<String> seenTitles = <String>{};
       List<DecorProductItem> merged = [];
 
       for (final p in fetched) {
-        final key = p.title.toLowerCase();
+        final key = p.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(p);
           seenTitles.add(key);
@@ -698,7 +708,7 @@ class _CarpetAnimatedSectionState extends State<CarpetAnimatedSection> {
       }
 
       for (final s in _staticCarpets) {
-        final key = s.title.toLowerCase();
+        final key = s.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(s);
           seenTitles.add(key);
@@ -706,10 +716,11 @@ class _CarpetAnimatedSectionState extends State<CarpetAnimatedSection> {
       }
 
       setState(() {
-        _carpets = merged;
+        _carpets = merged.isEmpty ? List<DecorProductItem>.from(_staticCarpets) : merged;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching Carpets: $e');
       setState(() {
         _isLoading = false;
         _carpets = List<DecorProductItem>.from(_staticCarpets);
@@ -736,6 +747,13 @@ class _CarpetAnimatedSectionState extends State<CarpetAnimatedSection> {
               ? const Padding(
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
+          )
+              : _carpets.isEmpty
+              ? const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: Text('No products available in this category.'),
+            ),
           )
               : GridView.builder(
             shrinkWrap: true,

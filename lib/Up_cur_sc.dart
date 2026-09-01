@@ -42,9 +42,9 @@ final List<NestedMenuItem> _globalShopItems = const [
   ),
 ];
 
-// ProductGridCard class remains the same as in Wal_Flo_Car.dart...
-
+// ============================================================
 // 1. UPHOLSTERY SECTION
+// ============================================================
 class Upholstery extends StatefulWidget {
   const Upholstery({super.key});
 
@@ -104,11 +104,11 @@ class _UpholsteryAnimatedSectionState extends State<UpholsteryAnimatedSection> {
   bool _isLoading = true;
   List<DecorProductItem> _upholsteryItems = [];
 
-  final List<DecorProductItem> _staticUpholsteryItems = const [
+  final List<DecorProductItem> _staticUpholsteryItems = [
     DecorProductItem(
       title: "Modular Curved Lounge Sofa",
       category: "Upholstery",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkRhQssdHo3-JIMolcjjqkDzYGPBwkZGtfeVvxP1f4ng&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9xpJbTRV0CF8opUBVj4T4-wr6RczL1eFiq1y2T00qyg&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQra5VULvZHxVb2zzQQbY4_fgh_dn4h7NdII0_rZt6Ekw&s=10",
@@ -118,7 +118,7 @@ class _UpholsteryAnimatedSectionState extends State<UpholsteryAnimatedSection> {
     DecorProductItem(
       title: "Floral Printed Sofa",
       category: "Upholstery",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsrdBEmz6tUd8qMklwgczwA3nenU3kBnpIbw2P4c9JLw&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxt-qePejPp7S892nn5fYThdDM8ymS_w1tUwryI8ws3w&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyJxd9-gsvOJ8MHgyg8kUGAq0aynrKmeJ-Lt_lq4Vzmg&s=10",
@@ -128,7 +128,7 @@ class _UpholsteryAnimatedSectionState extends State<UpholsteryAnimatedSection> {
     DecorProductItem(
       title: "Dual-Tone Leatherette Sofa",
       category: "Upholstery",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM5tNTTTWRARJmmYn4V6WJ9rG9Bi6xePOxs-ARGKYLCQ&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHFd8HQjzUx6SQTkzeQ0a4q6NtheUv9uOIorYPp1unsw&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQso9kXxUKdz4bVDJK4HO5rNwOeCgE_B9-RY17j8dFlLA&s",
@@ -147,17 +147,13 @@ class _UpholsteryAnimatedSectionState extends State<UpholsteryAnimatedSection> {
   Future<void> _fetchCategoryProducts() async {
     try {
       final fetched = await ApiService.fetchProductsByCategory("Upholstery");
-
-      if (fetched.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
+      print('Upholstery API fetched: ${fetched.length} items');
 
       final Set<String> seenTitles = <String>{};
       List<DecorProductItem> merged = [];
 
       for (final p in fetched) {
-        final key = p.title.toLowerCase();
+        final key = p.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(p);
           seenTitles.add(key);
@@ -165,7 +161,7 @@ class _UpholsteryAnimatedSectionState extends State<UpholsteryAnimatedSection> {
       }
 
       for (final s in _staticUpholsteryItems) {
-        final key = s.title.toLowerCase();
+        final key = s.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(s);
           seenTitles.add(key);
@@ -173,10 +169,11 @@ class _UpholsteryAnimatedSectionState extends State<UpholsteryAnimatedSection> {
       }
 
       setState(() {
-        _upholsteryItems = merged;
+        _upholsteryItems = merged.isEmpty ? List<DecorProductItem>.from(_staticUpholsteryItems) : merged;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching Upholstery: $e');
       setState(() {
         _isLoading = false;
         _upholsteryItems = List<DecorProductItem>.from(_staticUpholsteryItems);
@@ -197,12 +194,19 @@ class _UpholsteryAnimatedSectionState extends State<UpholsteryAnimatedSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Luxury Upholstery Fabrics & Sofas", style: GoogleFonts.cabin(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
+          Text("Luxury Upholstery Fabrics & Sofas", style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF276B5A))),
           const SizedBox(height: 16),
           _isLoading
               ? const Padding(
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
+          )
+              : _upholsteryItems.isEmpty
+              ? const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: Text('No products available in this category.'),
+            ),
           )
               : GridView.builder(
             shrinkWrap: true,
@@ -224,7 +228,9 @@ class _UpholsteryAnimatedSectionState extends State<UpholsteryAnimatedSection> {
   }
 }
 
+// ============================================================
 // 2. CURTAINS SECTION
+// ============================================================
 class Curtains extends StatefulWidget {
   const Curtains({super.key});
 
@@ -284,11 +290,11 @@ class _CurtainsAnimatedSectionState extends State<CurtainsAnimatedSection> {
   bool _isLoading = true;
   List<DecorProductItem> _curtainItems = [];
 
-  final List<DecorProductItem> _staticCurtainItems = const [
+  final List<DecorProductItem> _staticCurtainItems = [
     DecorProductItem(
       title: "Boho Palm Print & Navy Drapes",
       category: "Curtains",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSTPR_ATqgSAd4j0jqrSkBV7QPLDBe0nVO0twMhFfMtA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSb562mQjYbWcicnMLAEuZdWwTgE0DEQh32_SrnKNxDDg&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDCH0SaeY8vnwbfl9GGu1_FDTMNNpbnck8ikEKeE9H0w&s",
@@ -298,7 +304,7 @@ class _CurtainsAnimatedSectionState extends State<CurtainsAnimatedSection> {
     DecorProductItem(
       title: "Yellow Wildflower Floral Drapes",
       category: "Curtains",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpDTGGEt4ZMcIHTjRk7O-2ItFwf0nEXFF4V6J1atV_Lw&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMmAkaaFiFkf_xHWwDarlvv8Oi0VpRW3tGqSNEvxC9lA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvXcXPFlAZcYSulfyU2WFLZqowL_YDLvPIAfc3nuhwcg&s=10",
@@ -308,7 +314,7 @@ class _CurtainsAnimatedSectionState extends State<CurtainsAnimatedSection> {
     DecorProductItem(
       title: "Royal Blue & Gold Layered Drapes",
       category: "Curtains",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf5xEKHnMqzCP59cosJBE_UavvQHrJOA2nz1KDlqx33g&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbtEWamz6HLoRmkHsFaiXFsS2zyfvg-PJaEp-Zelp1wQ&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSm47Qt0RfK1KJ9QJul4Ig7bvruSMjgMoR78Dw2FhwmRw&s",
@@ -327,17 +333,13 @@ class _CurtainsAnimatedSectionState extends State<CurtainsAnimatedSection> {
   Future<void> _fetchCategoryProducts() async {
     try {
       final fetched = await ApiService.fetchProductsByCategory("Curtains");
-
-      if (fetched.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
+      print('Curtains API fetched: ${fetched.length} items');
 
       final Set<String> seenTitles = <String>{};
       List<DecorProductItem> merged = [];
 
       for (final p in fetched) {
-        final key = p.title.toLowerCase();
+        final key = p.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(p);
           seenTitles.add(key);
@@ -345,7 +347,7 @@ class _CurtainsAnimatedSectionState extends State<CurtainsAnimatedSection> {
       }
 
       for (final s in _staticCurtainItems) {
-        final key = s.title.toLowerCase();
+        final key = s.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(s);
           seenTitles.add(key);
@@ -353,10 +355,11 @@ class _CurtainsAnimatedSectionState extends State<CurtainsAnimatedSection> {
       }
 
       setState(() {
-        _curtainItems = merged;
+        _curtainItems = merged.isEmpty ? List<DecorProductItem>.from(_staticCurtainItems) : merged;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching Curtains: $e');
       setState(() {
         _isLoading = false;
         _curtainItems = List<DecorProductItem>.from(_staticCurtainItems);
@@ -384,6 +387,13 @@ class _CurtainsAnimatedSectionState extends State<CurtainsAnimatedSection> {
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
           )
+              : _curtainItems.isEmpty
+              ? const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: Text('No products available in this category.'),
+            ),
+          )
               : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -404,7 +414,9 @@ class _CurtainsAnimatedSectionState extends State<CurtainsAnimatedSection> {
   }
 }
 
+// ============================================================
 // 3. STRETCH CEILING SECTION
+// ============================================================
 class StretchCeiling extends StatefulWidget {
   const StretchCeiling({super.key});
 
@@ -464,11 +476,11 @@ class _StretchCeilingAnimatedSectionState extends State<StretchCeilingAnimatedSe
   bool _isLoading = true;
   List<DecorProductItem> _stretchCeilingItems = [];
 
-  final List<DecorProductItem> _staticStretchCeilingItems = const [
+  final List<DecorProductItem> _staticStretchCeilingItems = [
     DecorProductItem(
       title: "Glossy Mirror Stretch Ceiling",
       category: "Stretch Ceiling",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDLDPB52KffAPZmuAPuVztlL2jconnP8GXBWCD42hakA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTe_G75vtiXEGL4jyAGPr0ON4xLF6p94YXCqnqBT21kLg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRG_hf8wsx84KsohNAzAjTS52vWElP6fC5O0ef0mSy2w&s=10",
@@ -478,7 +490,7 @@ class _StretchCeilingAnimatedSectionState extends State<StretchCeilingAnimatedSe
     DecorProductItem(
       title: "Multi-Tiered Wooden Stretch Ceiling",
       category: "Stretch Ceiling",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeUctTmuvuv1HtPNyobLOWywyWBRucDCPYqjrJXw2OLA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5zk4uU55L1uOvbnS4IKNoaV12ek1LhhUWrSB7mxxLHg&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAkvNGzoawpID_qsnVBj6rk6xoEYmAUN7DqWiLiEL9Bg&s",
@@ -488,7 +500,7 @@ class _StretchCeilingAnimatedSectionState extends State<StretchCeilingAnimatedSe
     DecorProductItem(
       title: "Sky Print Backlit Stretch Ceiling",
       category: "Stretch Ceiling",
-      imageUrls: [
+      imageUrls: const [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVD6rqC8QjlcD7n4L8Hewldk2ayd2ZaOpgaiL1GL1ajA&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNwNawkBbFVrH6CKOtc1FKIHroTxdDkaYEchvemfHk3Q&s=10",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsk4lqdAT0ovA9K5abcLe7GbfGUbO1g-hmR6l6WS-RFQ&s=10",
@@ -507,17 +519,13 @@ class _StretchCeilingAnimatedSectionState extends State<StretchCeilingAnimatedSe
   Future<void> _fetchCategoryProducts() async {
     try {
       final fetched = await ApiService.fetchProductsByCategory("Stretch Ceiling");
-
-      if (fetched.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
+      print('Stretch Ceiling API fetched: ${fetched.length} items');
 
       final Set<String> seenTitles = <String>{};
       List<DecorProductItem> merged = [];
 
       for (final p in fetched) {
-        final key = p.title.toLowerCase();
+        final key = p.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(p);
           seenTitles.add(key);
@@ -525,7 +533,7 @@ class _StretchCeilingAnimatedSectionState extends State<StretchCeilingAnimatedSe
       }
 
       for (final s in _staticStretchCeilingItems) {
-        final key = s.title.toLowerCase();
+        final key = s.title.toLowerCase().trim();
         if (!seenTitles.contains(key)) {
           merged.add(s);
           seenTitles.add(key);
@@ -533,10 +541,11 @@ class _StretchCeilingAnimatedSectionState extends State<StretchCeilingAnimatedSe
       }
 
       setState(() {
-        _stretchCeilingItems = merged;
+        _stretchCeilingItems = merged.isEmpty ? List<DecorProductItem>.from(_staticStretchCeilingItems) : merged;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching Stretch Ceiling: $e');
       setState(() {
         _isLoading = false;
         _stretchCeilingItems = List<DecorProductItem>.from(_staticStretchCeilingItems);
@@ -563,6 +572,13 @@ class _StretchCeilingAnimatedSectionState extends State<StretchCeilingAnimatedSe
               ? const Padding(
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator()),
+          )
+              : _stretchCeilingItems.isEmpty
+              ? const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: Text('No products available in this category.'),
+            ),
           )
               : GridView.builder(
             shrinkWrap: true,
