@@ -2,13 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:bindu_decor/Nav_Widgets/Navigation.dart';
 import 'Home_Page.dart';
 
 // Base API Server URL definition for path formatting
-const String kBaseServerUrl = "https://yellow-woodpecker-430323.hostingersite.com/bindu_web/";
+const String kBaseServerUrl = "http://192.168.1.48/bindu_decor/";
 
 // Helper to handle absolute HTTP URLs and local server uploads directory paths
 String _resolveImageUrl(String path) {
@@ -189,6 +190,16 @@ class _BlogViewState extends State<BlogView> {
     );
   }
 
+  String _getPlainTextSnippet(String content) {
+    if (content.trim().startsWith('[')) {
+      try {
+        final doc = quill.Document.fromJson(jsonDecode(content));
+        return doc.toPlainText().trim();
+      } catch (_) {}
+    }
+    return content;
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -307,6 +318,7 @@ class _BlogViewState extends State<BlogView> {
   Widget _buildBlogCard(BlogModel blog) {
     final String rawPath = blog.photos.isNotEmpty ? blog.photos.first : '';
     final String resolvedUrl = _resolveImageUrl(rawPath);
+    final String previewSnippet = _getPlainTextSnippet(blog.description);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -374,7 +386,7 @@ class _BlogViewState extends State<BlogView> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        blog.description,
+                        previewSnippet,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 12.5,
                           color: Colors.grey.shade600,
@@ -793,7 +805,8 @@ class _BlogDetailPageState extends State<BlogDetailPage>
                                   "${widget.blog.status} by ",
                                   style: GoogleFonts.plusJakartaSans(
                                       fontSize: 12, color: Colors.grey.shade600),
-                                ), SizedBox(width: 8),
+                                ),
+                                const SizedBox(width: 8),
                                 Text(
                                   widget.blog.authorName,
                                   style: GoogleFonts.aleo(
@@ -806,15 +819,7 @@ class _BlogDetailPageState extends State<BlogDetailPage>
                         const SizedBox(height: 24),
                         _buildImageSection(isDesktop),
                         const SizedBox(height: 28),
-                        Text(
-                          widget.blog.description,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 16,
-                            height: 1.75,
-                            color: const Color(0xFF3C4043),
-                            letterSpacing: 0.2,
-                          ),
-                        ),
+                        QuillDeltaParser(content: widget.blog.description),
                         const SizedBox(height: 40),
                         const Divider(color: Color(0xFFE5E7EB), thickness: 1),
                         const SizedBox(height: 24),
@@ -878,6 +883,88 @@ class _BlogDetailPageState extends State<BlogDetailPage>
             ),
             const BinduFooter(),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// Widget to handle Quill Delta JSON format or legacy plain-text descriptions dynamically
+class QuillDeltaParser extends StatefulWidget {
+  final String content;
+
+  const QuillDeltaParser({super.key, required this.content});
+
+  @override
+  State<QuillDeltaParser> createState() => _QuillDeltaParserState();
+}
+
+class _QuillDeltaParserState extends State<QuillDeltaParser> {
+  late quill.QuillController _controller;
+  bool _isQuillJson = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.content.trim().startsWith('[')) {
+      try {
+        final doc = quill.Document.fromJson(jsonDecode(widget.content));
+        _controller = quill.QuillController(
+          document: doc,
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+        _isQuillJson = true;
+        return;
+      } catch (_) {}
+    }
+
+    _controller = quill.QuillController.basic();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isQuillJson) {
+      return Text(
+        widget.content,
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 16,
+          height: 1.75,
+          color: const Color(0xFF3C4043),
+          letterSpacing: 0.2,
+        ),
+      );
+    }
+
+    return AbsorbPointer(
+      child: quill.QuillEditor(
+        controller: _controller,
+        focusNode: FocusNode(),
+        scrollController: ScrollController(),
+        config: quill.QuillEditorConfig(
+          autoFocus: false,
+          expands: false,
+          padding: EdgeInsets.zero,
+          showCursor: false,
+          customStyles: quill.DefaultStyles(
+            paragraph: quill.DefaultTextBlockStyle(
+              GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                height: 1.75,
+                color: const Color(0xFF3C4043),
+                letterSpacing: 0.2,
+              ),
+              const quill.HorizontalSpacing(0, 0),
+              const quill.VerticalSpacing(0, 0),
+              const quill.VerticalSpacing(0, 0),
+              null,
+            ),
+          ),
         ),
       ),
     );
