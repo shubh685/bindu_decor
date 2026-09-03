@@ -1403,7 +1403,7 @@ Widget _contactForm(BuildContext context) {
 
     final String generatedReqId = 'BD-${DateTime.now().millisecondsSinceEpoch}';
 
-    final Uri apiUrl = Uri.parse('https://yellow-woodpecker-430323.hostingersite.com/bindu_web/send_inquiry.php');
+    final Uri apiUrl = Uri.parse('https://yellow-woodpecker-430323.hostingersite.com/bindu_web/');
 
     try {
       final response = await http

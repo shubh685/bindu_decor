@@ -8,26 +8,29 @@ import 'package:http/http.dart' as http;
 import 'package:bindu_decor/Nav_Widgets/Navigation.dart';
 import 'Home_Page.dart';
 
-// Base API Server URL definition for path formatting
-const String kBaseServerUrl = "http://192.168.1.48/bindu_decor/";
+const String kBaseServerUrl = "https://yellow-woodpecker-430323.hostingersite.com/bindu_web/";
 
-// Helper to handle absolute HTTP URLs and local server uploads directory paths
 String _resolveImageUrl(String path) {
   final cleanPath = path.trim();
   if (cleanPath.isEmpty) return '';
+
   if (cleanPath.startsWith('http://') || cleanPath.startsWith('https://')) {
     return cleanPath;
   }
 
-  // Format local directory uploads paths safely
   String formatted = cleanPath.replaceAll('\\', '/');
   if (formatted.startsWith('/')) {
     formatted = formatted.substring(1);
   }
-  return "$kBaseServerUrl$formatted";
+
+  if (formatted.startsWith('uploads/uploads/')) {
+    formatted = formatted.replaceFirst('uploads/uploads/', 'uploads/');
+  }
+
+  final Uri baseUrl = Uri.parse(kBaseServerUrl);
+  return baseUrl.resolve(formatted).toString();
 }
 
-// Model definition for Blog Items
 class BlogModel {
   final String id;
   final String title;
@@ -51,13 +54,12 @@ class BlogModel {
     List<String> rawPhotos = [];
     if (json['photos'] != null) {
       if (json['photos'] is List) {
-        rawPhotos = List<String>.from(json['photos']);
+        rawPhotos = List<String>.from(json['photos'].map((e) => e.toString()));
       } else if (json['photos'] is String) {
-        // Fallback for single photo URL or JSON-encoded strings
         try {
           final decoded = jsonDecode(json['photos']);
           if (decoded is List) {
-            rawPhotos = List<String>.from(decoded);
+            rawPhotos = List<String>.from(decoded.map((e) => e.toString()));
           } else {
             rawPhotos = [json['photos'].toString()];
           }
@@ -160,10 +162,10 @@ class _BlogViewState extends State<BlogView> {
             ),
           ],
         ),
-        child: Stack(
+        child: const Stack(
           alignment: Alignment.center,
           children: [
-            const SizedBox(
+            SizedBox(
               width: 80,
               height: 80,
               child: CircularProgressIndicator(
@@ -171,19 +173,7 @@ class _BlogViewState extends State<BlogView> {
                 valueColor: AlwaysStoppedAnimation<Color>(LuxuryTheme.primaryAccent),
               ),
             ),
-            ClipOval(
-              child: Image.asset(
-                "assets/images/bindu.png",
-                width: 45,
-                height: 45,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => const Icon(
-                  CupertinoIcons.photo,
-                  size: 28,
-                  color: LuxuryTheme.primaryDark,
-                ),
-              ),
-            ),
+            Icon(CupertinoIcons.doc_text, size: 30, color: LuxuryTheme.primaryDark),
           ],
         ),
       ),
@@ -360,12 +350,14 @@ class _BlogViewState extends State<BlogView> {
                         ? Image.network(
                       resolvedUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          Image.asset("assets/images/bindu.png", fit: BoxFit.cover),
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey.shade200,
+                        child: const Icon(CupertinoIcons.photo, color: Colors.grey),
+                      ),
                     )
-                        : Image.asset(
-                      "assets/images/bindu.png",
-                      fit: BoxFit.cover,
+                        : Container(
+                      color: Colors.grey.shade200,
+                      child: const Icon(CupertinoIcons.photo, color: Colors.grey),
                     ),
                   ),
                 ),
@@ -438,28 +430,17 @@ class _BlogViewState extends State<BlogView> {
   }
 }
 
-// ==========================================
-// AUTO-SCROLLING BLOG DETAIL PAGE WITH CAROUSEL
-// ==========================================
 class BlogDetailPage extends StatefulWidget {
   final BlogModel blog;
 
-  const BlogDetailPage({
-    super.key,
-    required this.blog,
-  });
+  const BlogDetailPage({super.key, required this.blog});
 
   @override
   State<BlogDetailPage> createState() => _BlogDetailPageState();
 }
 
-class _BlogDetailPageState extends State<BlogDetailPage>
-    with SingleTickerProviderStateMixin {
+class _BlogDetailPageState extends State<BlogDetailPage> with SingleTickerProviderStateMixin {
   late PageController _pageController;
-  late AnimationController _animController;
-  late Animation<double> _fadeInAnimation;
-  late Animation<Offset> _slideInAnimation;
-
   int _currentCarouselIndex = 0;
   Timer? _carouselTimer;
 
@@ -467,35 +448,13 @@ class _BlogDetailPageState extends State<BlogDetailPage>
   void initState() {
     super.initState();
     _pageController = PageController();
-
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _fadeInAnimation = CurvedAnimation(
-      parent: _animController,
-      curve: Curves.easeOut,
-    );
-
-    _slideInAnimation = Tween<Offset>(
-      begin: const Offset(0.0, 0.08),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _animController,
-        curve: Curves.easeOutCubic,
-      ),
-    );
-
-    _animController.forward();
     _startAutoCarouselTimer();
   }
 
   void _startAutoCarouselTimer() {
     if (widget.blog.photos.length > 1) {
       _carouselTimer?.cancel();
-      _carouselTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      _carouselTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
         if (_pageController.hasClients) {
           int nextPage = (_currentCarouselIndex + 1) % widget.blog.photos.length;
           _pageController.animateToPage(
@@ -512,210 +471,26 @@ class _BlogDetailPageState extends State<BlogDetailPage>
   void dispose() {
     _carouselTimer?.cancel();
     _pageController.dispose();
-    _animController.dispose();
     super.dispose();
   }
 
   Widget _buildBlogImage(String rawPath) {
     final resolvedUrl = _resolveImageUrl(rawPath);
-
     if (resolvedUrl.isEmpty) {
       return Container(
         color: const Color(0xFFF2F2F2),
-        child: const Center(
-          child: Icon(CupertinoIcons.photo, color: Colors.grey, size: 48),
-        ),
+        child: const Center(child: Icon(CupertinoIcons.photo, color: Colors.grey, size: 48)),
       );
     }
 
-    if (resolvedUrl.startsWith("http://") || resolvedUrl.startsWith("https://")) {
-      return Image.network(
-        resolvedUrl,
-        fit: BoxFit.cover,
-        width: double.infinity,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            color: const Color(0xFFF8F9FA),
-            child: const Center(
-              child: SizedBox(
-                width: 28,
-                height: 28,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF276B5A)),
-                ),
-              ),
-            ),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) => Container(
-          color: const Color(0xFFF2F2F2),
-          child: const Center(
-            child: Icon(CupertinoIcons.photo, color: Colors.grey, size: 48),
-          ),
-        ),
-      );
-    }
-
-    return Image.asset(
-      rawPath,
+    return Image.network(
+      resolvedUrl,
       fit: BoxFit.cover,
       width: double.infinity,
       errorBuilder: (context, error, stackTrace) => Container(
         color: const Color(0xFFF2F2F2),
-        child: const Center(
-          child: Icon(CupertinoIcons.photo, color: Colors.grey, size: 48),
-        ),
+        child: const Center(child: Icon(CupertinoIcons.photo, color: Colors.grey, size: 48)),
       ),
-    );
-  }
-
-  Widget _buildImageSection(bool isDesktop) {
-    final List<String> photos = widget.blog.photos;
-
-    if (photos.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    if (photos.length == 1) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          height: isDesktop ? 450 : 320,
-          width: double.infinity,
-          decoration: const BoxDecoration(color: Color(0xFFF5F5F5)),
-          child: _buildBlogImage(photos.first),
-        ),
-      );
-    }
-
-    return Column(
-      children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: SizedBox(
-                height: isDesktop ? 450 : 320,
-                width: double.infinity,
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: photos.length,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentCarouselIndex = index;
-                    });
-                  },
-                  itemBuilder: (context, index) {
-                    return _buildBlogImage(photos[index]);
-                  },
-                ),
-              ),
-            ),
-            Positioned(
-              left: 12,
-              child: CircleAvatar(
-                backgroundColor: Colors.white.withOpacity(0.85),
-                radius: 20,
-                child: IconButton(
-                  icon: const Icon(Icons.chevron_left, color: Colors.black87, size: 22),
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    int prevPage = (_currentCarouselIndex - 1 + photos.length) % photos.length;
-                    _pageController.animateToPage(
-                      prevPage,
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeInOut,
-                    );
-                    _startAutoCarouselTimer();
-                  },
-                ),
-              ),
-            ),
-            Positioned(
-              right: 12,
-              child: CircleAvatar(
-                backgroundColor: Colors.white.withOpacity(0.85),
-                radius: 20,
-                child: IconButton(
-                  icon: const Icon(Icons.chevron_right, color: Colors.black87, size: 22),
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    int nextPage = (_currentCarouselIndex + 1) % photos.length;
-                    _pageController.animateToPage(
-                      nextPage,
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeInOut,
-                    );
-                    _startAutoCarouselTimer();
-                  },
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 12,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(photos.length, (index) {
-                  final bool isSelected = index == _currentCarouselIndex;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: isSelected ? 22 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  );
-                }),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 14),
-        SizedBox(
-          height: 60,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: photos.length,
-            itemBuilder: (context, index) {
-              final isSelected = index == _currentCarouselIndex;
-              return GestureDetector(
-                onTap: () {
-                  _pageController.animateToPage(
-                    index,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                  _startAutoCarouselTimer();
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  margin: const EdgeInsets.only(right: 10),
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFF1A73E8)
-                          : Colors.transparent,
-                      width: 2.5,
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: _buildBlogImage(photos[index]),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 
@@ -729,14 +504,12 @@ class _BlogDetailPageState extends State<BlogDetailPage>
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
             Center(
@@ -746,225 +519,43 @@ class _BlogDetailPageState extends State<BlogDetailPage>
                   horizontal: isDesktop ? 24.0 : 18.0,
                   vertical: 20.0,
                 ),
-                child: FadeTransition(
-                  opacity: _fadeInAnimation,
-                  child: SlideTransition(
-                    position: _slideInAnimation,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFE8F0FE),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(
-                            widget.blog.subject.toUpperCase(),
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF1A73E8),
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          widget.blog.title,
-                          style: GoogleFonts.cormorantGaramond(
-                            fontSize: isDesktop ? 36 : 28,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF202124),
-                            height: 1.25,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 20,
-                              backgroundColor: const Color(0xFF276B5A),
-                              child: Text(
-                                widget.blog.authorName.isNotEmpty
-                                    ? widget.blog.authorName[0].toUpperCase()
-                                    : "B",
-                                style: GoogleFonts.plusJakartaSans(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 2),
-                                Text(
-                                  "${widget.blog.status} by ",
-                                  style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 12, color: Colors.grey.shade600),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  widget.blog.authorName,
-                                  style: GoogleFonts.aleo(
-                                      fontSize: 15, fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        _buildImageSection(isDesktop),
-                        const SizedBox(height: 28),
-                        QuillDeltaParser(content: widget.blog.description),
-                        const SizedBox(height: 40),
-                        const Divider(color: Color(0xFFE5E7EB), thickness: 1),
-                        const SizedBox(height: 24),
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8F9FA),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.grey.shade200),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(CupertinoIcons.chat_bubble_2_fill,
-                                  color: Color(0xFF276B5A), size: 32),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Have questions about this article?",
-                                      style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: const Color(0xFF202124)),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      "Get in touch with our design specialists.",
-                                      style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 12,
-                                          color: Colors.grey.shade600),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF276B5A),
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                onPressed: () => showContactFormDialog(context),
-                                child: Text("Contact Us",
-                                    style: GoogleFonts.plusJakartaSans(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-                      ],
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.blog.title,
+                      style: GoogleFonts.cormorantGaramond(
+                        fontSize: isDesktop ? 36 : 28,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF202124),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 20),
+                    if (widget.blog.photos.isNotEmpty)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: SizedBox(
+                          height: isDesktop ? 450 : 320,
+                          width: double.infinity,
+                          child: PageView.builder(
+                            controller: _pageController,
+                            itemCount: widget.blog.photos.length,
+                            onPageChanged: (idx) => setState(() => _currentCarouselIndex = idx),
+                            itemBuilder: (context, index) => _buildBlogImage(widget.blog.photos[index]),
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 28),
+                    Text(
+                      widget.blog.description,
+                      style: GoogleFonts.plusJakartaSans(fontSize: 16, height: 1.75),
+                    ),
+                  ],
                 ),
               ),
             ),
             const BinduFooter(),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// Widget to handle Quill Delta JSON format or legacy plain-text descriptions dynamically
-class QuillDeltaParser extends StatefulWidget {
-  final String content;
-
-  const QuillDeltaParser({super.key, required this.content});
-
-  @override
-  State<QuillDeltaParser> createState() => _QuillDeltaParserState();
-}
-
-class _QuillDeltaParserState extends State<QuillDeltaParser> {
-  late quill.QuillController _controller;
-  bool _isQuillJson = false;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.content.trim().startsWith('[')) {
-      try {
-        final doc = quill.Document.fromJson(jsonDecode(widget.content));
-        _controller = quill.QuillController(
-          document: doc,
-          selection: const TextSelection.collapsed(offset: 0),
-        );
-        _isQuillJson = true;
-        return;
-      } catch (_) {}
-    }
-
-    _controller = quill.QuillController.basic();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_isQuillJson) {
-      return Text(
-        widget.content,
-        style: GoogleFonts.plusJakartaSans(
-          fontSize: 16,
-          height: 1.75,
-          color: const Color(0xFF3C4043),
-          letterSpacing: 0.2,
-        ),
-      );
-    }
-
-    return AbsorbPointer(
-      child: quill.QuillEditor(
-        controller: _controller,
-        focusNode: FocusNode(),
-        scrollController: ScrollController(),
-        config: quill.QuillEditorConfig(
-          autoFocus: false,
-          expands: false,
-          padding: EdgeInsets.zero,
-          showCursor: false,
-          customStyles: quill.DefaultStyles(
-            paragraph: quill.DefaultTextBlockStyle(
-              GoogleFonts.plusJakartaSans(
-                fontSize: 16,
-                height: 1.75,
-                color: const Color(0xFF3C4043),
-                letterSpacing: 0.2,
-              ),
-              const quill.HorizontalSpacing(0, 0),
-              const quill.VerticalSpacing(0, 0),
-              const quill.VerticalSpacing(0, 0),
-              null,
-            ),
-          ),
         ),
       ),
     );
