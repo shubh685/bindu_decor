@@ -8,7 +8,7 @@ import 'package:visibility_detector/visibility_detector.dart';
 import 'Home_Page.dart';
 import 'Nav_Widgets/Navigation.dart';
 
-const String kBaseServerUrl = "https://yellow-woodpecker-430323.hostingersite.com/bindu_web/";
+const String kBaseServerUrl = "https://yellow-woodpecker-430323.hostingersite.com/bindu_decor_web/";
 
 class Clients extends StatefulWidget {
   const Clients({super.key});
