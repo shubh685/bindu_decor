@@ -1,6 +1,5 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../Pro_Details.dart';
+import 'package:http/http.dart' as http;import '../Pro_Details.dart';
 
 class ApiService {
   static const String baseUrl = "https://yellow-woodpecker-430323.hostingersite.com/bindu_web/";
